@@ -1,0 +1,21 @@
+/* Login page background */
+.login-bg {
+  background: linear-gradient(145deg, #eef2ff, #f0f9ff);
+}
+
+/* Feedback messages (login) */
+.feedback.error {
+  color: #991b1b;
+  background: #fee2e2;
+  border-radius: 8px;
+  padding: 10px 12px;
+  font-size: 0.9rem;
+}
+
+.feedback.success {
+  color: #065f46;
+  background: #d1fae5;
+  border-radius: 8px;
+  padding: 10px 12px;
+  font-size: 0.9rem;
+}

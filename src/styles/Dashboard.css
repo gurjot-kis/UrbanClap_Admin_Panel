@@ -1,0 +1,501 @@
+/* ── Sidebar (Bootstrap cannot do themed dark nav sidebar) ── */
+.db-sidebar {
+  width: 210px;
+  background: #1b3a5c;
+  color: #fff;
+}
+
+.db-avatar {
+  width: 76px;
+  height: 76px;
+  border-radius: 50%;
+  overflow: hidden;
+  border: 3px solid rgba(255, 255, 255, 0.18);
+}
+
+.db-avatar svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.db-nav-btn {
+  background: none;
+  color: rgba(255, 255, 255, 0.62);
+  font-size: 0.87rem;
+  cursor: pointer;
+  transition: background 0.18s, color 0.18s;
+}
+
+.db-nav-btn:hover,
+.db-nav-btn.active {
+  background: rgba(255, 255, 255, 0.1);
+  color: #fff;
+}
+
+.nav-icon {
+  width: 18px;
+  height: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+/* ── Stat card dollar badge ── */
+.stat-badge {
+  width: 26px;
+  height: 26px;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.8rem;
+  font-weight: 700;
+}
+
+/* ── Orange "Check Now" button (custom brand color) ── */
+.btn-check-orange {
+  background: #f5a623;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  transition: background 0.18s;
+}
+
+.btn-check-orange:hover {
+  background: #e09515;
+  color: #fff;
+}
+
+/* ── Legend dots ── */
+.leg-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 2px;
+  display: inline-block;
+  flex-shrink: 0;
+}
+
+.navy-dot  { background: #1b3a5c; }
+.orange-dot { background: #f5a623; }
+
+/* ── Donut centre label ── */
+.donut-ring-wrap {
+  position: relative;
+  width: 130px;
+  height: 130px;
+  flex-shrink: 0;
+}
+
+.donut-pct {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #1b3a5c;
+  pointer-events: none;
+}
+
+/* ── Mini Calendar ── */
+.mini-cal { width: 100%; }
+
+.cal-month {
+  margin: 0 0 10px;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: #374151;
+  text-align: center;
+}
+
+.cal-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 2px;
+  text-align: center;
+}
+
+.cal-head {
+  font-size: 0.68rem;
+  font-weight: 600;
+  color: #9ca3af;
+  padding: 3px 0;
+}
+
+.cal-cell {
+  font-size: 0.73rem;
+  color: #4b5563;
+  padding: 3px 1px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 22px;
+  border-radius: 50%;
+  cursor: default;
+}
+
+.cal-today {
+  background: #1b3a5c;
+  color: #fff;
+  font-weight: 700;
+  border-radius: 50%;
+  width: 22px;
+  height: 22px;
+  margin: 0 auto;
+}
+
+.cal-empty {
+  color: transparent;
+  pointer-events: none;
+}
+
+/* ── Category table ── */
+.cat-table thead th {
+  background: #f8f9fb;
+  font-size: 0.78rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #6b7280;
+  border-bottom: 2px solid #e5e7eb;
+  padding: 10px 14px;
+}
+
+.cat-table tbody td {
+  font-size: 0.875rem;
+  color: #374151;
+  padding: 10px 14px;
+  border-bottom: 1px solid #f3f4f6;
+}
+
+.cat-table tbody tr:hover td {
+  background: #f8faff;
+}
+
+.cat-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.cat-desc-cell {
+  max-width: 280px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Action buttons */
+.cat-btn-edit {
+  background: #eef4ff;
+  color: #1b3a5c;
+  border: none;
+  border-radius: 6px;
+  padding: 4px 8px;
+  transition: background 0.18s;
+}
+
+.cat-btn-edit:hover {
+  background: #d1e3ff;
+  color: #1b3a5c;
+}
+
+.cat-btn-delete {
+  background: #fff0f0;
+  color: #dc3545;
+  border: none;
+  border-radius: 6px;
+  padding: 4px 8px;
+  transition: background 0.18s;
+}
+
+.cat-btn-delete:hover {
+  background: #ffd6d6;
+  color: #dc3545;
+}
+
+/* Search input */
+.cat-search-wrap {
+  position: relative;
+  width: 220px;
+}
+
+.cat-search-icon {
+  position: absolute;
+  left: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #9ca3af;
+  pointer-events: none;
+  display: flex;
+}
+
+.cat-search-input {
+  padding-left: 32px;
+  border-radius: 8px;
+  border-color: #e5e7eb;
+  font-size: 0.85rem;
+}
+
+.cat-search-input:focus {
+  border-color: #1b3a5c;
+  box-shadow: 0 0 0 0.2rem rgba(27, 58, 92, 0.12);
+}
+
+/* Page size select */
+.cat-page-select {
+  width: auto;
+  min-width: 66px;
+  font-size: 0.85rem;
+  border-color: #e5e7eb;
+  border-radius: 8px;
+}
+
+/* Pagination */
+.cat-pagination .page-link {
+  color: #1b3a5c;
+  border-color: #e5e7eb;
+  font-size: 0.82rem;
+  padding: 4px 10px;
+}
+
+.cat-pagination .page-item.active .page-link {
+  background: #1b3a5c;
+  border-color: #1b3a5c;
+  color: #fff;
+}
+
+.cat-pagination .page-item:not(.active) .page-link:hover {
+  background: #eef4ff;
+  color: #1b3a5c;
+}
+
+/* Loading / error state */
+.cat-state {
+  min-height: 200px;
+}
+
+/* ── Edit modal ── */
+.edit-modal {
+  width: 100%;
+  max-width: 420px;
+  animation: subcat-slide-in 0.2s ease;
+  overflow: hidden;
+}
+
+.edit-modal-input {
+  border-color: #e5e7eb;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  padding: 9px 12px;
+  transition: border-color 0.18s, box-shadow 0.18s;
+}
+
+.edit-modal-input:focus {
+  border-color: #1b3a5c;
+  box-shadow: 0 0 0 0.2rem rgba(27, 58, 92, 0.12);
+}
+
+.edit-modal-textarea {
+  resize: vertical;
+  min-height: 80px;
+}
+
+.edit-modal-save-btn {
+  background: #1b3a5c;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  transition: background 0.18s;
+}
+
+.edit-modal-save-btn:hover:not(:disabled) {
+  background: #14304e;
+  color: #fff;
+}
+
+.edit-modal-save-btn:disabled {
+  opacity: 0.65;
+}
+
+.edit-modal-success-icon {
+  width: 52px;
+  height: 52px;
+  background: #d1fae5;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #198754;
+}
+
+/* ── Back button in top bar ── */
+.subcat-back-btn {
+  background: #f3f4f6;
+  border: none;
+  border-radius: 8px;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #374151;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+  flex-shrink: 0;
+}
+
+.subcat-back-btn:hover {
+  background: #e5e7eb;
+  color: #111827;
+}
+
+/* ── Delete confirm modal ── */
+.delete-modal {
+  width: 100%;
+  max-width: 420px;
+  animation: subcat-slide-in 0.2s ease;
+  overflow: hidden;
+}
+
+.delete-modal-warn-icon {
+  width: 40px;
+  height: 40px;
+  background: #fff3cd;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #c77700;
+  flex-shrink: 0;
+}
+
+.delete-modal-confirm-btn {
+  background: #dc3545;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  transition: background 0.18s;
+}
+
+.delete-modal-confirm-btn:hover:not(:disabled) {
+  background: #bb2d3b;
+  color: #fff;
+}
+
+.delete-modal-confirm-btn:disabled {
+  opacity: 0.65;
+}
+
+/* ── Add button in toolbar ── */
+.cat-btn-add {
+  background: #1b3a5c;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  font-size: 0.82rem;
+  font-weight: 600;
+  padding: 6px 14px;
+  display: flex;
+  align-items: center;
+  white-space: nowrap;
+  transition: background 0.18s;
+}
+
+.cat-btn-add:hover {
+  background: #14304e;
+  color: #fff;
+}
+
+/* ── View (eye) action button ── */
+.cat-btn-view {
+  background: #f0faf4;
+  color: #198754;
+  border: none;
+  border-radius: 6px;
+  padding: 4px 8px;
+  transition: background 0.18s;
+}
+
+.cat-btn-view:hover {
+  background: #c9f0d8;
+  color: #198754;
+}
+
+/* ── Sub-category modal backdrop ── */
+.subcat-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 30, 50, 0.55);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1050;
+  padding: 16px;
+  backdrop-filter: blur(2px);
+  animation: subcat-fade-in 0.18s ease;
+}
+
+@keyframes subcat-fade-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+/* ── Sub-category modal card ── */
+.subcat-modal {
+  width: 100%;
+  max-width: 680px;
+  max-height: 85vh;
+  display: flex;
+  flex-direction: column;
+  animation: subcat-slide-in 0.2s ease;
+  overflow: hidden;
+}
+
+@keyframes subcat-slide-in {
+  from { opacity: 0; transform: translateY(-18px) scale(0.98); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+/* ── Modal header ── */
+.subcat-modal-header {
+  border-bottom: 1px solid #e5e7eb;
+  flex-shrink: 0;
+  background: #fff;
+}
+
+/* ── Modal body (scrollable) ── */
+.subcat-modal-body {
+  overflow-y: auto;
+  flex: 1;
+  background: #fff;
+}
+
+/* ── Close button ── */
+.subcat-close-btn {
+  background: #f3f4f6;
+  border: none;
+  border-radius: 8px;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #6b7280;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+  flex-shrink: 0;
+}
+
+.subcat-close-btn:hover {
+  background: #e5e7eb;
+  color: #111827;
+}
