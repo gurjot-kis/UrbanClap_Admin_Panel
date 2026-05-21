@@ -5,26 +5,31 @@ import { clearAuthSession, getStoredToken, getStoredUser } from '../utils/auth'
 import Sidebar from '../components/Sidebar'
 import '../styles/Dashboard.css'
 
-interface UserResponse {
-  fullName?: string
+const VENDORS_API = '/api/vendor/vendors'
+
+interface VendorResponse {
+  name?: string
+  code?: string
   email?: string
   phone?: string
   address?: string
+  gst_number?: string
   status?: number
   [key: string]: unknown
 }
 
-function EditUserPage() {
+function EditVendorPage() {
   const navigate = useNavigate()
-  const { userId } = useParams<{ userId: string }>()
+  const { vendorId } = useParams<{ vendorId: string }>()
   const token = getStoredToken()
   const user = getStoredUser()
 
-  const [fullName, setFullName] = useState('')
+  const [name, setName] = useState('')
+  const [code, setCode] = useState('')
   const [email, setEmail] = useState('')
-  const [password, setPassword] = useState('')
   const [phone, setPhone] = useState('')
   const [address, setAddress] = useState('')
+  const [gstNumber, setGstNumber] = useState('')
   const [status, setStatus] = useState<0 | 1>(1)
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
@@ -39,61 +44,57 @@ function EditUserPage() {
     navigate('/login', { replace: true })
   }
 
-  const fetchUser = useCallback(async () => {
-    if (!userId) return
+  const fetchVendor = useCallback(async () => {
+    if (!vendorId) return
     setLoading(true)
     setError(null)
     try {
-      const res = await fetch(`/api/users/${userId}`, {
+      const res = await fetch(`${VENDORS_API}/${vendorId}`, {
         headers: { Authorization: `Bearer ${token}` },
       })
       if (!res.ok) throw new Error(`Server error: ${res.status}`)
       const json = await res.json()
-      const item: UserResponse = json?.data ?? json
-      setFullName(String(item.fullName ?? ''))
+      const item: VendorResponse = json?.data ?? json
+      setName(String(item.name ?? ''))
+      setCode(String(item.code ?? ''))
       setEmail(String(item.email ?? ''))
       setPhone(String(item.phone ?? ''))
       setAddress(String(item.address ?? ''))
+      setGstNumber(String(item.gst_number ?? ''))
       setStatus(Number(item.status) === 0 ? 0 : 1)
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to load user')
+      setError(err instanceof Error ? err.message : 'Failed to load vendor')
     } finally {
       setLoading(false)
     }
-  }, [token, userId])
+  }, [token, vendorId])
 
   useEffect(() => {
-    fetchUser()
-  }, [fetchUser])
+    fetchVendor()
+  }, [fetchVendor])
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault()
-    if (!userId) return
-    if (!fullName.trim() || !email.trim()) {
-      setError('Full name and email are required')
+    if (!vendorId) return
+    if (!name.trim() || !email.trim()) {
+      setError('Name and email are required')
       return
     }
 
     setSaving(true)
     setError(null)
     try {
-      const payload: {
-        fullName: string
-        email: string
-        phone: string
-        address: string
-        status: 0 | 1
-        password?: string
-      } = {
-        fullName: fullName.trim(),
+      const payload = {
+        name: name.trim(),
+        code: code.trim(),
         email: email.trim(),
         phone: phone.trim(),
         address: address.trim(),
+        gst_number: gstNumber.trim(),
         status,
       }
-      if (password.trim()) payload.password = password.trim()
 
-      const res = await fetch(`/api/users/${userId}`, {
+      const res = await fetch(`${VENDORS_API}/${vendorId}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -102,9 +103,9 @@ function EditUserPage() {
         body: JSON.stringify(payload),
       })
       if (!res.ok) throw new Error(`Server error: ${res.status}`)
-      navigate('/users')
+      navigate('/vendors')
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to update user')
+      setError(err instanceof Error ? err.message : 'Failed to update vendor')
     } finally {
       setSaving(false)
     }
@@ -116,12 +117,12 @@ function EditUserPage() {
       <div className="d-flex flex-column flex-grow-1 min-w-0">
         <header className="d-flex align-items-center justify-content-between px-4 py-3 bg-white shadow-sm">
           <div className="d-flex align-items-center gap-2">
-            <button type="button" className="subcat-back-btn" onClick={() => navigate('/users')} title="Back to Users">
+            <button type="button" className="subcat-back-btn" onClick={() => navigate('/vendors')} title="Back to Vendors">
               <svg viewBox="0 0 24 24" fill="currentColor" width="16" height="16">
                 <path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z" />
               </svg>
             </button>
-            <h6 className="mb-0 fw-semibold text-dark">Edit User</h6>
+            <h6 className="mb-0 fw-semibold text-dark">Edit Vendor</h6>
           </div>
           <button type="button" className="btn btn-danger btn-sm px-3 fw-semibold" onClick={handleLogout}>
             Logout
@@ -136,20 +137,32 @@ function EditUserPage() {
                   <div className="spinner-border text-primary" style={{ width: '2rem', height: '2rem' }} role="status">
                     <span className="visually-hidden">Loading...</span>
                   </div>
-                  <span className="text-muted small">Loading user details...</span>
+                  <span className="text-muted small">Loading vendor details...</span>
                 </div>
               ) : (
                 <form onSubmit={handleSubmit} className="d-flex flex-column gap-3">
-                  <div>
-                    <label className="form-label fw-semibold mb-1">Full Name</label>
-                    <input
-                      className="form-control edit-modal-input"
-                      value={fullName}
-                      onChange={(e) => setFullName(e.target.value)}
-                      placeholder="Enter full name"
-                      maxLength={120}
-                      required
-                    />
+                  <div className="row g-3">
+                    <div className="col-md-6">
+                      <label className="form-label fw-semibold mb-1">Name</label>
+                      <input
+                        className="form-control edit-modal-input"
+                        value={name}
+                        onChange={(e) => setName(e.target.value)}
+                        placeholder="Enter vendor name"
+                        maxLength={120}
+                        required
+                      />
+                    </div>
+                    <div className="col-md-6">
+                      <label className="form-label fw-semibold mb-1">Code</label>
+                      <input
+                        className="form-control edit-modal-input"
+                        value={code}
+                        onChange={(e) => setCode(e.target.value)}
+                        placeholder="Unique vendor code"
+                        maxLength={50}
+                      />
+                    </div>
                   </div>
 
                   <div>
@@ -165,24 +178,23 @@ function EditUserPage() {
                   </div>
 
                   <div>
-                    <label className="form-label fw-semibold mb-1">Password</label>
-                    <input
-                      type="password"
-                      className="form-control edit-modal-input"
-                      value={password}
-                      onChange={(e) => setPassword(e.target.value)}
-                      placeholder="Keep blank to keep existing password"
-                      minLength={6}
-                    />
-                  </div>
-
-                  <div>
                     <label className="form-label fw-semibold mb-1">Phone</label>
                     <input
                       className="form-control edit-modal-input"
                       value={phone}
                       onChange={(e) => setPhone(e.target.value)}
                       placeholder="Enter phone number"
+                      maxLength={20}
+                    />
+                  </div>
+
+                  <div>
+                    <label className="form-label fw-semibold mb-1">GST Number</label>
+                    <input
+                      className="form-control edit-modal-input"
+                      value={gstNumber}
+                      onChange={(e) => setGstNumber(e.target.value)}
+                      placeholder="Enter GST number"
                       maxLength={20}
                     />
                   </div>
@@ -213,11 +225,11 @@ function EditUserPage() {
                   {error && <p className="text-danger small mb-0">{error}</p>}
 
                   <div className="d-flex justify-content-end gap-2 pt-2">
-                    <button type="button" className="btn btn-light border" onClick={() => navigate('/users')} disabled={saving}>
+                    <button type="button" className="btn btn-light border" onClick={() => navigate('/vendors')} disabled={saving}>
                       Cancel
                     </button>
                     <button type="submit" className="btn edit-modal-save-btn px-3" disabled={saving}>
-                      {saving ? 'Updating...' : 'Update User'}
+                      {saving ? 'Updating...' : 'Update Vendor'}
                     </button>
                   </div>
                 </form>
@@ -230,4 +242,4 @@ function EditUserPage() {
   )
 }
 
-export default EditUserPage
+export default EditVendorPage

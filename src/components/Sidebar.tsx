@@ -15,6 +15,17 @@ const NAV_ITEMS = [
     ),
   },
   {
+    id: 'Vendors',
+    label: 'Vendors',
+    path: '/vendors',
+    activePaths: ['/vendors'],
+    icon: (
+      <svg viewBox="0 0 24 24" fill="currentColor" width="16" height="16">
+        <path d="M12 7V3H2v18h20V7H12zM6 19H4v-2h2v2zm0-4H4v-2h2v2zm0-4H4V9h2v2zm0-4H4V5h2v2zm4 12H8v-2h2v2zm0-4H8v-2h2v2zm0-4H8V9h2v2zm0-4H8V5h2v2zm10 12h-8v-2h2v-2h-2v-2h2v-2h-2V9h8v10zm-2-8h-2v2h2v-2zm0 4h-2v2h2v-2z" />
+      </svg>
+    ),
+  },
+  {
     id: 'Users',
     label: 'Users',
     path: '/users',
@@ -55,6 +66,28 @@ const NAV_ITEMS = [
     icon: (
       <svg viewBox="0 0 24 24" fill="currentColor" width="16" height="16">
         <path d="M21 16V8c0-.88-.48-1.69-1.25-2.08l-7-4a2.5 2.5 0 0 0-2.5 0l-7 4A2.34 2.34 0 0 0 2 8v8c0 .88.48 1.69 1.25 2.08l7 4c.38.2.81.3 1.25.3s.87-.1 1.25-.3l7-4A2.34 2.34 0 0 0 21 16zm-9 3.15-6-3.43V9.38l6 3.43v6.34zm1-8.07-6.04-3.45L13 4.18l6.04 3.45L13 11.08z" />
+      </svg>
+    ),
+  },
+  {
+    id: 'Banners',
+    label: 'Banners',
+    path: '/banners',
+    activePaths: ['/banners'],
+    icon: (
+      <svg viewBox="0 0 24 24" fill="currentColor" width="16" height="16">
+        <path d="M21 3H3c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h18c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H3V5h18v14zM9 7h6v2H9V7zm0 4h6v2H9v-2zm0 4h4v2H9v-2z" />
+      </svg>
+    ),
+  },
+  {
+    id: 'CartSettings',
+    label: 'Cart Settings',
+    path: '/cart-settings',
+    activePaths: ['/cart-settings'],
+    icon: (
+      <svg viewBox="0 0 24 24" fill="currentColor" width="16" height="16">
+        <path d="M7 18c-1.1 0-1.99.9-1.99 2S5.9 22 7 22s2-.9 2-2-.9-2-2-2zM1 2v2h2l3.6 7.59-1.35 2.45c-.16.28-.25.61-.25.96 0 1.1.9 2 2 2h12v-2H7.42c-.14 0-.25-.11-.25-.25l.03-.12.9-1.63h7.45c.75 0 1.41-.41 1.75-1.03l3.58-6.49A1 1 0 0 0 20 5H5.21l-.94-2H1zm16 16c-1.1 0-1.99.9-1.99 2s.89 2 1.99 2 2-.9 2-2-.9-2-2-2z" />
       </svg>
     ),
   },

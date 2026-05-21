@@ -1,30 +1,42 @@
-import React, { useCallback, useEffect, useRef, useState } from 'react'
+import React, { useState, useEffect, useCallback, useRef } from 'react'
 import { Navigate, useNavigate } from 'react-router-dom'
 import { clearAuthSession, getStoredToken, getStoredUser } from '../utils/auth'
 import Sidebar from '../components/Sidebar'
+import AddBannerModal from '../components/AddBannerModal'
+import EditBannerModal from '../components/EditBannerModal'
 import DeleteConfirmModal from '../components/DeleteConfirmModal'
+import { resolveMediaUrl } from '../config/api'
 import '../styles/Dashboard.css'
 
-interface UserItem {
+interface Banner {
   id?: string
-  user_id?: string
-  fullName?: string
-  email?: string
-  phone?: string
-  address?: string
+  banner_id?: string
+  title?: string
+  description?: string
+  banner_image?: string
+  order_url?: string
+  orderUrl?: string
+  status?: number
   [key: string]: unknown
 }
 
 const PAGE_SIZE_OPTIONS = [10, 25, 50]
 
-const getUserId = (user: UserItem): string => String(user.id ?? user.user_id ?? '')
+function bannerRowId(b: Banner): string {
+  return String(b.banner_id ?? b.id ?? '')
+}
 
-function UserListPage() {
+function bannerStatus(b: Banner): 0 | 1 {
+  const s = Number(b.status)
+  return s === 0 ? 0 : 1
+}
+
+function BannerPage() {
   const navigate = useNavigate()
   const token = getStoredToken()
   const user = getStoredUser()
 
-  const [users, setUsers] = useState<UserItem[]>([])
+  const [banners, setBanners] = useState<Banner[]>([])
   const [total, setTotal] = useState(0)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -32,7 +44,9 @@ function UserListPage() {
   const [debouncedSearch, setDebouncedSearch] = useState('')
   const [page, setPage] = useState(1)
   const [pageSize, setPageSize] = useState(10)
-  const [deleting, setDeleting] = useState<{ id: string; name: string } | null>(null)
+  const [showAddModal, setShowAddModal] = useState(false)
+  const [editing, setEditing] = useState<Banner | null>(null)
+  const [deleting, setDeleting] = useState<{ id: string; title: string } | null>(null)
   const debounceTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
 
   if (!token || !user) {
@@ -48,7 +62,12 @@ function UserListPage() {
     }, 400)
   }
 
-  const fetchUsers = useCallback(async () => {
+  const handlePageSize = (val: number) => {
+    setPageSize(val)
+    setPage(1)
+  }
+
+  const fetchBanners = useCallback(async () => {
     setLoading(true)
     setError(null)
     try {
@@ -58,28 +77,28 @@ function UserListPage() {
       })
       if (debouncedSearch.trim()) params.set('search', debouncedSearch.trim())
 
-      const res = await fetch(`/api/users?${params}`, {
+      const res = await fetch(`/api/banners?${params}`, {
         headers: { Authorization: `Bearer ${token}` },
       })
       if (!res.ok) throw new Error(`Server error: ${res.status}`)
       const json = await res.json()
 
-      const items: UserItem[] = Array.isArray(json) ? json : (json.data ?? [])
+      const items: Banner[] = Array.isArray(json) ? json : (json.data ?? [])
       const serverTotal: number =
         json.total ?? json.meta?.total ?? json.pagination?.total ?? items.length
 
-      setUsers(items)
+      setBanners(items)
       setTotal(serverTotal)
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to load users')
+      setError(err instanceof Error ? err.message : 'Failed to load banners')
     } finally {
       setLoading(false)
     }
-  }, [debouncedSearch, page, pageSize, token])
+  }, [page, pageSize, debouncedSearch, token])
 
   useEffect(() => {
-    fetchUsers()
-  }, [fetchUsers])
+    fetchBanners()
+  }, [fetchBanners])
 
   const handleLogout = () => {
     clearAuthSession()
@@ -99,7 +118,7 @@ function UserListPage() {
 
       <div className="d-flex flex-column flex-grow-1 min-w-0">
         <header className="d-flex align-items-center justify-content-between px-4 py-3 bg-white shadow-sm">
-          <h6 className="mb-0 fw-semibold text-dark">Users</h6>
+          <h6 className="mb-0 fw-semibold text-dark">Banners</h6>
           <button type="button" className="btn btn-danger btn-sm px-3 fw-semibold" onClick={handleLogout}>
             Logout
           </button>
@@ -108,16 +127,14 @@ function UserListPage() {
         <div className="p-4 d-flex flex-column gap-3 flex-grow-1">
           <div className="card border-0 rounded-3 shadow-sm">
             <div className="card-body p-4">
+
               <div className="d-flex flex-wrap align-items-center justify-content-between gap-3 mb-4">
                 <div className="d-flex align-items-center gap-2">
                   <label className="text-muted small mb-0">Show</label>
                   <select
                     className="form-select form-select-sm cat-page-select"
                     value={pageSize}
-                    onChange={(e) => {
-                      setPageSize(Number(e.target.value))
-                      setPage(1)
-                    }}
+                    onChange={(e) => handlePageSize(Number(e.target.value))}
                   >
                     {PAGE_SIZE_OPTIONS.map((n) => (
                       <option key={n} value={n}>{n}</option>
@@ -130,12 +147,12 @@ function UserListPage() {
                   <button
                     type="button"
                     className="btn btn-sm cat-btn-add"
-                    onClick={() => navigate('/users/new')}
+                    onClick={() => setShowAddModal(true)}
                   >
                     <svg viewBox="0 0 24 24" fill="currentColor" width="14" height="14" className="me-1">
                       <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z" />
                     </svg>
-                    Add User
+                    Add Banner
                   </button>
 
                   <div className="cat-search-wrap">
@@ -147,7 +164,7 @@ function UserListPage() {
                     <input
                       type="search"
                       className="form-control form-control-sm cat-search-input"
-                      placeholder="Search users..."
+                      placeholder="Search…"
                       value={search}
                       onChange={(e) => handleSearch(e.target.value)}
                     />
@@ -158,14 +175,17 @@ function UserListPage() {
               {loading ? (
                 <div className="cat-state d-flex flex-column align-items-center justify-content-center py-5 gap-3">
                   <div className="spinner-border text-primary" style={{ width: '2rem', height: '2rem' }} role="status">
-                    <span className="visually-hidden">Loading...</span>
+                    <span className="visually-hidden">Loading…</span>
                   </div>
-                  <span className="text-muted small">Loading users...</span>
+                  <span className="text-muted small">Loading banners…</span>
                 </div>
               ) : error ? (
                 <div className="cat-state d-flex flex-column align-items-center justify-content-center py-5 gap-3">
+                  <svg viewBox="0 0 24 24" fill="#dc3545" width="40" height="40">
+                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z" />
+                  </svg>
                   <p className="text-danger mb-0 small">{error}</p>
-                  <button type="button" className="btn btn-sm btn-outline-primary" onClick={fetchUsers}>
+                  <button type="button" className="btn btn-sm btn-outline-primary" onClick={fetchBanners}>
                     Retry
                   </button>
                 </div>
@@ -176,40 +196,75 @@ function UserListPage() {
                       <thead>
                         <tr>
                           <th style={{ width: 60 }}>#</th>
-                          <th>Full Name</th>
-                          <th>Email</th>
-                          <th>Phone</th>
-                          <th>Address</th>
-                          <th style={{ width: 140 }} className="text-center">Actions</th>
+                          <th style={{ width: 100 }}>Image</th>
+                          <th>Title</th>
+                          <th>Description</th>
+                          <th>Order URL</th>
+                          <th style={{ width: 100 }}>Status</th>
+                          <th style={{ width: 120 }} className="text-center">Actions</th>
                         </tr>
                       </thead>
                       <tbody>
-                        {users.length === 0 ? (
+                        {banners.length === 0 ? (
                           <tr>
-                            <td colSpan={6} className="text-center text-muted py-5">
-                              No users found
-                              {debouncedSearch && <span> for "<strong>{debouncedSearch}</strong>"</span>}
+                            <td colSpan={7} className="text-center text-muted py-5">
+                              No banners found
+                              {debouncedSearch && (
+                                <span>
+                                  {' '}
+                                  for &quot;<strong>{debouncedSearch}</strong>&quot;
+                                </span>
+                              )}
                             </td>
                           </tr>
                         ) : (
-                          users.map((item, idx) => {
-                            const userId = getUserId(item)
-                            const displayName = String(item.fullName ?? item.email ?? 'User')
+                          banners.map((b, idx) => {
+                            const bid = bannerRowId(b)
+                            const title = String(b.title ?? '')
+                            const desc = String(b.description ?? '')
+                            const orderLink = String(b.order_url ?? b.orderUrl ?? '')
+                            const st = bannerStatus(b)
+                            const img = String(b.banner_image ?? '')
                             return (
-                              <tr key={userId || `${item.email}-${idx}`}>
+                              <tr key={bid || `${title}-${idx}`}>
                                 <td className="text-muted small">{(currentPage - 1) * pageSize + idx + 1}</td>
-                                <td className="fw-medium">{String(item.fullName ?? '-')}</td>
-                                <td className="text-muted small">{String(item.email ?? '-')}</td>
-                                <td className="text-muted small">{String(item.phone ?? '-')}</td>
-                                <td className="text-muted small cat-desc-cell">{String(item.address ?? '-')}</td>
+                                <td>
+                                  {img ? (
+                                    <img
+                                      src={resolveMediaUrl(img)}
+                                      alt={title}
+                                      style={{ width: 72, height: 40, objectFit: 'cover', borderRadius: 6, border: '1px solid #dee2e6' }}
+                                    />
+                                  ) : (
+                                    <span className="fst-italic text-muted opacity-50 small">—</span>
+                                  )}
+                                </td>
+                                <td className="fw-medium">{title || '—'}</td>
+                                <td className="text-muted small cat-desc-cell">
+                                  {desc || <span className="fst-italic text-muted opacity-50">—</span>}
+                                </td>
+                                <td className="small">
+                                  {orderLink ? (
+                                    <a href={orderLink} target="_blank" rel="noopener noreferrer" className="text-truncate d-inline-block" style={{ maxWidth: 180 }}>
+                                      {orderLink}
+                                    </a>
+                                  ) : (
+                                    <span className="fst-italic text-muted opacity-50">—</span>
+                                  )}
+                                </td>
+                                <td>
+                                  <span className={`badge ${st === 1 ? 'text-bg-success' : 'text-bg-secondary'}`}>
+                                    {st === 1 ? 'Active' : 'Inactive'}
+                                  </span>
+                                </td>
                                 <td className="text-center">
                                   <div className="d-flex justify-content-center gap-2">
                                     <button
                                       type="button"
                                       className="btn btn-sm cat-btn-edit"
-                                      title="Edit User"
-                                      disabled={!userId}
-                                      onClick={() => navigate(`/users/${userId}/edit`)}
+                                      title="Edit"
+                                      disabled={!bid}
+                                      onClick={() => setEditing(b)}
                                     >
                                       <svg viewBox="0 0 24 24" fill="currentColor" width="13" height="13">
                                         <path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04a1 1 0 0 0 0-1.41l-2.34-2.34a1 1 0 0 0-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z" />
@@ -218,9 +273,9 @@ function UserListPage() {
                                     <button
                                       type="button"
                                       className="btn btn-sm cat-btn-delete"
-                                      title="Delete User"
-                                      disabled={!userId}
-                                      onClick={() => setDeleting({ id: userId, name: displayName })}
+                                      title="Delete"
+                                      disabled={!bid}
+                                      onClick={() => setDeleting({ id: bid, title: title || 'Banner' })}
                                     >
                                       <svg viewBox="0 0 24 24" fill="currentColor" width="13" height="13">
                                         <path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z" />
@@ -240,34 +295,36 @@ function UserListPage() {
                     <p className="text-muted small mb-0">
                       {total === 0
                         ? 'No entries'
-                        : `Showing ${(currentPage - 1) * pageSize + 1}-${Math.min(currentPage * pageSize, total)} of ${total} entr${total === 1 ? 'y' : 'ies'}`}
+                        : `Showing ${(currentPage - 1) * pageSize + 1}–${Math.min(currentPage * pageSize, total)} of ${total} entr${total === 1 ? 'y' : 'ies'}`}
                     </p>
 
                     {totalPages > 1 && (
                       <nav>
                         <ul className="pagination pagination-sm mb-0 cat-pagination">
                           <li className={`page-item${currentPage === 1 ? ' disabled' : ''}`}>
-                            <button className="page-link" onClick={() => setPage(currentPage - 1)} disabled={currentPage === 1}>
+                            <button className="page-link" type="button" onClick={() => setPage(currentPage - 1)} disabled={currentPage === 1}>
                               ‹
                             </button>
                           </li>
+
                           {visiblePages.map((n, i) => {
                             const prev = visiblePages[i - 1]
                             return (
                               <React.Fragment key={n}>
                                 {prev !== undefined && n - prev > 1 && (
                                   <li className="page-item disabled">
-                                    <span className="page-link">...</span>
+                                    <span className="page-link">…</span>
                                   </li>
                                 )}
                                 <li className={`page-item${n === currentPage ? ' active' : ''}`}>
-                                  <button className="page-link" onClick={() => setPage(n)}>{n}</button>
+                                  <button className="page-link" type="button" onClick={() => setPage(n)}>{n}</button>
                                 </li>
                               </React.Fragment>
                             )
                           })}
+
                           <li className={`page-item${currentPage === totalPages ? ' disabled' : ''}`}>
-                            <button className="page-link" onClick={() => setPage(currentPage + 1)} disabled={currentPage === totalPages}>
+                            <button className="page-link" type="button" onClick={() => setPage(currentPage + 1)} disabled={currentPage === totalPages}>
                               ›
                             </button>
                           </li>
@@ -284,15 +341,32 @@ function UserListPage() {
 
       {deleting && (
         <DeleteConfirmModal
-          title="Delete User"
-          itemName={deleting.name}
-          apiPath={`/api/users/${deleting.id}`}
+          title="Delete Banner"
+          itemName={deleting.title}
+          apiPath={`/api/banners/${deleting.id}`}
           onClose={() => setDeleting(null)}
-          onSuccess={fetchUsers}
+          onSuccess={fetchBanners}
+        />
+      )}
+
+      {showAddModal && (
+        <AddBannerModal onClose={() => setShowAddModal(false)} onSuccess={fetchBanners} />
+      )}
+
+      {editing && bannerRowId(editing) && (
+        <EditBannerModal
+          bannerId={bannerRowId(editing)}
+          initialTitle={String(editing.title ?? '')}
+          initialDescription={String(editing.description ?? '')}
+          initialOrderUrl={String(editing.order_url ?? editing.orderUrl ?? '')}
+          initialStatus={bannerStatus(editing)}
+          initialBannerImage={String(editing.banner_image ?? '')}
+          onClose={() => setEditing(null)}
+          onSuccess={fetchBanners}
         />
       )}
     </div>
   )
 }
 
-export default UserListPage
+export default BannerPage

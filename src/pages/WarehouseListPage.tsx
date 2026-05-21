@@ -1,43 +1,74 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react'
-import { Navigate, useNavigate } from 'react-router-dom'
+import { Navigate, useNavigate, useParams, useLocation } from 'react-router-dom'
 import { clearAuthSession, getStoredToken, getStoredUser } from '../utils/auth'
 import Sidebar from '../components/Sidebar'
 import DeleteConfirmModal from '../components/DeleteConfirmModal'
+import WarehouseViewModal from '../components/WarehouseViewModal'
 import '../styles/Dashboard.css'
 
-interface UserItem {
+interface WarehouseItem {
+  warehouse_id?: string
   id?: string
-  user_id?: string
-  fullName?: string
-  email?: string
-  phone?: string
-  address?: string
+  vendor_id?: string
+  name?: string
+  code?: string
+  city?: string
+  state?: string
+  status?: number
+  is_default?: number | boolean
   [key: string]: unknown
 }
 
 const PAGE_SIZE_OPTIONS = [10, 25, 50]
+const WAREHOUSES_API = '/api/vendor/warehouses'
 
-const getUserId = (user: UserItem): string => String(user.id ?? user.user_id ?? '')
+const EYE_ICON = (
+  <svg viewBox="0 0 24 24" fill="currentColor" width="13" height="13">
+    <path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z" />
+  </svg>
+)
 
-function UserListPage() {
+const getWarehouseId = (w: WarehouseItem): string => String(w.warehouse_id ?? w.id ?? '')
+
+function warehouseStatus(w: WarehouseItem): 0 | 1 {
+  return Number(w.status) === 0 ? 0 : 1
+}
+
+function isDefaultWarehouse(w: WarehouseItem): boolean {
+  return w.is_default === true || w.is_default === 1
+}
+
+function WarehouseListPage() {
   const navigate = useNavigate()
+  const { vendorId } = useParams<{ vendorId: string }>()
+  const location = useLocation()
+  const vendorName = (location.state as { vendorName?: string } | null)?.vendorName ?? 'Vendor'
+
   const token = getStoredToken()
   const user = getStoredUser()
 
-  const [users, setUsers] = useState<UserItem[]>([])
+  const [warehouses, setWarehouses] = useState<WarehouseItem[]>([])
   const [total, setTotal] = useState(0)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [search, setSearch] = useState('')
   const [debouncedSearch, setDebouncedSearch] = useState('')
+  const [statusFilter, setStatusFilter] = useState<'' | '0' | '1'>('')
   const [page, setPage] = useState(1)
   const [pageSize, setPageSize] = useState(10)
+  const [viewing, setViewing] = useState<{ id: string; name: string } | null>(null)
   const [deleting, setDeleting] = useState<{ id: string; name: string } | null>(null)
   const debounceTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
 
   if (!token || !user) {
     return <Navigate to="/login" replace />
   }
+
+  if (!vendorId) {
+    return <Navigate to="/vendors" replace />
+  }
+
+  const warehousesBase = `/vendors/${vendorId}/warehouses`
 
   const handleSearch = (val: string) => {
     setSearch(val)
@@ -48,38 +79,40 @@ function UserListPage() {
     }, 400)
   }
 
-  const fetchUsers = useCallback(async () => {
+  const fetchWarehouses = useCallback(async () => {
     setLoading(true)
     setError(null)
     try {
       const params = new URLSearchParams({
+        vendor_id: vendorId,
         page: String(page),
         limit: String(pageSize),
       })
       if (debouncedSearch.trim()) params.set('search', debouncedSearch.trim())
+      if (statusFilter !== '') params.set('status', statusFilter)
 
-      const res = await fetch(`/api/users?${params}`, {
+      const res = await fetch(`${WAREHOUSES_API}?${params}`, {
         headers: { Authorization: `Bearer ${token}` },
       })
       if (!res.ok) throw new Error(`Server error: ${res.status}`)
       const json = await res.json()
 
-      const items: UserItem[] = Array.isArray(json) ? json : (json.data ?? [])
+      const items: WarehouseItem[] = Array.isArray(json) ? json : (json.data ?? [])
       const serverTotal: number =
         json.total ?? json.meta?.total ?? json.pagination?.total ?? items.length
 
-      setUsers(items)
+      setWarehouses(items)
       setTotal(serverTotal)
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to load users')
+      setError(err instanceof Error ? err.message : 'Failed to load warehouses')
     } finally {
       setLoading(false)
     }
-  }, [debouncedSearch, page, pageSize, token])
+  }, [debouncedSearch, page, pageSize, statusFilter, token, vendorId])
 
   useEffect(() => {
-    fetchUsers()
-  }, [fetchUsers])
+    fetchWarehouses()
+  }, [fetchWarehouses])
 
   const handleLogout = () => {
     clearAuthSession()
@@ -99,7 +132,17 @@ function UserListPage() {
 
       <div className="d-flex flex-column flex-grow-1 min-w-0">
         <header className="d-flex align-items-center justify-content-between px-4 py-3 bg-white shadow-sm">
-          <h6 className="mb-0 fw-semibold text-dark">Users</h6>
+          <div className="d-flex align-items-center gap-2">
+            <button type="button" className="subcat-back-btn" onClick={() => navigate('/vendors')} title="Back to Vendors">
+              <svg viewBox="0 0 24 24" fill="currentColor" width="16" height="16">
+                <path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z" />
+              </svg>
+            </button>
+            <div>
+              <h6 className="mb-0 fw-semibold text-dark">Warehouses</h6>
+              <small className="text-muted" style={{ fontSize: '0.75rem' }}>{vendorName}</small>
+            </div>
+          </div>
           <button type="button" className="btn btn-danger btn-sm px-3 fw-semibold" onClick={handleLogout}>
             Logout
           </button>
@@ -109,33 +152,51 @@ function UserListPage() {
           <div className="card border-0 rounded-3 shadow-sm">
             <div className="card-body p-4">
               <div className="d-flex flex-wrap align-items-center justify-content-between gap-3 mb-4">
-                <div className="d-flex align-items-center gap-2">
-                  <label className="text-muted small mb-0">Show</label>
-                  <select
-                    className="form-select form-select-sm cat-page-select"
-                    value={pageSize}
-                    onChange={(e) => {
-                      setPageSize(Number(e.target.value))
-                      setPage(1)
-                    }}
-                  >
-                    {PAGE_SIZE_OPTIONS.map((n) => (
-                      <option key={n} value={n}>{n}</option>
-                    ))}
-                  </select>
-                  <span className="text-muted small">entries</span>
+                <div className="d-flex flex-wrap align-items-center gap-3">
+                  <div className="d-flex align-items-center gap-2">
+                    <label className="text-muted small mb-0">Show</label>
+                    <select
+                      className="form-select form-select-sm cat-page-select"
+                      value={pageSize}
+                      onChange={(e) => {
+                        setPageSize(Number(e.target.value))
+                        setPage(1)
+                      }}
+                    >
+                      {PAGE_SIZE_OPTIONS.map((n) => (
+                        <option key={n} value={n}>{n}</option>
+                      ))}
+                    </select>
+                    <span className="text-muted small">entries</span>
+                  </div>
+
+                  <div className="d-flex align-items-center gap-2">
+                    <label className="text-muted small mb-0">Status</label>
+                    <select
+                      className="form-select form-select-sm cat-page-select"
+                      value={statusFilter}
+                      onChange={(e) => {
+                        setStatusFilter(e.target.value as '' | '0' | '1')
+                        setPage(1)
+                      }}
+                    >
+                      <option value="">All</option>
+                      <option value="1">Active</option>
+                      <option value="0">Inactive</option>
+                    </select>
+                  </div>
                 </div>
 
                 <div className="d-flex align-items-center gap-3">
                   <button
                     type="button"
                     className="btn btn-sm cat-btn-add"
-                    onClick={() => navigate('/users/new')}
+                    onClick={() => navigate(`${warehousesBase}/new`, { state: { vendorName } })}
                   >
                     <svg viewBox="0 0 24 24" fill="currentColor" width="14" height="14" className="me-1">
                       <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z" />
                     </svg>
-                    Add User
+                    Add Warehouse
                   </button>
 
                   <div className="cat-search-wrap">
@@ -147,7 +208,7 @@ function UserListPage() {
                     <input
                       type="search"
                       className="form-control form-control-sm cat-search-input"
-                      placeholder="Search users..."
+                      placeholder="Search warehouses..."
                       value={search}
                       onChange={(e) => handleSearch(e.target.value)}
                     />
@@ -160,12 +221,12 @@ function UserListPage() {
                   <div className="spinner-border text-primary" style={{ width: '2rem', height: '2rem' }} role="status">
                     <span className="visually-hidden">Loading...</span>
                   </div>
-                  <span className="text-muted small">Loading users...</span>
+                  <span className="text-muted small">Loading warehouses...</span>
                 </div>
               ) : error ? (
                 <div className="cat-state d-flex flex-column align-items-center justify-content-center py-5 gap-3">
                   <p className="text-danger mb-0 small">{error}</p>
-                  <button type="button" className="btn btn-sm btn-outline-primary" onClick={fetchUsers}>
+                  <button type="button" className="btn btn-sm btn-outline-primary" onClick={fetchWarehouses}>
                     Retry
                   </button>
                 </div>
@@ -176,40 +237,64 @@ function UserListPage() {
                       <thead>
                         <tr>
                           <th style={{ width: 60 }}>#</th>
-                          <th>Full Name</th>
-                          <th>Email</th>
-                          <th>Phone</th>
-                          <th>Address</th>
+                          <th>Name</th>
+                          <th>Code</th>
+                          <th>City</th>
+                          <th>State</th>
+                          <th style={{ width: 90 }}>Default</th>
+                          <th style={{ width: 100 }}>Status</th>
                           <th style={{ width: 140 }} className="text-center">Actions</th>
                         </tr>
                       </thead>
                       <tbody>
-                        {users.length === 0 ? (
+                        {warehouses.length === 0 ? (
                           <tr>
-                            <td colSpan={6} className="text-center text-muted py-5">
-                              No users found
-                              {debouncedSearch && <span> for "<strong>{debouncedSearch}</strong>"</span>}
+                            <td colSpan={8} className="text-center text-muted py-5">
+                              No warehouses found
+                              {debouncedSearch && <span> for &quot;<strong>{debouncedSearch}</strong>&quot;</span>}
                             </td>
                           </tr>
                         ) : (
-                          users.map((item, idx) => {
-                            const userId = getUserId(item)
-                            const displayName = String(item.fullName ?? item.email ?? 'User')
+                          warehouses.map((item, idx) => {
+                            const warehouseId = getWarehouseId(item)
+                            const name = String(item.name ?? '-')
+                            const st = warehouseStatus(item)
                             return (
-                              <tr key={userId || `${item.email}-${idx}`}>
+                              <tr key={warehouseId || `${item.code}-${idx}`}>
                                 <td className="text-muted small">{(currentPage - 1) * pageSize + idx + 1}</td>
-                                <td className="fw-medium">{String(item.fullName ?? '-')}</td>
-                                <td className="text-muted small">{String(item.email ?? '-')}</td>
-                                <td className="text-muted small">{String(item.phone ?? '-')}</td>
-                                <td className="text-muted small cat-desc-cell">{String(item.address ?? '-')}</td>
+                                <td className="fw-medium">{name}</td>
+                                <td className="text-muted small">{String(item.code ?? '-')}</td>
+                                <td className="text-muted small">{String(item.city ?? '-')}</td>
+                                <td className="text-muted small">{String(item.state ?? '-')}</td>
+                                <td>
+                                  {isDefaultWarehouse(item) ? (
+                                    <span className="badge text-bg-primary">Default</span>
+                                  ) : (
+                                    <span className="text-muted small">—</span>
+                                  )}
+                                </td>
+                                <td>
+                                  <span className={`badge ${st === 1 ? 'text-bg-success' : 'text-bg-secondary'}`}>
+                                    {st === 1 ? 'Active' : 'Inactive'}
+                                  </span>
+                                </td>
                                 <td className="text-center">
                                   <div className="d-flex justify-content-center gap-2">
                                     <button
                                       type="button"
+                                      className="btn btn-sm cat-btn-view"
+                                      title="View Details"
+                                      disabled={!warehouseId}
+                                      onClick={() => setViewing({ id: warehouseId, name })}
+                                    >
+                                      {EYE_ICON}
+                                    </button>
+                                    <button
+                                      type="button"
                                       className="btn btn-sm cat-btn-edit"
-                                      title="Edit User"
-                                      disabled={!userId}
-                                      onClick={() => navigate(`/users/${userId}/edit`)}
+                                      title="Edit Warehouse"
+                                      disabled={!warehouseId}
+                                      onClick={() => navigate(`${warehousesBase}/${warehouseId}/edit`, { state: { vendorName } })}
                                     >
                                       <svg viewBox="0 0 24 24" fill="currentColor" width="13" height="13">
                                         <path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04a1 1 0 0 0 0-1.41l-2.34-2.34a1 1 0 0 0-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z" />
@@ -218,9 +303,9 @@ function UserListPage() {
                                     <button
                                       type="button"
                                       className="btn btn-sm cat-btn-delete"
-                                      title="Delete User"
-                                      disabled={!userId}
-                                      onClick={() => setDeleting({ id: userId, name: displayName })}
+                                      title="Delete Warehouse"
+                                      disabled={!warehouseId}
+                                      onClick={() => setDeleting({ id: warehouseId, name })}
                                     >
                                       <svg viewBox="0 0 24 24" fill="currentColor" width="13" height="13">
                                         <path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z" />
@@ -247,7 +332,7 @@ function UserListPage() {
                       <nav>
                         <ul className="pagination pagination-sm mb-0 cat-pagination">
                           <li className={`page-item${currentPage === 1 ? ' disabled' : ''}`}>
-                            <button className="page-link" onClick={() => setPage(currentPage - 1)} disabled={currentPage === 1}>
+                            <button className="page-link" type="button" onClick={() => setPage(currentPage - 1)} disabled={currentPage === 1}>
                               ‹
                             </button>
                           </li>
@@ -261,13 +346,13 @@ function UserListPage() {
                                   </li>
                                 )}
                                 <li className={`page-item${n === currentPage ? ' active' : ''}`}>
-                                  <button className="page-link" onClick={() => setPage(n)}>{n}</button>
+                                  <button className="page-link" type="button" onClick={() => setPage(n)}>{n}</button>
                                 </li>
                               </React.Fragment>
                             )
                           })}
                           <li className={`page-item${currentPage === totalPages ? ' disabled' : ''}`}>
-                            <button className="page-link" onClick={() => setPage(currentPage + 1)} disabled={currentPage === totalPages}>
+                            <button className="page-link" type="button" onClick={() => setPage(currentPage + 1)} disabled={currentPage === totalPages}>
                               ›
                             </button>
                           </li>
@@ -282,17 +367,25 @@ function UserListPage() {
         </div>
       </div>
 
+      {viewing && (
+        <WarehouseViewModal
+          warehouseId={viewing.id}
+          warehouseName={viewing.name}
+          onClose={() => setViewing(null)}
+        />
+      )}
+
       {deleting && (
         <DeleteConfirmModal
-          title="Delete User"
+          title="Delete Warehouse"
           itemName={deleting.name}
-          apiPath={`/api/users/${deleting.id}`}
+          apiPath={`${WAREHOUSES_API}/${deleting.id}`}
           onClose={() => setDeleting(null)}
-          onSuccess={fetchUsers}
+          onSuccess={fetchWarehouses}
         />
       )}
     </div>
   )
 }
 
-export default UserListPage
+export default WarehouseListPage
