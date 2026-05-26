@@ -3,6 +3,7 @@ import type { FormEvent } from 'react'
 import { Navigate, useNavigate, useParams } from 'react-router-dom'
 import { clearAuthSession, getStoredToken, getStoredUser } from '../utils/auth'
 import Sidebar from '../components/Sidebar'
+import { ROUTES } from '../routes'
 import '../styles/Dashboard.css'
 
 const VENDORS_API = '/api/vendor/vendors'
@@ -30,18 +31,19 @@ function EditVendorPage() {
   const [phone, setPhone] = useState('')
   const [address, setAddress] = useState('')
   const [gstNumber, setGstNumber] = useState('')
+  const [password, setPassword] = useState('')
   const [status, setStatus] = useState<0 | 1>(1)
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
   if (!token || !user) {
-    return <Navigate to="/login" replace />
+    return <Navigate to={ROUTES.login} replace />
   }
 
   const handleLogout = () => {
     clearAuthSession()
-    navigate('/login', { replace: true })
+    navigate(ROUTES.login, { replace: true })
   }
 
   const fetchVendor = useCallback(async () => {
@@ -84,15 +86,25 @@ function EditVendorPage() {
     setSaving(true)
     setError(null)
     try {
-      const payload = {
+      const payload: {
+        name: string
+        email: string
+        code: string
+        phone: string
+        address: string
+        gst_number: string
+        status: 0 | 1
+        password?: string
+      } = {
         name: name.trim(),
-        code: code.trim(),
         email: email.trim(),
+        code: code.trim(),
         phone: phone.trim(),
         address: address.trim(),
         gst_number: gstNumber.trim(),
         status,
       }
+      if (password.trim()) payload.password = password.trim()
 
       const res = await fetch(`${VENDORS_API}/${vendorId}`, {
         method: 'PUT',
@@ -103,7 +115,7 @@ function EditVendorPage() {
         body: JSON.stringify(payload),
       })
       if (!res.ok) throw new Error(`Server error: ${res.status}`)
-      navigate('/vendors')
+      navigate(ROUTES.vendors)
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to update vendor')
     } finally {
@@ -117,7 +129,7 @@ function EditVendorPage() {
       <div className="d-flex flex-column flex-grow-1 min-w-0">
         <header className="d-flex align-items-center justify-content-between px-4 py-3 bg-white shadow-sm">
           <div className="d-flex align-items-center gap-2">
-            <button type="button" className="subcat-back-btn" onClick={() => navigate('/vendors')} title="Back to Vendors">
+            <button type="button" className="subcat-back-btn" onClick={() => navigate(ROUTES.vendors)} title="Back to Vendors">
               <svg viewBox="0 0 24 24" fill="currentColor" width="16" height="16">
                 <path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z" />
               </svg>
@@ -178,6 +190,18 @@ function EditVendorPage() {
                   </div>
 
                   <div>
+                    <label className="form-label fw-semibold mb-1">Password</label>
+                    <input
+                      type="password"
+                      className="form-control edit-modal-input"
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      placeholder="Keep blank to keep existing password"
+                      minLength={6}
+                    />
+                  </div>
+
+                  <div>
                     <label className="form-label fw-semibold mb-1">Phone</label>
                     <input
                       className="form-control edit-modal-input"
@@ -225,7 +249,7 @@ function EditVendorPage() {
                   {error && <p className="text-danger small mb-0">{error}</p>}
 
                   <div className="d-flex justify-content-end gap-2 pt-2">
-                    <button type="button" className="btn btn-light border" onClick={() => navigate('/vendors')} disabled={saving}>
+                    <button type="button" className="btn btn-light border" onClick={() => navigate(ROUTES.vendors)} disabled={saving}>
                       Cancel
                     </button>
                     <button type="submit" className="btn edit-modal-save-btn px-3" disabled={saving}>

@@ -6,6 +6,7 @@ import { resolveMediaUrl } from '../config/api'
 import Sidebar from '../components/Sidebar'
 import GoogleAddressInput from '../components/GoogleAddressInput'
 import type { ParsedAddress } from '../utils/googlePlaces'
+import { ROUTES } from '../routes'
 import '../styles/Dashboard.css'
 
 const WAREHOUSES_API = '/api/vendor/warehouses'
@@ -63,18 +64,18 @@ function EditWarehousePage() {
   const [error, setError] = useState<string | null>(null)
 
   if (!token || !user) {
-    return <Navigate to="/login" replace />
+    return <Navigate to={ROUTES.login} replace />
   }
 
   if (!vendorId || !warehouseId) {
-    return <Navigate to="/vendors" replace />
+    return <Navigate to={ROUTES.vendors} replace />
   }
 
-  const listPath = `/vendors/${vendorId}/warehouses`
+  const listPath = ROUTES.vendorWarehouses(vendorId)
 
   const handleLogout = () => {
     clearAuthSession()
-    navigate('/login', { replace: true })
+    navigate(ROUTES.login, { replace: true })
   }
 
   const fetchWarehouse = useCallback(async () => {

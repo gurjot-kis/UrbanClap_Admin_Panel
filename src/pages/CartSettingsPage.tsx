@@ -5,6 +5,7 @@ import Sidebar from '../components/Sidebar'
 import AddCartSettingsModal from '../components/AddCartSettingsModal'
 import EditCartSettingsModal from '../components/EditCartSettingsModal'
 import DeleteConfirmModal from '../components/DeleteConfirmModal'
+import { ROUTES } from '../routes'
 import '../styles/Dashboard.css'
 
 interface CartSettings {
@@ -61,7 +62,7 @@ function CartSettingsPage() {
   const [deleting, setDeleting] = useState<{ id: string; label: string } | null>(null)
 
   if (!token || !user) {
-    return <Navigate to="/login" replace />
+    return <Navigate to={ROUTES.login} replace />
   }
 
   const handlePageSize = (val: number) => {
@@ -94,7 +95,7 @@ function CartSettingsPage() {
 
   const handleLogout = () => {
     clearAuthSession()
-    navigate('/login', { replace: true })
+    navigate(ROUTES.login, { replace: true })
   }
 
   const totalPages = Math.max(1, Math.ceil(total / pageSize))

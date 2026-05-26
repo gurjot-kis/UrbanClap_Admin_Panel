@@ -3,6 +3,7 @@ import type { FormEvent } from 'react'
 import { Navigate, useNavigate } from 'react-router-dom'
 import { clearAuthSession, getStoredToken, getStoredUser } from '../utils/auth'
 import Sidebar from '../components/Sidebar'
+import { ROUTES } from '../routes'
 import '../styles/Dashboard.css'
 
 function AddUserPage() {
@@ -20,12 +21,12 @@ function AddUserPage() {
   const [error, setError] = useState<string | null>(null)
 
   if (!token || !user) {
-    return <Navigate to="/login" replace />
+    return <Navigate to={ROUTES.login} replace />
   }
 
   const handleLogout = () => {
     clearAuthSession()
-    navigate('/login', { replace: true })
+    navigate(ROUTES.login, { replace: true })
   }
 
   const handleSubmit = async (e: FormEvent) => {
@@ -56,7 +57,7 @@ function AddUserPage() {
         body: JSON.stringify(payload),
       })
       if (!res.ok) throw new Error(`Server error: ${res.status}`)
-      navigate('/users')
+      navigate(ROUTES.users)
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to add user')
     } finally {
@@ -70,7 +71,7 @@ function AddUserPage() {
       <div className="d-flex flex-column flex-grow-1 min-w-0">
         <header className="d-flex align-items-center justify-content-between px-4 py-3 bg-white shadow-sm">
           <div className="d-flex align-items-center gap-2">
-            <button type="button" className="subcat-back-btn" onClick={() => navigate('/users')} title="Back to Users">
+            <button type="button" className="subcat-back-btn" onClick={() => navigate(ROUTES.users)} title="Back to Users">
               <svg viewBox="0 0 24 24" fill="currentColor" width="16" height="16">
                 <path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z" />
               </svg>
@@ -160,7 +161,7 @@ function AddUserPage() {
                 {error && <p className="text-danger small mb-0">{error}</p>}
 
                 <div className="d-flex justify-content-end gap-2 pt-2">
-                  <button type="button" className="btn btn-light border" onClick={() => navigate('/users')} disabled={saving}>
+                  <button type="button" className="btn btn-light border" onClick={() => navigate(ROUTES.users)} disabled={saving}>
                     Cancel
                   </button>
                   <button type="submit" className="btn edit-modal-save-btn px-3" disabled={saving}>

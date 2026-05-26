@@ -16,7 +16,9 @@ const EyeIcon = ({ open }: { open: boolean }) =>
     </svg>
   )
 import type { LoginApiResponse } from '../types/auth'
-import { getStoredToken, setAuthSession } from '../utils/auth'
+import { ROUTES } from '../routes'
+import { getStoredToken, getStoredUser, setAuthSession } from '../utils/auth'
+import { getPostLoginRoute } from '../utils/roles'
 
 const LOGIN_ENDPOINT = '/api/login'
 
@@ -29,7 +31,7 @@ function LoginPage() {
   const [showPassword, setShowPassword] = useState(false)
 
   if (getStoredToken()) {
-    return <Navigate to="/dashboard" replace />
+    return <Navigate to={getPostLoginRoute(getStoredUser()?.role)} replace />
   }
 
   const handleLogin = async (event: FormEvent<HTMLFormElement>) => {
@@ -50,11 +52,13 @@ function LoginPage() {
         throw new Error(result.message || 'Unable to login right now.')
       }
 
-      setAuthSession({
+      const authUser = {
         ...result.data,
+        role: result.data.role ?? (result.data as Record<string, unknown>).role as string | undefined,
         profilePicture: (result.data as Record<string, unknown>).profilePicture as string | undefined,
-      })
-      navigate('/dashboard', { replace: true })
+      }
+      setAuthSession(authUser)
+      navigate(getPostLoginRoute(authUser.role), { replace: true })
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Something went wrong.')
     } finally {
@@ -75,8 +79,8 @@ function LoginPage() {
                 <ellipse cx="40" cy="70" rx="26" ry="18" fill="#7da8cc" />
               </svg>
             </div>
-            <h4 className="fw-bold mb-1" style={{ color: '#1b3a5c' }}>Admin Login</h4>
-            <p className="text-muted small mb-0">Sign in to access the admin panel</p>
+            <h4 className="fw-bold mb-1" style={{ color: '#1b3a5c' }}>Portal Login</h4>
+            <p className="text-muted small mb-0">Sign in to access your dashboard</p>
           </div>
 
           {/* Error alert */}
@@ -108,7 +112,7 @@ function LoginPage() {
                 <label htmlFor="password" className="form-label fw-semibold small mb-0">
                   Password
                 </label>
-                <Link to="/forgot-password" className="small text-decoration-none" style={{ color: '#1b3a5c' }}>
+                <Link to={ROUTES.forgotPassword} className="small text-decoration-none" style={{ color: '#1b3a5c' }}>
                   Forgot Password?
                 </Link>
               </div>

@@ -23,8 +23,8 @@ function GoogleAddressInput({
   disabled = false,
   className = 'form-control edit-modal-input',
 }: Props) {
-  const inputRef = useRef<HTMLInputElement>(null)
-  const autocompleteRef = useRef<google.maps.places.Autocomplete | null>(null)
+  const containerRef = useRef<HTMLDivElement>(null)
+  const elementRef = useRef<google.maps.places.PlaceAutocompleteElement | null>(null)
   const onChangeRef = useRef(onChange) as MutableRefObject<typeof onChange>
   const onPlaceSelectRef = useRef(onPlaceSelect) as MutableRefObject<typeof onPlaceSelect>
   const [ready, setReady] = useState(false)
@@ -41,22 +41,45 @@ function GoogleAddressInput({
     }
 
     let cancelled = false
+    let autocompleteEl: google.maps.places.PlaceAutocompleteElement | null = null
+
+    const handleInput = () => {
+      if (autocompleteEl) onChangeRef.current(autocompleteEl.value)
+    }
+
+    const handleSelect = async (event: google.maps.places.PlacePredictionSelectEvent) => {
+      const place = event.placePrediction.toPlace()
+      await place.fetchFields({
+        fields: ['formattedAddress', 'addressComponents', 'location'],
+      })
+      const parsed = parseGooglePlace(place)
+      onChangeRef.current(parsed.full_address)
+      onPlaceSelectRef.current(parsed)
+    }
 
     loadGoogleMapsScript(apiKey)
-      .then(() => {
-        if (cancelled || !inputRef.current || !window.google?.maps?.places) return
+      .then(async () => {
+        if (cancelled || !containerRef.current) return
 
-        const Autocomplete = window.google.maps.places.Autocomplete
-        const ac = new Autocomplete(inputRef.current, { types: ['address'] })
+        const { PlaceAutocompleteElement } = (await window.google!.maps!.importLibrary(
+          'places'
+        )) as google.maps.places.PlacesLibrary
 
-        ac.addListener('place_changed', () => {
-          const place = ac.getPlace()
-          const parsed = parseGooglePlace(place)
-          onChangeRef.current(parsed.full_address)
-          onPlaceSelectRef.current(parsed)
+        autocompleteEl = new PlaceAutocompleteElement({
+          includedRegionCodes: ['in'],
         })
+        autocompleteEl.placeholder = placeholder
+        autocompleteEl.disabled = disabled
+        autocompleteEl.className = className
+        autocompleteEl.style.width = '100%'
+        if (value) autocompleteEl.value = value
 
-        autocompleteRef.current = ac
+        autocompleteEl.addEventListener('gmp-select', handleSelect)
+        autocompleteEl.addEventListener('input', handleInput)
+
+        containerRef.current.innerHTML = ''
+        containerRef.current.appendChild(autocompleteEl)
+        elementRef.current = autocompleteEl
         setReady(true)
         setLoadError(null)
       })
@@ -68,25 +91,26 @@ function GoogleAddressInput({
 
     return () => {
       cancelled = true
-      if (autocompleteRef.current && window.google?.maps?.event) {
-        window.google.maps.event.clearInstanceListeners(autocompleteRef.current)
+      if (autocompleteEl) {
+        autocompleteEl.removeEventListener('gmp-select', handleSelect)
+        autocompleteEl.removeEventListener('input', handleInput)
+        autocompleteEl.remove()
       }
-      autocompleteRef.current = null
+      elementRef.current = null
     }
   }, [])
 
+  useEffect(() => {
+    const el = elementRef.current
+    if (!el || !ready) return
+    el.placeholder = placeholder
+    el.disabled = disabled
+    if (el.value !== value) el.value = value
+  }, [value, placeholder, disabled, ready])
+
   return (
     <div>
-      <input
-        ref={inputRef}
-        type="text"
-        className={className}
-        value={value}
-        onChange={(e) => onChange(e.target.value)}
-        placeholder={placeholder}
-        disabled={disabled}
-        autoComplete="off"
-      />
+      <div ref={containerRef} className="google-address-autocomplete" />
       {loadError && (
         <small className="text-warning d-block mt-1">{loadError}</small>
       )}

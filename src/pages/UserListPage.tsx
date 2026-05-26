@@ -3,6 +3,7 @@ import { Navigate, useNavigate } from 'react-router-dom'
 import { clearAuthSession, getStoredToken, getStoredUser } from '../utils/auth'
 import Sidebar from '../components/Sidebar'
 import DeleteConfirmModal from '../components/DeleteConfirmModal'
+import { ROUTES } from '../routes'
 import '../styles/Dashboard.css'
 
 interface UserItem {
@@ -36,7 +37,7 @@ function UserListPage() {
   const debounceTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
 
   if (!token || !user) {
-    return <Navigate to="/login" replace />
+    return <Navigate to={ROUTES.login} replace />
   }
 
   const handleSearch = (val: string) => {
@@ -83,7 +84,7 @@ function UserListPage() {
 
   const handleLogout = () => {
     clearAuthSession()
-    navigate('/login', { replace: true })
+    navigate(ROUTES.login, { replace: true })
   }
 
   const totalPages = Math.max(1, Math.ceil(total / pageSize))
@@ -130,7 +131,7 @@ function UserListPage() {
                   <button
                     type="button"
                     className="btn btn-sm cat-btn-add"
-                    onClick={() => navigate('/users/new')}
+                    onClick={() => navigate(ROUTES.usersNew)}
                   >
                     <svg viewBox="0 0 24 24" fill="currentColor" width="14" height="14" className="me-1">
                       <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z" />
@@ -209,7 +210,7 @@ function UserListPage() {
                                       className="btn btn-sm cat-btn-edit"
                                       title="Edit User"
                                       disabled={!userId}
-                                      onClick={() => navigate(`/users/${userId}/edit`)}
+                                      onClick={() => navigate(ROUTES.userEdit(userId))}
                                     >
                                       <svg viewBox="0 0 24 24" fill="currentColor" width="13" height="13">
                                         <path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04a1 1 0 0 0 0-1.41l-2.34-2.34a1 1 0 0 0-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z" />

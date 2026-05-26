@@ -1,8 +1,8 @@
 import { useCallback, useEffect, useState } from 'react'
 import type { ChangeEvent, FormEvent } from 'react'
 import { Navigate, useNavigate, useParams } from 'react-router-dom'
-import { clearAuthSession, getStoredToken, getStoredUser } from '../utils/auth'
-import { resolveMediaUrl } from '../config/api'
+import { getStoredToken, getStoredUser } from '../../utils/auth'
+import { resolveMediaUrl } from '../../config/api'
 import {
   getCategoryOptionId,
   getOptionName,
@@ -10,10 +10,10 @@ import {
   parseProductApiError,
   type CategoryOption,
   type SubCategoryOption,
-} from '../utils/productForm'
-import Sidebar from '../components/Sidebar'
-import { ROUTES } from '../routes'
-import '../styles/Dashboard.css'
+} from '../../utils/productForm'
+import VendorLayout from '../../components/vendor/VendorLayout'
+import { ROUTES, VENDOR_ROUTES } from '../../routes'
+import '../../styles/Dashboard.css'
 
 interface ProductResponse {
   name?: string
@@ -35,7 +35,7 @@ interface ProductResponse {
   [key: string]: unknown
 }
 
-function EditProductPage() {
+function VendorEditProductPage() {
   const navigate = useNavigate()
   const { productId } = useParams<{ productId: string }>()
   const token = getStoredToken()
@@ -75,11 +75,6 @@ function EditProductPage() {
 
   if (!token || !user) {
     return <Navigate to={ROUTES.login} replace />
-  }
-
-  const handleLogout = () => {
-    clearAuthSession()
-    navigate(ROUTES.login, { replace: true })
   }
 
   const fetchProduct = useCallback(async () => {
@@ -249,7 +244,7 @@ function EditProductPage() {
         body: formData,
       })
       if (!res.ok) throw new Error(await parseProductApiError(res, `Server error: ${res.status}`))
-      navigate(ROUTES.products)
+      navigate(VENDOR_ROUTES.products)
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to update product')
     } finally {
@@ -258,24 +253,8 @@ function EditProductPage() {
   }
 
   return (
-    <div className="d-flex min-vh-100" style={{ background: '#eef1f6' }}>
-      <Sidebar />
-      <div className="d-flex flex-column flex-grow-1 min-w-0">
-        <header className="d-flex align-items-center justify-content-between px-4 py-3 bg-white shadow-sm">
-          <div className="d-flex align-items-center gap-2">
-            <button type="button" className="subcat-back-btn" onClick={() => navigate(ROUTES.products)} title="Back to Products">
-              <svg viewBox="0 0 24 24" fill="currentColor" width="16" height="16">
-                <path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z" />
-              </svg>
-            </button>
-            <h6 className="mb-0 fw-semibold text-dark">Edit Product</h6>
-          </div>
-          <button type="button" className="btn btn-danger btn-sm px-3 fw-semibold" onClick={handleLogout}>
-            Logout
-          </button>
-        </header>
-
-        <div className="p-4">
+    <VendorLayout title="Edit Product" backTo={VENDOR_ROUTES.products} backTitle="Back to Products">
+        <div>
           <div className="card border-0 rounded-3 shadow-sm" style={{ maxWidth: 700 }}>
             <div className="card-body p-4">
               {loading ? (
@@ -575,7 +554,7 @@ function EditProductPage() {
                   {error && <p className="text-danger small mb-0">{error}</p>}
 
                   <div className="d-flex justify-content-end gap-2 pt-2">
-                    <button type="button" className="btn btn-light border" onClick={() => navigate(ROUTES.products)} disabled={saving}>
+                    <button type="button" className="btn btn-light border" onClick={() => navigate(VENDOR_ROUTES.products)} disabled={saving}>
                       Cancel
                     </button>
                     <button type="submit" className="btn edit-modal-save-btn px-3" disabled={saving}>
@@ -587,9 +566,8 @@ function EditProductPage() {
             </div>
           </div>
         </div>
-      </div>
-    </div>
+    </VendorLayout>
   )
 }
 
-export default EditProductPage
+export default VendorEditProductPage

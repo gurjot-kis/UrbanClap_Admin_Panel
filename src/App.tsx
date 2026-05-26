@@ -1,6 +1,6 @@
 import { Navigate, Route, Routes } from 'react-router-dom'
 import './App.css'
-import ProtectedRoute from './components/ProtectedRoute'
+import { AdminProtectedRoute, VendorProtectedRoute } from './components/ProtectedRoute'
 import DashboardPage from './pages/DashboardPage'
 import CategoryPage from './pages/CategoryPage'
 import SubCategoryPage from './pages/SubCategoryPage'
@@ -25,39 +25,56 @@ import LoginPage from './pages/LoginPage'
 import ForgotPasswordPage from './pages/ForgotPasswordPage'
 import VerifyOtpPage from './pages/VerifyOtpPage'
 import ResetPasswordPage from './pages/ResetPasswordPage'
+import VendorDashboardPage from './pages/vendor/VendorDashboardPage'
+import VendorProfilePage from './pages/vendor/VendorProfilePage'
+import VendorCategoryPage from './pages/vendor/VendorCategoryPage'
+import VendorSubCategoryPage from './pages/vendor/VendorSubCategoryPage'
+import VendorProductListPage from './pages/vendor/VendorProductListPage'
+import VendorAddProductPage from './pages/vendor/VendorAddProductPage'
+import VendorEditProductPage from './pages/vendor/VendorEditProductPage'
+import { ROUTES, VENDOR_ROUTES } from './routes'
 
 function App() {
   return (
     <Routes>
-      <Route path="/" element={<Navigate to="/login" replace />} />
-      <Route path="/login" element={<LoginPage />} />
-      <Route path="/forgot-password" element={<ForgotPasswordPage />} />
-      <Route path="/verify-otp" element={<VerifyOtpPage />} />
-      <Route path="/reset-password" element={<ResetPasswordPage />} />
-      <Route element={<ProtectedRoute />}>
-        <Route path="/dashboard" element={<DashboardPage />} />
-        <Route path="/categories" element={<CategoryPage />} />
-        <Route path="/admin/sub-categories/:categoryId" element={<SubCategoryPage />} />
-        <Route path="/products" element={<ProductListPage />} />
-        <Route path="/orders" element={<OrdersPage />} />
-        <Route path="/orders/:orderId" element={<OrderDetailsPage />} />
-        <Route path="/products/new" element={<AddProductPage />} />
-        <Route path="/products/:productId/edit" element={<EditProductPage />} />
-        <Route path="/banners" element={<BannerPage />} />
-        <Route path="/cart-settings" element={<CartSettingsPage />} />
-        <Route path="/users" element={<UserListPage />} />
-        <Route path="/users/new" element={<AddUserPage />} />
-        <Route path="/users/:userId/edit" element={<EditUserPage />} />
-        <Route path="/vendors" element={<VendorListPage />} />
-        <Route path="/vendors/new" element={<AddWarehousePage />} />
-        <Route path="/vendors/create" element={<AddVendorPage />} />
-        <Route path="/vendors/:vendorId/edit" element={<EditVendorPage />} />
-        <Route path="/vendors/:vendorId/warehouses" element={<WarehouseListPage />} />
-        <Route path="/vendors/:vendorId/warehouses/new" element={<AddWarehousePage />} />
-        <Route path="/vendors/:vendorId/warehouses/:warehouseId/edit" element={<EditWarehousePage />} />
-        <Route path="/profile" element={<ProfilePage />} />
+      <Route path="/" element={<Navigate to={ROUTES.login} replace />} />
+      <Route path={ROUTES.login} element={<LoginPage />} />
+      <Route path={ROUTES.forgotPassword} element={<ForgotPasswordPage />} />
+      <Route path={ROUTES.verifyOtp} element={<VerifyOtpPage />} />
+      <Route path={ROUTES.resetPassword} element={<ResetPasswordPage />} />
+      <Route element={<VendorProtectedRoute />}>
+        <Route path={VENDOR_ROUTES.dashboard} element={<VendorDashboardPage />} />
+        <Route path={VENDOR_ROUTES.profile} element={<VendorProfilePage />} />
+        <Route path={VENDOR_ROUTES.categories} element={<VendorCategoryPage />} />
+        <Route path="/vendor/sub-categories/:categoryId" element={<VendorSubCategoryPage />} />
+        <Route path={VENDOR_ROUTES.products} element={<VendorProductListPage />} />
+        <Route path={VENDOR_ROUTES.productsNew} element={<VendorAddProductPage />} />
+        <Route path="/vendor/products/:productId/edit" element={<VendorEditProductPage />} />
       </Route>
-      <Route path="*" element={<Navigate to="/login" replace />} />
+      <Route element={<AdminProtectedRoute />}>
+        <Route path={ROUTES.dashboard} element={<DashboardPage />} />
+        <Route path={ROUTES.categories} element={<CategoryPage />} />
+        <Route path="/admin/sub-categories/:categoryId" element={<SubCategoryPage />} />
+        <Route path={ROUTES.products} element={<ProductListPage />} />
+        <Route path={ROUTES.orders} element={<OrdersPage />} />
+        <Route path="/admin/orders/:orderId" element={<OrderDetailsPage />} />
+        <Route path={ROUTES.productsNew} element={<AddProductPage />} />
+        <Route path="/admin/products/:productId/edit" element={<EditProductPage />} />
+        <Route path={ROUTES.banners} element={<BannerPage />} />
+        <Route path={ROUTES.cartSettings} element={<CartSettingsPage />} />
+        <Route path={ROUTES.users} element={<UserListPage />} />
+        <Route path={ROUTES.usersNew} element={<AddUserPage />} />
+        <Route path="/admin/users/:userId/edit" element={<EditUserPage />} />
+        <Route path={ROUTES.vendors} element={<VendorListPage />} />
+        <Route path={ROUTES.vendorsNew} element={<AddWarehousePage />} />
+        <Route path={ROUTES.vendorsCreate} element={<AddVendorPage />} />
+        <Route path="/admin/vendors/:vendorId/edit" element={<EditVendorPage />} />
+        <Route path="/admin/vendors/:vendorId/warehouses" element={<WarehouseListPage />} />
+        <Route path="/admin/vendors/:vendorId/warehouses/new" element={<AddWarehousePage />} />
+        <Route path="/admin/vendors/:vendorId/warehouses/:warehouseId/edit" element={<EditWarehousePage />} />
+        <Route path={ROUTES.profile} element={<ProfilePage />} />
+      </Route>
+      <Route path="*" element={<Navigate to={ROUTES.login} replace />} />
     </Routes>
   )
 }

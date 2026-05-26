@@ -3,6 +3,7 @@ import { Navigate, useNavigate } from 'react-router-dom'
 import { clearAuthSession, getStoredToken, getStoredUser, setAuthSession } from '../utils/auth'
 import { resolveMediaUrl } from '../config/api'
 import Sidebar from '../components/Sidebar'
+import { ROUTES } from '../routes'
 import '../styles/Dashboard.css'
 
 interface AdminProfileResponse {
@@ -37,12 +38,12 @@ function ProfilePage() {
   const [success, setSuccess] = useState<string | null>(null)
 
   if (!token || !currentUser) {
-    return <Navigate to="/login" replace />
+    return <Navigate to={ROUTES.login} replace />
   }
 
   const handleLogout = () => {
     clearAuthSession()
-    navigate('/login', { replace: true })
+    navigate(ROUTES.login, { replace: true })
   }
 
   const fetchProfile = useCallback(async () => {

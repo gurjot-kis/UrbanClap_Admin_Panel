@@ -6,6 +6,7 @@ import EditModal from '../components/EditModal'
 import AddSubCategoryModal from '../components/AddSubCategoryModal'
 import DeleteConfirmModal from '../components/DeleteConfirmModal'
 import { resolveMediaUrl } from '../config/api'
+import { ROUTES } from '../routes'
 import '../styles/Dashboard.css'
 
 interface SubCategory {
@@ -42,7 +43,7 @@ function SubCategoryPage() {
   const debounceTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
 
   if (!token || !user) {
-    return <Navigate to="/login" replace />
+    return <Navigate to={ROUTES.login} replace />
   }
 
   // Debounce search — reset to page 1 and fire after 400 ms
@@ -92,7 +93,7 @@ function SubCategoryPage() {
 
   const handleLogout = () => {
     clearAuthSession()
-    navigate('/login', { replace: true })
+    navigate(ROUTES.login, { replace: true })
   }
 
   const totalPages = Math.max(1, Math.ceil(total / pageSize))
@@ -118,7 +119,7 @@ function SubCategoryPage() {
             <button
               type="button"
               className="subcat-back-btn"
-              onClick={() => navigate('/categories')}
+              onClick={() => navigate(ROUTES.categories)}
               title="Back to Categories"
             >
               <svg viewBox="0 0 24 24" fill="currentColor" width="16" height="16">

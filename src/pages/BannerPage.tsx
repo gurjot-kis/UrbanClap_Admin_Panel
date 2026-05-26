@@ -6,6 +6,7 @@ import AddBannerModal from '../components/AddBannerModal'
 import EditBannerModal from '../components/EditBannerModal'
 import DeleteConfirmModal from '../components/DeleteConfirmModal'
 import { resolveMediaUrl } from '../config/api'
+import { ROUTES } from '../routes'
 import '../styles/Dashboard.css'
 
 interface Banner {
@@ -50,7 +51,7 @@ function BannerPage() {
   const debounceTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
 
   if (!token || !user) {
-    return <Navigate to="/login" replace />
+    return <Navigate to={ROUTES.login} replace />
   }
 
   const handleSearch = (val: string) => {
@@ -102,7 +103,7 @@ function BannerPage() {
 
   const handleLogout = () => {
     clearAuthSession()
-    navigate('/login', { replace: true })
+    navigate(ROUTES.login, { replace: true })
   }
 
   const totalPages = Math.max(1, Math.ceil(total / pageSize))

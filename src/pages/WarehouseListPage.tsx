@@ -4,6 +4,7 @@ import { clearAuthSession, getStoredToken, getStoredUser } from '../utils/auth'
 import Sidebar from '../components/Sidebar'
 import DeleteConfirmModal from '../components/DeleteConfirmModal'
 import WarehouseViewModal from '../components/WarehouseViewModal'
+import { ROUTES } from '../routes'
 import '../styles/Dashboard.css'
 
 interface WarehouseItem {
@@ -61,14 +62,14 @@ function WarehouseListPage() {
   const debounceTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
 
   if (!token || !user) {
-    return <Navigate to="/login" replace />
+    return <Navigate to={ROUTES.login} replace />
   }
 
   if (!vendorId) {
-    return <Navigate to="/vendors" replace />
+    return <Navigate to={ROUTES.vendors} replace />
   }
 
-  const warehousesBase = `/vendors/${vendorId}/warehouses`
+  const warehousesBase = ROUTES.vendorWarehouses(vendorId)
 
   const handleSearch = (val: string) => {
     setSearch(val)
@@ -116,7 +117,7 @@ function WarehouseListPage() {
 
   const handleLogout = () => {
     clearAuthSession()
-    navigate('/login', { replace: true })
+    navigate(ROUTES.login, { replace: true })
   }
 
   const totalPages = Math.max(1, Math.ceil(total / pageSize))
@@ -133,7 +134,7 @@ function WarehouseListPage() {
       <div className="d-flex flex-column flex-grow-1 min-w-0">
         <header className="d-flex align-items-center justify-content-between px-4 py-3 bg-white shadow-sm">
           <div className="d-flex align-items-center gap-2">
-            <button type="button" className="subcat-back-btn" onClick={() => navigate('/vendors')} title="Back to Vendors">
+            <button type="button" className="subcat-back-btn" onClick={() => navigate(ROUTES.vendors)} title="Back to Vendors">
               <svg viewBox="0 0 24 24" fill="currentColor" width="16" height="16">
                 <path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z" />
               </svg>

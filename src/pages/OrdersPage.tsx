@@ -2,6 +2,7 @@ import React, { useCallback, useEffect, useRef, useState } from 'react'
 import { Navigate, useNavigate } from 'react-router-dom'
 import { clearAuthSession, getStoredToken, getStoredUser } from '../utils/auth'
 import Sidebar from '../components/Sidebar'
+import { ROUTES } from '../routes'
 import '../styles/Dashboard.css'
 
 interface Order {
@@ -42,7 +43,7 @@ function OrdersPage() {
   const debounceTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
 
   if (!token || !user) {
-    return <Navigate to="/login" replace />
+    return <Navigate to={ROUTES.login} replace />
   }
 
   const handleSearch = (val: string) => {
@@ -89,7 +90,7 @@ function OrdersPage() {
 
   const handleLogout = () => {
     clearAuthSession()
-    navigate('/login', { replace: true })
+    navigate(ROUTES.login, { replace: true })
   }
 
   const totalPages = Math.max(1, Math.ceil(total / pageSize))
@@ -207,7 +208,7 @@ function OrdersPage() {
                                     title="View Order"
                                     disabled={!orderId}
                                     onClick={() => {
-                                      if (orderId) navigate(`/orders/${orderId}`)
+                                      if (orderId) navigate(ROUTES.orderDetails(orderId))
                                     }}
                                   >
                                     <svg viewBox="0 0 24 24" fill="currentColor" width="13" height="13">

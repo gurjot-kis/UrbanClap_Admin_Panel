@@ -2,6 +2,7 @@ import { useCallback, useEffect, useState } from 'react'
 import { Navigate, useNavigate } from 'react-router-dom'
 import { clearAuthSession, getStoredToken, getStoredUser } from '../utils/auth'
 import Sidebar from '../components/Sidebar'
+import { ROUTES } from '../routes'
 import '../styles/Dashboard.css'
 
 // const BAR_DATA = [
@@ -69,12 +70,12 @@ function DashboardPage() {
   const monthOptions = getLast12MonthOptions()
 
   if (!token || !user) {
-    return <Navigate to="/login" replace />
+    return <Navigate to={ROUTES.login} replace />
   }
 
   const handleLogout = () => {
     clearAuthSession()
-    navigate('/login', { replace: true })
+    navigate(ROUTES.login, { replace: true })
   }
 
   const fetchCounts = useCallback(async () => {

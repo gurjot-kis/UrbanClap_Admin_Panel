@@ -5,6 +5,7 @@ import { clearAuthSession, getStoredToken, getStoredUser } from '../utils/auth'
 import Sidebar from '../components/Sidebar'
 import GoogleAddressInput from '../components/GoogleAddressInput'
 import type { ParsedAddress } from '../utils/googlePlaces'
+import { ROUTES } from '../routes'
 import '../styles/Dashboard.css'
 
 const WAREHOUSES_API = '/api/vendor/warehouses'
@@ -34,7 +35,7 @@ function AddWarehousePage() {
   const token = getStoredToken()
   const user = getStoredUser()
 
-  const isRootVendorsNew = location.pathname === '/vendors/new'
+  const isRootVendorsNew = location.pathname === ROUTES.vendorsNew
   const routeVendorId = isRootVendorsNew ? '' : (vendorIdFromRoute ?? '')
 
   const [vendorOptions, setVendorOptions] = useState<VendorOption[]>([])
@@ -59,7 +60,7 @@ function AddWarehousePage() {
   const [error, setError] = useState<string | null>(null)
 
   const effectiveVendorId = isRootVendorsNew ? selectedVendorId : routeVendorId
-  const listPath = effectiveVendorId ? `/vendors/${effectiveVendorId}/warehouses` : '/vendors'
+  const listPath = effectiveVendorId ? ROUTES.vendorWarehouses(effectiveVendorId) : ROUTES.vendors
 
   const selectedVendorName = vendorOptions.find((v) => getVendorOptionId(v) === selectedVendorId)?.name
   const headerSubtitle = isRootVendorsNew
@@ -67,11 +68,11 @@ function AddWarehousePage() {
     : (vendorNameFromState || 'Vendor')
 
   if (!token || !user) {
-    return <Navigate to="/login" replace />
+    return <Navigate to={ROUTES.login} replace />
   }
 
   if (!isRootVendorsNew && !routeVendorId) {
-    return <Navigate to="/vendors" replace />
+    return <Navigate to={ROUTES.vendors} replace />
   }
 
   const fetchVendorsForPicker = useCallback(async () => {
@@ -109,7 +110,7 @@ function AddWarehousePage() {
 
   const handleLogout = () => {
     clearAuthSession()
-    navigate('/login', { replace: true })
+    navigate(ROUTES.login, { replace: true })
   }
 
   const handleImageChange = (e: ChangeEvent<HTMLInputElement>) => {
@@ -195,7 +196,7 @@ function AddWarehousePage() {
             <button
               type="button"
               className="subcat-back-btn"
-              onClick={() => navigate(isRootVendorsNew ? '/vendors' : listPath, { state: { vendorName: vendorNameFromState } })}
+              onClick={() => navigate(isRootVendorsNew ? ROUTES.vendors : listPath, { state: { vendorName: vendorNameFromState } })}
               title={isRootVendorsNew ? 'Back to Vendors' : 'Back to Warehouses'}
             >
               <svg viewBox="0 0 24 24" fill="currentColor" width="16" height="16">
@@ -375,7 +376,7 @@ function AddWarehousePage() {
                   <button
                     type="button"
                     className="btn btn-light border"
-                    onClick={() => navigate(isRootVendorsNew ? '/vendors' : listPath, { state: { vendorName: vendorNameFromState } })}
+                    onClick={() => navigate(isRootVendorsNew ? ROUTES.vendors : listPath, { state: { vendorName: vendorNameFromState } })}
                     disabled={saving}
                   >
                     Cancel

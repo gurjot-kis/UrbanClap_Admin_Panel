@@ -3,6 +3,7 @@ import { Navigate, useNavigate, useParams } from 'react-router-dom'
 import { clearAuthSession, getStoredToken, getStoredUser } from '../utils/auth'
 import { resolveMediaUrl } from '../config/api'
 import Sidebar from '../components/Sidebar'
+import { ROUTES } from '../routes'
 import '../styles/Dashboard.css'
 
 interface OrderItem {
@@ -84,7 +85,7 @@ function OrderDetailsPage() {
   const [updating, setUpdating] = useState(false)
 
   if (!token || !user) {
-    return <Navigate to="/login" replace />
+    return <Navigate to={ROUTES.login} replace />
   }
 
   const fetchOrderDetails = useCallback(async () => {
@@ -114,7 +115,7 @@ function OrderDetailsPage() {
 
   const handleLogout = () => {
     clearAuthSession()
-    navigate('/login', { replace: true })
+    navigate(ROUTES.login, { replace: true })
   }
 
   const handleUpdateStatus = async () => {
@@ -148,7 +149,7 @@ function OrderDetailsPage() {
       <div className="d-flex flex-column flex-grow-1 min-w-0">
         <header className="d-flex align-items-center justify-content-between px-4 py-3 bg-white shadow-sm">
           <div className="d-flex align-items-center gap-2">
-            <button type="button" className="subcat-back-btn" onClick={() => navigate('/orders')} title="Back to Orders">
+            <button type="button" className="subcat-back-btn" onClick={() => navigate(ROUTES.orders)} title="Back to Orders">
               <svg viewBox="0 0 24 24" fill="currentColor" width="16" height="16">
                 <path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z" />
               </svg>

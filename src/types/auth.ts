@@ -3,6 +3,8 @@ export type AuthUser = {
   name: string
   email: string
   token: string
+  role?: string
+  status?: number
   profilePicture?: string
 }
 

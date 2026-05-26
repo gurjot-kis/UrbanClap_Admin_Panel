@@ -6,6 +6,7 @@ import EditModal from '../components/EditModal'
 import AddCategoryModal from '../components/AddCategoryModal'
 import DeleteConfirmModal from '../components/DeleteConfirmModal'
 import { resolveMediaUrl } from '../config/api'
+import { ROUTES } from '../routes'
 import '../styles/Dashboard.css'
 
 interface Category {
@@ -39,7 +40,7 @@ function CategoryPage() {
   const debounceTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
 
   if (!token || !user) {
-    return <Navigate to="/login" replace />
+    return <Navigate to={ROUTES.login} replace />
   }
 
   // Debounce search input — reset to page 1 and fire after 400 ms
@@ -93,7 +94,7 @@ function CategoryPage() {
 
   const handleLogout = () => {
     clearAuthSession()
-    navigate('/login', { replace: true })
+    navigate(ROUTES.login, { replace: true })
   }
 
   const totalPages = Math.max(1, Math.ceil(total / pageSize))
@@ -236,7 +237,10 @@ function CategoryPage() {
                                     type="button"
                                     className="btn btn-sm cat-btn-view"
                                     title="View Sub-Categories"
-                                    onClick={() => navigate(`/admin/sub-categories/${cat.category_id}`, { state: { categoryName: cat.name } })}
+                                    onClick={() => {
+                                      if (!cat.category_id) return
+                                      navigate(ROUTES.subCategories(cat.category_id), { state: { categoryName: cat.name } })
+                                    }}
                                   >
                                     <svg viewBox="0 0 24 24" fill="currentColor" width="13" height="13">
                                       <path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z" />
