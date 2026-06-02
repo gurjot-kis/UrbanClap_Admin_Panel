@@ -32,6 +32,11 @@ import VendorSubCategoryPage from './pages/vendor/VendorSubCategoryPage'
 import VendorProductListPage from './pages/vendor/VendorProductListPage'
 import VendorAddProductPage from './pages/vendor/VendorAddProductPage'
 import VendorEditProductPage from './pages/vendor/VendorEditProductPage'
+import VendorWarehouseListPage from './pages/vendor/VendorWarehouseListPage'
+import VendorAddWarehousePage from './pages/vendor/VendorAddWarehousePage'
+import VendorEditWarehousePage from './pages/vendor/VendorEditWarehousePage'
+import VendorOrdersPage from './pages/vendor/VendorOrdersPage'
+import VendorCartSettingsPage from './pages/vendor/VendorCartSettingsPage'
 import { ROUTES, VENDOR_ROUTES } from './routes'
 
 function App() {
@@ -50,6 +55,11 @@ function App() {
         <Route path={VENDOR_ROUTES.products} element={<VendorProductListPage />} />
         <Route path={VENDOR_ROUTES.productsNew} element={<VendorAddProductPage />} />
         <Route path="/vendor/products/:productId/edit" element={<VendorEditProductPage />} />
+        <Route path={VENDOR_ROUTES.warehouses} element={<VendorWarehouseListPage />} />
+        <Route path={VENDOR_ROUTES.warehousesNew} element={<VendorAddWarehousePage />} />
+        <Route path="/vendor/warehouses/:warehouseId/edit" element={<VendorEditWarehousePage />} />
+        <Route path={VENDOR_ROUTES.orders} element={<VendorOrdersPage />} />
+        <Route path={VENDOR_ROUTES.cartSettings} element={<VendorCartSettingsPage />} />
       </Route>
       <Route element={<AdminProtectedRoute />}>
         <Route path={ROUTES.dashboard} element={<DashboardPage />} />

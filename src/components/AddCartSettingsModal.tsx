@@ -4,6 +4,8 @@ import { getStoredToken } from '../utils/auth'
 interface Props {
   onClose: () => void
   onSuccess: () => void
+  apiPath?: string
+  extraPayload?: Record<string, unknown>
 }
 
 type FormState = 'ready' | 'saving' | 'success' | 'saveError'
@@ -42,7 +44,12 @@ function buildPayload(values: Record<FieldKey, string>) {
   return { handling_charge, delivery_charge, free_delivery_min_amount, small_cart_charge, small_cart_max_amount }
 }
 
-function AddCartSettingsModal({ onClose, onSuccess }: Props) {
+function AddCartSettingsModal({
+  onClose,
+  onSuccess,
+  apiPath = '/api/admin/cart-settings',
+  extraPayload,
+}: Props) {
   const token = getStoredToken()
   const backdropRef = useRef<HTMLDivElement>(null)
   const firstRef = useRef<HTMLInputElement>(null)
@@ -70,10 +77,10 @@ function AddCartSettingsModal({ onClose, onSuccess }: Props) {
     setFormState('saving')
     setSaveError('')
     try {
-      const res = await fetch('/api/admin/cart-settings', {
+      const res = await fetch(apiPath, {
         method: 'POST',
         headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload),
+        body: JSON.stringify({ ...payload, ...(extraPayload ?? {}) }),
       })
       if (!res.ok) throw new Error(`Server error: ${res.status}`)
       setFormState('success')

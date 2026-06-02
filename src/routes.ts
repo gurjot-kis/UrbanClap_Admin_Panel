@@ -41,4 +41,9 @@ export const VENDOR_ROUTES = {
   products: '/vendor/products',
   productsNew: '/vendor/products/new',
   productEdit: (productId: string | number) => `/vendor/products/${productId}/edit`,
+  warehouses: '/vendor/warehouses',
+  warehousesNew: '/vendor/warehouses/new',
+  warehouseEdit: (warehouseId: string | number) => `/vendor/warehouses/${warehouseId}/edit`,
+  orders: '/vendor/orders',
+  cartSettings: '/vendor/cart-settings',
 } as const

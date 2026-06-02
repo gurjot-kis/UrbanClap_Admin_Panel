@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef, type ChangeEvent } from 'react'
 import { resolveMediaUrl } from '../config/api'
 import { getStoredToken } from '../utils/auth'
+import { UPLOAD_AREA_OPTIONS, type UploadArea } from '../utils/banner'
 
 interface Props {
   onClose: () => void
@@ -19,6 +20,7 @@ function AddBannerModal({ onClose, onSuccess }: Props) {
   const [description, setDescription] = useState('')
   const [orderUrl, setOrderUrl] = useState('')
   const [status, setStatus] = useState<0 | 1>(1)
+  const [uploadArea, setUploadArea] = useState<UploadArea>('website')
   const [bannerImageFile, setBannerImageFile] = useState<File | null>(null)
   const [saveError, setSaveError] = useState('')
   const [imagePreviewUrl, setImagePreviewUrl] = useState('')
@@ -68,6 +70,7 @@ function AddBannerModal({ onClose, onSuccess }: Props) {
       formData.append('description', description.trim())
       formData.append('order_url', orderUrl.trim())
       formData.append('status', String(status))
+      formData.append('upload_area', uploadArea)
       if (bannerImageFile) formData.append('banner_image', bannerImageFile)
 
       const res = await fetch('/api/banners', {
@@ -165,6 +168,22 @@ function AddBannerModal({ onClose, onSuccess }: Props) {
                   placeholder="https://…"
                   disabled={isSaving}
                 />
+              </div>
+
+              <div className="mb-3">
+                <label className="form-label fw-semibold small text-dark">Upload area</label>
+                <select
+                  className="form-select edit-modal-input"
+                  value={uploadArea}
+                  onChange={(e) => setUploadArea(e.target.value as UploadArea)}
+                  disabled={isSaving}
+                >
+                  {UPLOAD_AREA_OPTIONS.map((opt) => (
+                    <option key={opt.value} value={opt.value}>
+                      {opt.label}
+                    </option>
+                  ))}
+                </select>
               </div>
 
               <div className="mb-3">

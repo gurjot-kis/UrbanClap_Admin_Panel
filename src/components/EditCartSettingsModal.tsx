@@ -14,6 +14,9 @@ interface Props {
   initialValues: CartSettingsFormValues
   onClose: () => void
   onSuccess: () => void
+  apiBasePath?: string
+  queryString?: string
+  extraPayload?: Record<string, unknown>
 }
 
 type FormState = 'ready' | 'saving' | 'success' | 'saveError'
@@ -59,11 +62,19 @@ function recordToValues(record: Record<string, unknown>, fallback: CartSettingsF
   }
 }
 
-function EditCartSettingsModal({ cartSettingsId, initialValues, onClose, onSuccess }: Props) {
+function EditCartSettingsModal({
+  cartSettingsId,
+  initialValues,
+  onClose,
+  onSuccess,
+  apiBasePath = '/api/admin/cart-settings',
+  queryString = '',
+  extraPayload,
+}: Props) {
   const token = getStoredToken()
   const backdropRef = useRef<HTMLDivElement>(null)
   const firstRef = useRef<HTMLInputElement>(null)
-  const apiPath = `/api/admin/cart-settings/${cartSettingsId}`
+  const apiPath = `${apiBasePath}/${cartSettingsId}${queryString ? `?${queryString}` : ''}`
 
   const [formState, setFormState] = useState<FormState>('ready')
   const [values, setValues] = useState(() => toStrings(initialValues))
@@ -112,7 +123,7 @@ function EditCartSettingsModal({ cartSettingsId, initialValues, onClose, onSucce
       const res = await fetch(apiPath, {
         method: 'PUT',
         headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload),
+        body: JSON.stringify({ ...payload, ...(extraPayload ?? {}) }),
       })
       if (!res.ok) throw new Error(`Server error: ${res.status}`)
       setFormState('success')

@@ -7,6 +7,7 @@ import EditBannerModal from '../components/EditBannerModal'
 import DeleteConfirmModal from '../components/DeleteConfirmModal'
 import { resolveMediaUrl } from '../config/api'
 import { ROUTES } from '../routes'
+import { formatUploadAreaLabel } from '../utils/banner'
 import '../styles/Dashboard.css'
 
 interface Banner {
@@ -18,6 +19,7 @@ interface Banner {
   order_url?: string
   orderUrl?: string
   status?: number
+  upload_area?: string
   [key: string]: unknown
 }
 
@@ -201,6 +203,7 @@ function BannerPage() {
                           <th>Title</th>
                           <th>Description</th>
                           <th>Order URL</th>
+                          <th style={{ width: 100 }}>Upload Area</th>
                           <th style={{ width: 100 }}>Status</th>
                           <th style={{ width: 120 }} className="text-center">Actions</th>
                         </tr>
@@ -208,7 +211,7 @@ function BannerPage() {
                       <tbody>
                         {banners.length === 0 ? (
                           <tr>
-                            <td colSpan={7} className="text-center text-muted py-5">
+                            <td colSpan={8} className="text-center text-muted py-5">
                               No banners found
                               {debouncedSearch && (
                                 <span>
@@ -252,6 +255,11 @@ function BannerPage() {
                                   ) : (
                                     <span className="fst-italic text-muted opacity-50">—</span>
                                   )}
+                                </td>
+                                <td>
+                                  <span className="badge text-bg-light border text-capitalize">
+                                    {formatUploadAreaLabel(b.upload_area)}
+                                  </span>
                                 </td>
                                 <td>
                                   <span className={`badge ${st === 1 ? 'text-bg-success' : 'text-bg-secondary'}`}>
@@ -361,6 +369,7 @@ function BannerPage() {
           initialDescription={String(editing.description ?? '')}
           initialOrderUrl={String(editing.order_url ?? editing.orderUrl ?? '')}
           initialStatus={bannerStatus(editing)}
+          initialUploadArea={String(editing.upload_area ?? 'website')}
           initialBannerImage={String(editing.banner_image ?? '')}
           onClose={() => setEditing(null)}
           onSuccess={fetchBanners}

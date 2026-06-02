@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef, type ChangeEvent } from 'react'
 import { getStoredToken } from '../utils/auth'
 import { resolveMediaUrl } from '../config/api'
+import { UPLOAD_AREA_OPTIONS, normalizeUploadArea, type UploadArea } from '../utils/banner'
 
 interface Props {
   bannerId: string
@@ -9,6 +10,7 @@ interface Props {
   initialDescription: string
   initialOrderUrl: string
   initialStatus: 0 | 1
+  initialUploadArea: string
   initialBannerImage: string
   onClose: () => void
   onSuccess: () => void
@@ -27,6 +29,7 @@ function EditBannerModal({
   initialDescription,
   initialOrderUrl,
   initialStatus,
+  initialUploadArea,
   initialBannerImage,
   onClose,
   onSuccess,
@@ -42,6 +45,7 @@ function EditBannerModal({
   const [description, setDescription] = useState(initialDescription)
   const [orderUrl, setOrderUrl] = useState(initialOrderUrl)
   const [status, setStatus] = useState<0 | 1>(initialStatus)
+  const [uploadArea, setUploadArea] = useState<UploadArea>(() => normalizeUploadArea(initialUploadArea))
   const [imageUrl, setImageUrl] = useState(initialBannerImage)
   const [imageFile, setImageFile] = useState<File | null>(null)
   const [imagePreviewUrl, setImagePreviewUrl] = useState('')
@@ -67,6 +71,7 @@ function EditBannerModal({
         setDescription(String(record.description ?? ''))
         setOrderUrl(String(record.order_url ?? record.orderUrl ?? ''))
         setStatus(parseStatus(record.status ?? initialStatus))
+        setUploadArea(normalizeUploadArea(record.upload_area ?? initialUploadArea))
         const img = record.banner_image ?? record.bannerImage ?? initialBannerImage
         setImageUrl(String(img ?? ''))
       } catch {
@@ -113,6 +118,7 @@ function EditBannerModal({
       formData.append('description', description.trim())
       formData.append('order_url', orderUrl.trim())
       formData.append('status', String(status))
+      formData.append('upload_area', uploadArea)
       if (imageFile) formData.append('banner_image', imageFile)
 
       const res = await fetch(apiPath, {
@@ -210,6 +216,22 @@ function EditBannerModal({
                   onChange={(e) => setOrderUrl(e.target.value)}
                   disabled={isSaving}
                 />
+              </div>
+
+              <div className="mb-3">
+                <label className="form-label fw-semibold small text-dark">Upload area</label>
+                <select
+                  className="form-select edit-modal-input"
+                  value={uploadArea}
+                  onChange={(e) => setUploadArea(e.target.value as UploadArea)}
+                  disabled={isSaving}
+                >
+                  {UPLOAD_AREA_OPTIONS.map((opt) => (
+                    <option key={opt.value} value={opt.value}>
+                      {opt.label}
+                    </option>
+                  ))}
+                </select>
               </div>
 
               <div className="mb-3">
