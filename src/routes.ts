@@ -31,7 +31,9 @@ export const ROUTES = {
   vendorWarehouseEdit: (vendorId: string | number, warehouseId: string | number) =>
     `/admin/vendors/${vendorId}/warehouses/${warehouseId}/edit`,
   profile: '/admin/profile',
+  support: '/admin/support',
 } as const
+
 
 export const VENDOR_ROUTES = {
   dashboard: '/vendor/dashboard',

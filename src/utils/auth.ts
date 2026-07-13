@@ -21,6 +21,8 @@ export const getStoredUser = (): AuthUser | null => {
 
 export const getStoredToken = (): string | null => localStorage.getItem(AUTH_TOKEN_KEY)
 
+
+
 export const setAuthSession = (user: AuthUser): void => {
   localStorage.setItem(AUTH_TOKEN_KEY, user.token)
   localStorage.setItem(AUTH_USER_KEY, JSON.stringify(user))

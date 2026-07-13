@@ -1,0 +1,142 @@
+/* ===== Chat background ===== */
+.chat-scroll-bg {
+  background-color: #f3f7f4;
+}
+
+/* ===== WhatsApp-style dot pattern (auto dark via OS setting) ===== */
+.bg-whatsapp-pattern {
+  background-image: radial-gradient(#e0e7e2 1.2px, transparent 1.2px);
+  background-size: 24px 24px;
+}
+ 
+@media (prefers-color-scheme: dark) {
+  .chat-scroll-bg{
+    background-color: #000;
+  }
+  .bg-whatsapp-pattern {
+    background-image: radial-gradient(#1c221e 1.2px, transparent 1.2px);
+
+  }
+}
+
+/* ===== Floating date pill ===== */
+.floating-date-pill {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 14px;
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0.4px;
+  text-transform: uppercase;
+  color: #047857;
+  background: rgba(236, 253, 245, 0.92);
+  backdrop-filter: blur(6px);
+  border: 1px solid rgba(16, 185, 129, 0.2);
+  border-radius: 999px;
+  box-shadow: 0 4px 14px rgba(16, 185, 129, 0.08);
+  pointer-events: none;
+  user-select: none;
+  transition: opacity 0.3s ease, transform 0.3s ease;
+}
+.floating-date-pill.is-hidden {
+  opacity: 0;
+  transform: translate(-50%, -6px) scale(0.95);
+}
+.floating-date-pill.is-visible {
+  opacity: 1;
+  transform: translate(-50%, 0) scale(1);
+}
+
+/* ===== Loading older messages pill ===== */
+.loading-older-pill {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  background: rgba(255, 255, 255, 0.92);
+  backdrop-filter: blur(4px);
+  border: 1px solid #eef1f5;
+  border-radius: 999px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.06);
+  animation: pillFadeIn 0.2s ease both;
+}
+@keyframes pillFadeIn {
+  from { opacity: 0; transform: translate(-50%, -6px); }
+  to { opacity: 1; transform: translate(-50%, 0); }
+}
+
+.bounce-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #10b981;
+  animation: bounceDot 1s infinite ease-in-out both;
+}
+.bounce-dot:nth-child(1) { animation-delay: -0.3s; }
+.bounce-dot:nth-child(2) { animation-delay: -0.15s; }
+.bounce-dot:nth-child(3) { animation-delay: 0s; }
+
+@keyframes bounceDot {
+  0%, 80%, 100% { transform: scale(0.7); opacity: 0.6; }
+  40% { transform: scale(1); opacity: 1; }
+}
+
+.loading-older-label {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  color: #475569;
+}
+
+/* ===== Scroll-to-bottom button ===== */
+.scroll-to-bottom-btn {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  border: 1px solid #eef1f5;
+  background: #ffffff;
+  color: #64748b;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.1);
+  transition: transform 0.2s ease, box-shadow 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+  animation: scaleIn 0.2s ease both;
+}
+.scroll-to-bottom-btn:hover {
+  color: #059669;
+  border-color: #a7f3d0;
+  box-shadow: 0 10px 24px rgba(16, 185, 129, 0.15);
+  transform: translateY(-2px);
+}
+.scroll-to-bottom-btn:active {
+  transform: scale(0.95);
+}
+
+@keyframes scaleIn {
+  from { opacity: 0; transform: scale(0.9); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+.unread-badge-gradient {
+  position: absolute;
+  top: -6px;
+  right: -6px;
+  min-width: 20px;
+  height: 20px;
+  padding: 0 5px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  font-size: 10.5px;
+  font-weight: 700;
+  color: #ffffff;
+  background: linear-gradient(135deg, #10b981, #14b8a6);
+  box-shadow: 0 2px 8px rgba(16, 185, 129, 0.35);
+  border: 2px solid #ffffff;
+  animation: scaleIn 0.2s ease both;
+}
+

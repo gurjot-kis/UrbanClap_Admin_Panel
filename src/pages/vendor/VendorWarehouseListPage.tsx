@@ -1,10 +1,10 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
-import { Navigate, useNavigate } from 'react-router-dom'
+import { Navigate } from 'react-router-dom'
 import { getStoredToken, getStoredUser } from '../../utils/auth'
 import VendorLayout from '../../components/vendor/VendorLayout'
 import VendorPagination from '../../components/vendor/VendorPagination'
 import WarehouseViewModal from '../../components/WarehouseViewModal'
-import { ROUTES, VENDOR_ROUTES } from '../../routes'
+import { ROUTES } from '../../routes'
 import '../../styles/Dashboard.css'
 
 interface WarehouseItem {
@@ -40,7 +40,6 @@ function isDefaultWarehouse(w: WarehouseItem): boolean {
 }
 
 function VendorWarehouseListPage() {
-  const navigate = useNavigate()
   const token = getStoredToken()
   const user = getStoredUser()
 

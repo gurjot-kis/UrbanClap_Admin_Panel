@@ -13,6 +13,7 @@ import UserListPage from './pages/UserListPage'
 import AddUserPage from './pages/AddUserPage'
 import EditUserPage from './pages/EditUserPage'
 import ProfilePage from './pages/ProfilePage'
+import SupportPage from './pages/SupportPage'
 import BannerPage from './pages/BannerPage'
 import CartSettingsPage from './pages/CartSettingsPage'
 import VendorListPage from './pages/VendorListPage'
@@ -83,6 +84,7 @@ function App() {
         <Route path="/admin/vendors/:vendorId/warehouses/new" element={<AddWarehousePage />} />
         <Route path="/admin/vendors/:vendorId/warehouses/:warehouseId/edit" element={<EditWarehousePage />} />
         <Route path={ROUTES.profile} element={<ProfilePage />} />
+        <Route path={ROUTES.support} element={<SupportPage />} />
       </Route>
       <Route path="*" element={<Navigate to={ROUTES.login} replace />} />
     </Routes>

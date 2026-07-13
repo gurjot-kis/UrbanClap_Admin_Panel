@@ -1,0 +1,173 @@
+/* ===== Message row entrance ===== */
+.msg-row {
+  animation: msgFadeIn 0.25s ease both;
+}
+
+@keyframes msgFadeIn {
+  from { opacity: 0; transform: translateY(4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* ===== Bubble shapes & colors ===== */
+.msg-bubble-own {
+  background: linear-gradient(135deg, #059669, #14b8a6);
+  color: #ffffff;
+  border-radius: 18px 18px 4px 18px;
+  box-shadow: 0 2px 10px rgba(5, 150, 105, 0.15);
+}
+
+.msg-bubble-received {
+  background: #ffffff;
+  color: #111827;
+  border: 1px solid #eef1f5;
+  border-radius: 18px 18px 18px 4px;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.04);
+}
+
+/* ===== Reply preview blocks ===== */
+.msg-reply-preview {
+  background: rgba(0, 0, 0, 0.05);
+  border-radius: 10px;
+  transition: background-color 0.15s ease;
+}
+.msg-bubble-own .msg-reply-preview {
+  background: rgba(255, 255, 255, 0.16);
+}
+.msg-reply-preview:hover {
+  background: rgba(0, 0, 0, 0.09);
+}
+.msg-bubble-own .msg-reply-preview:hover {
+  background: rgba(255, 255, 255, 0.24);
+}
+
+/* ===== Reply button: hidden until row hover ===== */
+.msg-reply-btn {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  border: none;
+  background: #f1f3f5;
+  color: #6b7280;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transform: scale(0.9);
+  transition: opacity 0.15s ease, transform 0.15s ease, background-color 0.15s ease;
+  flex-shrink: 0;
+}
+.msg-row:hover .msg-reply-btn {
+  opacity: 1;
+  transform: scale(1);
+}
+.msg-reply-btn:hover {
+  background: #e2e8f0;
+  color: #374151;
+}
+.msg-reply-btn:active {
+  transform: scale(0.92);
+}
+
+/* ===== Media grid items ===== */
+.msg-media-item {
+  position: relative;
+  overflow: hidden;
+  cursor: pointer;
+  background: #f1f5f9;
+  transition: opacity 0.15s ease;
+}
+.msg-media-item:hover {
+  opacity: 0.92;
+}
+.msg-media-item img,
+.msg-media-item video {
+  transition: transform 0.3s ease;
+}
+.msg-media-item:hover img {
+  transform: scale(1.05);
+}
+
+/* ===== File download card ===== */
+.msg-file-card {
+  transition: transform 0.15s ease, background-color 0.15s ease;
+  text-decoration: none;
+}
+.msg-file-card:hover {
+  transform: translateY(-2px);
+}
+
+/* ===== Links inside message text ===== */
+.msg-link-own {
+  color: #bae6fd;
+  font-weight: 600;
+  text-decoration: underline;
+}
+.msg-link-own:hover {
+  color: #e0f2fe;
+}
+.msg-link-received {
+  color: #2563eb;
+  font-weight: 600;
+}
+.msg-link-received:hover {
+  text-decoration: underline;
+}
+
+/* ===== Highlight flash for scroll-to-parent ===== */
+.highlight-flash {
+  animation: highlightPulse 1.5s ease;
+}
+@keyframes highlightPulse {
+  0% { background-color: rgba(250, 204, 21, 0.35); }
+  100% { background-color: transparent; }
+}
+
+/* ===== Lightbox ===== */
+.lightbox-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  background: rgba(0, 0, 0, 0.85);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.lightbox-fade-in { animation: lbFadeIn 0.2s ease both; }
+.lightbox-fade-out { animation: lbFadeOut 0.2s ease both; }
+@keyframes lbFadeIn { from { opacity: 0; } to { opacity: 1; } }
+@keyframes lbFadeOut { from { opacity: 1; } to { opacity: 0; } }
+
+.lightbox-content {
+  max-width: 85vw;
+  max-height: 80vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+}
+.lightbox-scale-in { animation: lbScaleIn 0.2s ease both; }
+.lightbox-scale-out { animation: lbScaleOut 0.2s ease both; }
+@keyframes lbScaleIn { from { opacity: 0; transform: scale(0.94); } to { opacity: 1; transform: scale(1); } }
+@keyframes lbScaleOut { from { opacity: 1; transform: scale(1); } to { opacity: 0; transform: scale(0.94); } }
+
+.lightbox-nav-btn {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(0, 0, 0, 0.4);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.15s ease, background-color 0.15s ease;
+}
+.lightbox-nav-btn:hover {
+  background: rgba(0, 0, 0, 0.6);
+  transform: scale(1.05);
+}
+.lightbox-nav-btn:active {
+  transform: scale(0.95);
+}

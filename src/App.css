@@ -19,3 +19,162 @@
   padding: 10px 12px;
   font-size: 0.9rem;
 }
+
+
+/* Premium WhatsApp-like repeating background pattern */
+/* .bg-whatsapp-pattern {
+  background-image: radial-gradient(#e0e7e2 1.2px, transparent 1.2px);
+  background-size: 24px 24px;
+}
+
+@media (prefers-color-scheme: dark) {
+  .bg-whatsapp-pattern {
+    background-image: radial-gradient(#1c221e 1.2px, transparent 1.2px);
+  }
+}
+
+.dark .bg-whatsapp-pattern {
+  background-image: radial-gradient(#1c221e 1.2px, transparent 1.2px);
+  background-size: 24px 24px;
+} */
+
+
+/* Hardware-accelerated smooth scroll container */
+.smooth-scroll-container {
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  will-change: scroll-position;
+  transform: translate3d(0, 0, 0);
+  backface-visibility: hidden;
+}
+
+/* Global custom thin scrollbars for WebKit browsers (Chrome, Safari, Edge) */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 9999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+
+.dark ::-webkit-scrollbar-thumb {
+  background: #334155;
+}
+
+.dark ::-webkit-scrollbar-thumb:hover {
+  background: #475569;
+}
+
+/* Global custom thin scrollbars for Firefox */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: #cbd5e1 transparent;
+}
+
+/* Lightbox Animations */
+.animate-fadeIn {
+  animation: fadeIn 0.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.animate-fadeOut {
+  animation: fadeOut 0.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.animate-scaleIn {
+  animation: scaleIn 0.25s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
+.animate-scaleOut {
+  animation: scaleOut 0.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes fadeOut {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
+@keyframes scaleIn {
+  from {
+    transform: scale(0.92);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+@keyframes scaleOut {
+  from {
+    transform: scale(1);
+    opacity: 1;
+  }
+  to {
+    transform: scale(0.95);
+    opacity: 0;
+  }
+}
+
+/* Premium Textarea Scrollbar Style */
+.premium-textarea-scrollbar::-webkit-scrollbar {
+  width: 4px;
+}
+.premium-textarea-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+.premium-textarea-scrollbar::-webkit-scrollbar-thumb {
+  background: #10b981;
+  border-radius: 9999px;
+}
+.premium-textarea-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: #059669;
+}
+.dark .premium-textarea-scrollbar::-webkit-scrollbar-thumb {
+  background: #047857;
+}
+.dark .premium-textarea-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: #065f46;
+}
+
+/* Highlight Flash Animation for Replied Messages */
+@keyframes highlightFlash {
+  0% {
+    box-shadow: 0 0 0 0px rgba(16, 185, 129, 0.6);
+    background-color: rgba(16, 185, 129, 0.1);
+  }
+  30% {
+    box-shadow: 0 0 0 6px rgba(16, 185, 129, 0.4);
+    background-color: rgba(16, 185, 129, 0.2);
+  }
+  100% {
+    box-shadow: 0 0 0 0px rgba(16, 185, 129, 0);
+    background-color: transparent;
+  }
+}
+
+.highlight-flash {
+  animation: highlightFlash 1.5s ease-in-out;
+}

@@ -31,6 +31,6 @@ export async function getBannerimg(token: string): Promise<BannerimgItem[]> {
     headers: { Authorization: `Bearer ${token}` },
   })
   if (!res.ok) throw new Error(`bannerimg: ${res.status}`)
-  const json: unknown = await res.json()
-  return normalizeList(json?.data ?? json)
+  const json = (await res.json()) as any;
+  return normalizeList(json?.data ?? json);
 }

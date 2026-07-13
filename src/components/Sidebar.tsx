@@ -1,12 +1,12 @@
-import { useNavigate, useLocation } from 'react-router-dom'
-import { getStoredUser } from '../utils/auth'
-import { resolveMediaUrl } from '../config/api'
-import { ROUTES } from '../routes'
+import { useNavigate, useLocation } from "react-router-dom";
+import { getStoredUser } from "../utils/auth";
+import { resolveMediaUrl } from "../config/api";
+import { ROUTES } from "../routes";
 
 const NAV_ITEMS = [
   {
-    id: 'Dashboard',
-    label: 'Dashboard',
+    id: "Dashboard",
+    label: "Dashboard",
     path: ROUTES.dashboard,
     activePaths: [ROUTES.dashboard],
     icon: (
@@ -16,8 +16,8 @@ const NAV_ITEMS = [
     ),
   },
   {
-    id: 'Vendors',
-    label: 'Vendors',
+    id: "Vendors",
+    label: "Vendors",
     path: ROUTES.vendors,
     activePaths: [ROUTES.vendors],
     icon: (
@@ -27,8 +27,8 @@ const NAV_ITEMS = [
     ),
   },
   {
-    id: 'Users',
-    label: 'Users',
+    id: "Users",
+    label: "Users",
     path: ROUTES.users,
     activePaths: [ROUTES.users],
     icon: (
@@ -38,8 +38,8 @@ const NAV_ITEMS = [
     ),
   },
   {
-    id: 'Profile',
-    label: 'Profile',
+    id: "Profile",
+    label: "Profile",
     path: ROUTES.profile,
     activePaths: [ROUTES.profile],
     icon: (
@@ -49,10 +49,10 @@ const NAV_ITEMS = [
     ),
   },
   {
-    id: 'Category',
-    label: 'Category',
+    id: "Category",
+    label: "Category",
     path: ROUTES.categories,
-    activePaths: [ROUTES.categories, '/admin/sub-categories'],
+    activePaths: [ROUTES.categories, "/admin/sub-categories"],
     icon: (
       <svg viewBox="0 0 24 24" fill="currentColor" width="16" height="16">
         <path d="M10 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2h-8l-2-2z" />
@@ -60,8 +60,8 @@ const NAV_ITEMS = [
     ),
   },
   {
-    id: 'Product',
-    label: 'Product',
+    id: "Product",
+    label: "Product",
     path: ROUTES.products,
     activePaths: [ROUTES.products],
     icon: (
@@ -71,8 +71,8 @@ const NAV_ITEMS = [
     ),
   },
   {
-    id: 'Banners',
-    label: 'Banners',
+    id: "Banners",
+    label: "Banners",
     path: ROUTES.banners,
     activePaths: [ROUTES.banners],
     icon: (
@@ -82,8 +82,8 @@ const NAV_ITEMS = [
     ),
   },
   {
-    id: 'CartSettings',
-    label: 'Cart Settings',
+    id: "CartSettings",
+    label: "Cart Settings",
     path: ROUTES.cartSettings,
     activePaths: [ROUTES.cartSettings],
     icon: (
@@ -93,8 +93,8 @@ const NAV_ITEMS = [
     ),
   },
   {
-    id: 'Orders',
-    label: 'Orders',
+    id: "Orders",
+    label: "Orders",
     path: ROUTES.orders,
     activePaths: [ROUTES.orders],
     icon: (
@@ -103,12 +103,25 @@ const NAV_ITEMS = [
       </svg>
     ),
   },
-]
+
+  {
+    id: "Support",
+    label: "Support",
+    path: ROUTES.support,
+    activePaths: [ROUTES.support],
+    icon: (
+      <svg viewBox="0 0 24 24" fill="currentColor" width="16" height="16">
+        <path d="M20 2H4a2 2 0 0 0-2 2v18l4-4h14a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2zM7 11a1 1 0 1 1 0-2 1 1 0 0 1 0 2zm5 0a1 1 0 1 1 0-2 1 1 0 0 1 0 2zm5 0a1 1 0 1 1 0-2 1 1 0 0 1 0 2z" />
+      </svg>
+    ),
+  },
+
+];
 
 function Sidebar() {
-  const user = getStoredUser()
-  const navigate = useNavigate()
-  const { pathname } = useLocation()
+  const user = getStoredUser();
+  const navigate = useNavigate();
+  const { pathname } = useLocation();
 
   return (
     <aside className="db-sidebar d-flex flex-column flex-shrink-0">
@@ -119,7 +132,12 @@ function Sidebar() {
             <img
               src={resolveMediaUrl(user.profilePicture)}
               alt={user.name}
-              style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '50%' }}
+              style={{
+                width: "100%",
+                height: "100%",
+                objectFit: "cover",
+                borderRadius: "50%",
+              }}
             />
           ) : (
             <svg viewBox="0 0 80 80" xmlns="http://www.w3.org/2000/svg">
@@ -129,7 +147,9 @@ function Sidebar() {
             </svg>
           )}
         </div>
-        <h6 className="fw-bold text-white mb-1 text-uppercase ls-wide">{user?.name}</h6>
+        <h6 className="fw-bold text-white mb-1 text-uppercase ls-wide">
+          {user?.name}
+        </h6>
         <small className="text-white-50">{user?.email}</small>
       </div>
 
@@ -139,7 +159,7 @@ function Sidebar() {
           <button
             key={item.id}
             type="button"
-            className={`db-nav-btn w-100 d-flex align-items-center gap-2 px-4 py-2 border-0 text-start${item.activePaths.some((p) => pathname.startsWith(p)) ? ' active' : ''}`}
+            className={`db-nav-btn w-100 d-flex align-items-center gap-2 px-4 py-2 border-0 text-start${item.activePaths.some((p) => pathname.startsWith(p)) ? " active" : ""}`}
             onClick={() => navigate(item.path)}
           >
             <span className="nav-icon">{item.icon}</span>
@@ -148,7 +168,7 @@ function Sidebar() {
         ))}
       </nav>
     </aside>
-  )
+  );
 }
 
-export default Sidebar
+export default Sidebar;

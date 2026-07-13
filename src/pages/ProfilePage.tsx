@@ -1,4 +1,5 @@
-import { FormEvent, useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
+import type { FormEvent } from 'react'
 import { Navigate, useNavigate } from 'react-router-dom'
 import { clearAuthSession, getStoredToken, getStoredUser, setAuthSession } from '../utils/auth'
 import { resolveMediaUrl } from '../config/api'
