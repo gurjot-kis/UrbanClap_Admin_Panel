@@ -38,7 +38,7 @@ const NewChatModal: FC<NewChatModalProps> = ({ isOpen, onClose }) => {
         const messagesRes = await getMessages({
           conversationId: conversation._id,
           page: 1,
-          limit: 20,
+          limit: 30,
         }).unwrap();
 
         dispatch(

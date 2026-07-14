@@ -1,0 +1,106 @@
+@media (min-width: 768px) {
+  .chat-sidebar-wrapper {
+    width: 320px !important;
+  }
+}
+
+@keyframes dropBounce {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-8px); }
+}
+
+
+/* ===== Message skeleton — full page loader ===== */
+.msg-skeleton-wrapper {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  min-height: 100%;
+  padding: 8px 4px 12px;
+}
+
+.msg-skeleton-row {
+  display: flex;
+  align-items: flex-end;
+  gap: 8px;
+  margin-bottom: 18px;
+  opacity: 0;
+  animation: skeletonRowIn 0.4s ease forwards;
+}
+.msg-skeleton-row.received { justify-content: flex-start; }
+.msg-skeleton-row.sent { justify-content: flex-end; }
+
+.msg-skeleton-row:nth-child(1) { animation-delay: 0.05s; }
+.msg-skeleton-row:nth-child(2) { animation-delay: 0.12s; }
+.msg-skeleton-row:nth-child(3) { animation-delay: 0.19s; }
+.msg-skeleton-row:nth-child(4) { animation-delay: 0.26s; }
+.msg-skeleton-row:nth-child(5) { animation-delay: 0.33s; }
+.msg-skeleton-row:nth-child(6) { animation-delay: 0.4s; }
+.msg-skeleton-row:nth-child(7) { animation-delay: 0.47s; }
+
+@keyframes skeletonRowIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.msg-skeleton-avatar {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.msg-skeleton-bubble {
+  position: relative;
+  overflow: hidden;
+  height: 40px;
+  border-radius: 16px;
+  background: #dde3e7;
+}
+.msg-skeleton-row.received .msg-skeleton-bubble { border-radius: 16px 16px 16px 4px; }
+.msg-skeleton-row.sent .msg-skeleton-bubble { border-radius: 16px 16px 4px 16px; }
+
+.msg-skeleton-bubble::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  width: 60%;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.9) 50%,
+    transparent 100%
+  );
+  animation: skeletonShimmer 1.6s ease-in-out infinite;
+}
+
+@keyframes skeletonShimmer {
+  0% { transform: translateX(-150%); }
+  100% { transform: translateX(250%); }
+}
+
+@media (prefers-color-scheme: dark) {
+  .msg-skeleton-avatar,
+  .msg-skeleton-bubble {
+    background: #2a3630;
+  }
+  .msg-skeleton-bubble::after {
+    background: linear-gradient(
+      90deg,
+      transparent 0%,
+      rgba(255, 255, 255, 0.15) 50%,
+      transparent 100%
+    );
+  }
+}
+
+/* ===== Loaded messages fade-in ===== */
+.msg-list-fade-in {
+  animation: msgListFadeIn 0.3s ease both;
+}
+@keyframes msgListFadeIn {
+  from { opacity: 0; transform: translateY(4px); }
+  to { opacity: 1; transform: translateY(0); }
+}

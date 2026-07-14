@@ -4,21 +4,25 @@ import type { Conversation, Message } from "./chatTypes";
 interface ChatState {
   selectedConversation: Conversation | null;
   messages: Message[];
-  typingUsers: Record<string, Record<string, string>>; // conversationId -> { userId: userName }
-  onlineUsers: string[]; // list of user IDs
+  isMessagesLoading: boolean;
+  typingUsers: Record<string, Record<string, string>>;
+  onlineUsers: string[];
   hasMore: boolean;
   currentPage: number;
   replyingToMessage: Message | null;
+  pendingFiles: File[];
 }
 
 const initialState: ChatState = {
   selectedConversation: null,
   messages: [],
+  isMessagesLoading: false,
   typingUsers: {},
   onlineUsers: [],
   hasMore: false,
   currentPage: 1,
   replyingToMessage: null,
+  pendingFiles: [],
 };
 
 const chatSlice = createSlice({
@@ -31,6 +35,8 @@ const chatSlice = createSlice({
     ) => {
       state.selectedConversation = action.payload;
       state.replyingToMessage = null;
+      state.messages = [];
+      state.isMessagesLoading = !!action.payload;
     },
 
     clearSelectedConversation: (state) => {
@@ -42,19 +48,30 @@ const chatSlice = createSlice({
 
     setMessages: (
       state,
-      action: PayloadAction<{ messages: Message[]; hasMore: boolean; page: number }>
+      action: PayloadAction<{
+        messages: Message[];
+        hasMore: boolean;
+        page: number;
+      }>,
     ) => {
       state.messages = action.payload.messages;
       state.hasMore = action.payload.hasMore;
       state.currentPage = action.payload.page;
+      state.isMessagesLoading = false;
     },
 
     prependMessages: (
       state,
-      action: PayloadAction<{ messages: Message[]; hasMore: boolean; page: number }>
+      action: PayloadAction<{
+        messages: Message[];
+        hasMore: boolean;
+        page: number;
+      }>,
     ) => {
       const existingIds = new Set(state.messages.map((m) => m._id));
-      const uniquePrepended = action.payload.messages.filter((m) => !existingIds.has(m._id));
+      const uniquePrepended = action.payload.messages.filter(
+        (m) => !existingIds.has(m._id),
+      );
       state.messages = [...uniquePrepended, ...state.messages];
       state.hasMore = action.payload.hasMore;
       state.currentPage = action.payload.page;
@@ -65,7 +82,9 @@ const chatSlice = createSlice({
         state.selectedConversation &&
         action.payload.conversation === state.selectedConversation._id
       ) {
-        const exists = state.messages.some((msg) => msg._id === action.payload._id);
+        const exists = state.messages.some(
+          (msg) => msg._id === action.payload._id,
+        );
         if (!exists) {
           state.messages.push(action.payload);
         }
@@ -74,7 +93,7 @@ const chatSlice = createSlice({
 
     markMessagesAsRead: (
       state,
-      action: PayloadAction<{ conversationId: string; userId: string }>
+      action: PayloadAction<{ conversationId: string; userId: string }>,
     ) => {
       const { conversationId, userId } = action.payload;
       if (
@@ -90,7 +109,10 @@ const chatSlice = createSlice({
           if (!alreadyRead) {
             return {
               ...msg,
-              readBy: [...msg.readBy, { user: userId, readAt: new Date().toISOString() }],
+              readBy: [
+                ...msg.readBy,
+                { user: userId, readAt: new Date().toISOString() },
+              ],
             };
           }
           return msg;
@@ -106,7 +128,11 @@ const chatSlice = createSlice({
 
     setUserTyping: (
       state,
-      action: PayloadAction<{ conversationId: string; userId: string; userName: string }>,
+      action: PayloadAction<{
+        conversationId: string;
+        userId: string;
+        userName: string;
+      }>,
     ) => {
       const { conversationId, userId, userName } = action.payload;
       if (!state.typingUsers[conversationId]) {
@@ -136,24 +162,37 @@ const chatSlice = createSlice({
     },
 
     removeUserOffline: (state, action: PayloadAction<string>) => {
-      state.onlineUsers = state.onlineUsers.filter((id) => id !== action.payload);
+      state.onlineUsers = state.onlineUsers.filter(
+        (id) => id !== action.payload,
+      );
     },
 
-    setReplyingToMessage: (
-      state,
-      action: PayloadAction<Message | null>,
-    ) => {
+    setReplyingToMessage: (state, action: PayloadAction<Message | null>) => {
       state.replyingToMessage = action.payload;
+    },
+
+    addPendingFiles: (state, action: PayloadAction<File[]>) => {
+      state.pendingFiles.push(...action.payload);
+    },
+
+    removePendingFile: (state, action: PayloadAction<number>) => {
+      state.pendingFiles.splice(action.payload, 1);
+    },
+
+    clearPendingFiles: (state) => {
+      state.pendingFiles = [];
     },
 
     resetChatState: (state) => {
       state.selectedConversation = null;
       state.messages = [];
+      state.isMessagesLoading = false;
       state.typingUsers = {};
       state.onlineUsers = [];
       state.hasMore = false;
       state.currentPage = 1;
       state.replyingToMessage = null;
+      state.pendingFiles = [];
     },
   },
 });
@@ -172,6 +211,9 @@ export const {
   addUserOnline,
   removeUserOffline,
   setReplyingToMessage,
+  addPendingFiles,
+  removePendingFile,
+  clearPendingFiles,
   resetChatState,
 } = chatSlice.actions;
 

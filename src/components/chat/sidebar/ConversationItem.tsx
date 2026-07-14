@@ -13,6 +13,9 @@ import {
 import { useAppDispatch, useAppSelector } from "../../../store/hooks";
 import UserAvatar from "../shared/UserAvatar";
 import DeleteConfirmModal from "./DeleteConfirmModal";
+import { FaImage, FaVideo } from "react-icons/fa6";
+import { IoDocumentText } from "react-icons/io5";
+
 
 interface Props {
   conversation: Conversation;
@@ -45,7 +48,7 @@ export default function ConversationItem({ conversation }: Props) {
       const response = await getMessages({
         conversationId: conversation._id,
         page: 1,
-        limit: 20,
+        limit: 30,
       }).unwrap();
 
       dispatch(
@@ -84,24 +87,41 @@ export default function ConversationItem({ conversation }: Props) {
     }
   };
 
-  const renderLastMessage = () => {
-    const lastMsg = conversation.lastMessage;
-    if (!lastMsg) return { icon: null, text: "No messages yet" };
+const renderLastMessage = () => {
+  const lastMsg = conversation.lastMessage;
+  if (!lastMsg) return { icon: null, text: "No messages yet" };
 
-    const type = lastMsg.messageType || "text";
-    const text = lastMsg.text;
+  const type = lastMsg.messageType || "text";
+  const text = lastMsg.text;
 
-    if (type === "image") {
-      return { icon: "📷", text: text || "Photo" };
-    }
-    if (type === "video") {
-      return { icon: "🎥", text: text || "Video" };
-    }
-    if (type === "file") {
-      return { icon: "📁", text: text || "Document" };
-    }
-    return { icon: null, text: text || "No messages yet" };
-  };
+  switch (type) {
+    case "image":
+      return {
+        icon: <FaImage className="me-1 text-muted" size={13} />,
+        text: text || "Photo",
+      };
+
+    case "video":
+      return {
+        icon: <FaVideo className="me-1 text-muted" size={15} />,
+        text: text || "Video",
+      };
+
+    case "file":
+      return {
+        icon: (
+          <IoDocumentText className="me-1 text-muted" size={16} />
+        ),
+        text: text || "Document",
+      };
+
+    default:
+      return {
+        icon: null,
+        text: text || "No messages yet",
+      };
+  }
+};
 
   const renderTimestamp = () => {
     const lastMsg = conversation.lastMessage;

@@ -33,7 +33,7 @@ export const chatApi = baseApi.injectEndpoints({
         limit?: number;
       }
     >({
-      query: ({ conversationId, page = 1, limit = 20 }) => ({
+      query: ({ conversationId, page = 1, limit = 30 }) => ({
         url: `/conversations/${conversationId}/messages?page=${page}&limit=${limit}`,
         method: "GET",
       }),
@@ -91,6 +91,16 @@ export const chatApi = baseApi.injectEndpoints({
       },
     }),
 
+    getSuperadmins: builder.query<ApiResponse<User[]>, void>({
+      query: () => ({
+        url: "/users/superadmins",
+        method: "GET",
+      }),
+      extraOptions: {
+        requiresAuth: true,
+      },
+    }),
+
     createPrivateConversation: builder.mutation<ApiResponse<Conversation>, { receiverId: string }>({
       query: (body) => ({
         url: "/conversations/private",
@@ -113,6 +123,30 @@ export const chatApi = baseApi.injectEndpoints({
         requiresAuth: true,
       },
     }),
+
+    endConversation: builder.mutation<{ success: boolean; message: string }, { conversationId: string; end_chat: boolean; rating?: number }>({
+      query: ({ conversationId, end_chat, rating }) => ({
+        url: `/conversations/${conversationId}/end-chat`,
+        method: "POST",
+        body: { end_chat, ...(rating !== undefined && { rating }) },
+      }),
+      invalidatesTags: ["Conversation"],
+      extraOptions: {
+        requiresAuth: true,
+      },
+    }),
+
+    rateConversation: builder.mutation<{ success: boolean; message: string }, { conversationId: string; rating: number }>({
+      query: ({ conversationId, rating }) => ({
+        url: `/conversations/${conversationId}/rate`,
+        method: "POST",
+        body: { rating },
+      }),
+      invalidatesTags: ["Conversation"],
+      extraOptions: {
+        requiresAuth: true,
+      },
+    }),
   }),
 });
 
@@ -123,6 +157,9 @@ export const {
   useUploadMediaMutation,
   useUploadMultipleMediaMutation,
   useGetUsersQuery,
+  useGetSuperadminsQuery,
   useCreatePrivateConversationMutation,
   useDeleteConversationMutation,
+  useEndConversationMutation,
+  useRateConversationMutation,
 } = chatApi;

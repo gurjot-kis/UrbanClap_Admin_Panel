@@ -220,57 +220,57 @@ const MessageBubble: React.FC<MessageBubbleProps> = ({ message }) => {
       case "media_group": {
         if (!mediaItems || mediaItems.length === 0) return null;
 
-        const colClass =
-          mediaItems.length === 2
-            ? "col-6"
-            : mediaItems.length === 3
-              ? "col-4"
-              : "col-6";
+        const count = mediaItems.length;
+        const gridClass =
+          count === 1
+            ? ""
+            : count === 2
+              ? "msg-media-grid-2"
+              : count === 3
+                ? "msg-media-grid-3"
+                : "msg-media-grid-4";
+
+        const itemsToRender = mediaItems.slice(0, 4);
 
         return (
           <div className="d-flex flex-column gap-2">
-            <div className="row g-1" style={{ maxWidth: "300px" }}>
-              {mediaItems.slice(0, 4).map((item, idx) => {
-                const isOverLimit = mediaItems.length > 4 && idx === 3;
+            <div className={`msg-media-grid ${gridClass}`}>
+              {itemsToRender.map((item, idx) => {
+                const isOverLimit = count > 4 && idx === 3;
                 return (
-                  <div key={item.id} className={colClass}>
-                    <div
-                      onClick={() => setActiveLightboxIndex(idx)}
-                      className="msg-media-item ratio ratio-1x1 rounded-3"
-                    >
-                      {item.messageType === "image" ? (
-                        <img
+                  <div
+                    key={item.id}
+                    className="msg-media-grid-item"
+                    onClick={() => setActiveLightboxIndex(idx)}
+                  >
+                    {item.messageType === "image" ? (
+                      <img
+                        src={getMediaUrl(item.mediaUrl)}
+                        alt="Uploaded media"
+                      />
+                    ) : (
+                      <>
+                        <video
                           src={getMediaUrl(item.mediaUrl)}
-                          alt="Uploaded media"
-                          className="w-100 h-100 object-fit-cover"
+                          muted
+                          playsInline
                         />
-                      ) : (
-                        <div className="w-100 h-100 position-relative">
-                          <video
-                            src={getMediaUrl(item.mediaUrl)}
-                            className="w-100 h-100 object-fit-cover"
-                            muted
-                            playsInline
-                          />
-                          <div className="position-absolute top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center bg-black bg-opacity-25">
-                            <svg
-                              fill="currentColor"
-                              viewBox="0 0 24 24"
-                              width="28"
-                              height="28"
-                              className="text-white"
-                            >
-                              <path d="M8 5v14l11-7z" />
-                            </svg>
-                          </div>
+                        <div className="msg-media-play-icon">
+                          <svg
+                            fill="currentColor"
+                            viewBox="0 0 24 24"
+                            width="28"
+                            height="28"
+                            className="text-white"
+                          >
+                            <path d="M8 5v14l11-7z" />
+                          </svg>
                         </div>
-                      )}
-                      {isOverLimit && (
-                        <div className="position-absolute top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center text-white fw-bold bg-black bg-opacity-50">
-                          +{mediaItems.length - 3}
-                        </div>
-                      )}
-                    </div>
+                      </>
+                    )}
+                    {isOverLimit && (
+                      <div className="msg-media-grid-overlay">+{count - 3}</div>
+                    )}
                   </div>
                 );
               })}

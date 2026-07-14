@@ -26,6 +26,7 @@ export interface User {
   avatar?: string;
   profilePicture?: string;
   bio?: string;
+  role?: string;
   createdAt: string;
   updatedAt: string;
   token: string;

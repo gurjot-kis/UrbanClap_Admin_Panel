@@ -1,11 +1,10 @@
 import { useEffect, useRef } from "react";
-import { Navigate, useNavigate } from "react-router-dom";
-import { clearAuthSession, getStoredToken, getStoredUser } from "../utils/auth";
-import Sidebar from "../components/Sidebar";
-import ChatLayout from "../components/chat/ChatLayout";
-import { ROUTES } from "../routes";
-import { connectSocket, disconnectSocket } from "../services/socket";
-import { useAppDispatch, useAppSelector } from "../store/hooks";
+import { Navigate } from "react-router-dom";
+import { getStoredToken, getStoredUser } from "../../utils/auth";
+import ChatLayout from "../../components/chat/ChatLayout";
+import { VENDOR_ROUTES } from "../../routes";
+import { connectSocket, disconnectSocket } from "../../services/socket";
+import { useAppDispatch, useAppSelector } from "../../store/hooks";
 import {
   setOnlineUsers,
   addUserOnline,
@@ -14,17 +13,17 @@ import {
   setUserTyping,
   setUserStopTyping,
   markMessagesAsRead,
-} from "../features/chat/chatSlice";
-import type { Message } from "../features/chat/chatTypes";
-import { chatApi } from "../features/chat/chatApi";
-import "../styles/Dashboard.css";
-import "../styles/Chat.css";
+  setSelectedConversation,
+} from "../../features/chat/chatSlice";
+import type { Message } from "../../features/chat/chatTypes";
+import { chatApi } from "../../features/chat/chatApi";
+import VendorLayout from "../../components/vendor/VendorLayout";
+import "../../styles/Chat.css";
 
-function SupportPage() {
-  const navigate = useNavigate();
+function VendorSupportPage() {
   const dispatch = useAppDispatch();
-  const adminToken = getStoredToken();
-  const adminUser = getStoredUser();
+  const vendorToken = getStoredToken();
+  const vendorUser = getStoredUser();
 
   const selectedConversation = useAppSelector(
     (state) => state.chat.selectedConversation,
@@ -41,24 +40,16 @@ function SupportPage() {
     userRef.current = user;
   }, [user]);
 
-  // Clean login session verification
-  if (!adminToken || !adminUser) {
-    return <Navigate to={ROUTES.login} replace />;
+  if (!vendorToken || !vendorUser) {
+    return <Navigate to={VENDOR_ROUTES.dashboard} replace />;
   }
 
-  const handleLogout = () => {
-    disconnectSocket();
-    clearAuthSession();
-    navigate(ROUTES.login, { replace: true });
-  };
-
   useEffect(() => {
-    if (!adminToken) return;
+    if (!vendorToken) return;
 
-    const socket = connectSocket(adminToken);
+    const socket = connectSocket(vendorToken);
 
     if (socket) {
-      // Presence events
       socket.on("get_online_users", (userIds: string[]) => {
         dispatch(setOnlineUsers(userIds));
       });
@@ -71,7 +62,6 @@ function SupportPage() {
         dispatch(removeUserOffline(data.userId));
       });
 
-      // Chat events
       socket.on(
         "new_message",
         (response: { conversationId: string; message: Message }) => {
@@ -191,13 +181,6 @@ function SupportPage() {
       );
 
       socket.on(
-        "conversation_rated",
-        (_data: { conversationId: string; rating: number; feedback?: string }) => {
-          dispatch(chatApi.util.invalidateTags(["Conversation"]));
-        },
-      );
-
-      socket.on(
         "end_chat",
         (data: { conversationId: string; end_chat: boolean }) => {
           dispatch(
@@ -214,6 +197,23 @@ function SupportPage() {
               },
             ),
           );
+
+          const currentSelected = selectedConversationRef.current;
+          if (currentSelected && currentSelected._id === data.conversationId) {
+            dispatch(
+              setSelectedConversation({
+                ...currentSelected,
+                isEnded: true,
+              }),
+            );
+          }
+        },
+      );
+
+      socket.on(
+        "conversation_rated",
+        (_data: { conversationId: string; rating: number; feedback?: string }) => {
+          dispatch(chatApi.util.invalidateTags(["Conversation"]));
         },
       );
     }
@@ -227,46 +227,18 @@ function SupportPage() {
         socket.off("messages_read");
         socket.off("user_typing");
         socket.off("user_stop_typing");
-        socket.off("conversation_rated");
         socket.off("end_chat");
+        socket.off("conversation_rated");
       }
       disconnectSocket();
     };
-  }, [adminToken, dispatch]);
+  }, [vendorToken, dispatch]);
 
   return (
-    <div className="d-flex min-vh-100 bg-light">
-      <Sidebar />
-      <div className="flex-grow-1 db-main-layout">
-        {/* Top Navbar */}
-        <div className="db-navbar d-flex align-items-center justify-content-between px-4 py-3 bg-white border-bottom shadow-sm">
-          <h5 className="fw-bold mb-0 text-navy">Support Hub</h5>
-          <button
-            className="btn btn-sm btn-outline-danger"
-            onClick={handleLogout}
-          >
-            Logout
-          </button>
-        </div>
-
-        {/* Page Content: Embedded Chat module */}
-        <div className="db-main-content">
-          <div
-            className="card border-0 rounded-3 shadow-sm"
-            style={{ padding: "10px 10px 0" }}
-          >
-            {/* <div className="mb-4">
-              <h4 className="fw-bold text-navy mb-1">Customer Support Chat</h4>
-              <p className="text-muted small mb-0">
-                Connect and assist customers in real-time.
-              </p>
-            </div> */}
-            <ChatLayout />
-          </div>
-        </div>
-      </div>
-    </div>
+    <VendorLayout title="Support">
+      <ChatLayout />
+    </VendorLayout>
   );
 }
 
-export default SupportPage;
+export default VendorSupportPage;

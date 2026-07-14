@@ -3,16 +3,17 @@ import {
   useGetConversationsQuery,
   useLazyGetMessagesQuery,
   useGetUsersQuery,
+  useGetSuperadminsQuery,
   useCreatePrivateConversationMutation,
 } from "../../../features/chat/chatApi";
 import { useAppDispatch, useAppSelector } from "../../../store/hooks";
 import { setSelectedConversation, setMessages } from "../../../features/chat/chatSlice";
 import type { User } from "../../../features/auth/authTypes";
+import { isVendorRole } from "../../../utils/roles";
 import UserAvatar from "../shared/UserAvatar";
 import ConversationItem from "./ConversationItem";
 import NewChatButton from "./NewChatButton";
 import SearchConversation from "./SearchConversation";
-import SidebarHeader from "./SidebarHeader";
 import NewChatModal from "./NewChatModal";
 
 const ConversationSkeleton = () => (
@@ -57,6 +58,7 @@ const EmptyState = () => (
 
 const ChatSidebar = () => {
   const dispatch = useAppDispatch();
+  const currentUser = useAppSelector((state) => state.auth.user);
   const selectedConversation = useAppSelector((state) => state.chat.selectedConversation);
   const [getMessages] = useLazyGetMessagesQuery();
 
@@ -68,7 +70,10 @@ const ChatSidebar = () => {
   const { data: usersResponse, isLoading: isUsersLoading } = useGetUsersQuery(searchQuery, {
     skip: !searchQuery.trim(),
   });
+  const { data: superadminsResponse, isLoading: isSuperadminsLoading } = useGetSuperadminsQuery();
   const [createConversation, { isLoading: isCreating }] = useCreatePrivateConversationMutation();
+
+  const isVendor = isVendorRole(currentUser?.role);
 
   useEffect(() => {
     if (isLoading || !data?.data || selectedConversation) return;
@@ -83,7 +88,7 @@ const ChatSidebar = () => {
             const response = await getMessages({
               conversationId: savedConv._id,
               page: 1,
-              limit: 20,
+              limit: 30,
             }).unwrap();
             dispatch(
               setMessages({
@@ -105,14 +110,14 @@ const ChatSidebar = () => {
     setError("");
     try {
       const existingConv = data?.data?.find((c) => c.user?._id === user._id);
-      if (existingConv) {
+      if (existingConv && !existingConv.isEnded) {
         dispatch(setSelectedConversation(existingConv));
         localStorage.setItem("activeConversationId", existingConv._id);
 
         const response = await getMessages({
           conversationId: existingConv._id,
           page: 1,
-          limit: 20,
+          limit: 30,
         }).unwrap();
 
         dispatch(
@@ -136,7 +141,7 @@ const ChatSidebar = () => {
         const messagesRes = await getMessages({
           conversationId: conversation._id,
           page: 1,
-          limit: 20,
+          limit: 30,
         }).unwrap();
 
         dispatch(
@@ -158,12 +163,73 @@ const ChatSidebar = () => {
     <aside className="chat-sidebar border-end border-light d-flex flex-column h-100 bg-white">
       {/* <SidebarHeader /> */}
 
-      <div className="px-3 py-3 border-bottom border-light flex-shrink-0">
-        <SearchConversation value={searchQuery} onChange={setSearchQuery} />
-
-        <div className="mt-2.5 mt-2">
-          <NewChatButton onClick={() => setIsNewChatModalOpen(true)} />
+      {isVendor && (
+        <div className="px-3 py-3 border-bottom border-light flex-shrink-0">
+          <h6 className="fw-bold mb-2 text-dark" style={{ fontSize: "0.85rem" }}>
+            Chat with Admin
+          </h6>
+          {isSuperadminsLoading ? (
+            <div className="d-flex align-items-center justify-content-center py-3 text-muted small">
+              <span className="spinner-border spinner-border-sm me-2" role="status" />
+              Loading admins...
+            </div>
+          ) : superadminsResponse?.data && superadminsResponse.data.length > 0 ? (
+            <div className="list-group list-group-flush px-1">
+              {superadminsResponse.data.map((admin: User) => {
+                const existingActiveConv = data?.data?.find(
+                  (c) => c.user?._id === admin._id && !c.isEnded,
+                );
+                if (existingActiveConv) return null;
+                return (
+                  <div
+                    key={admin._id}
+                    onClick={() => handleSelectUser(admin)}
+                    className="list-group-item list-group-item-action d-flex align-items-center gap-3 border-0 px-3 py-2 rounded-3 cursor-pointer mb-1"
+                    style={{ cursor: "pointer" }}
+                  >
+                    <UserAvatar name={admin.name} imageUrl={admin.profilePicture} size="md" />
+                    <div className="flex-grow-1 min-w-0">
+                      <h6 className="mb-0 fw-bold text-dark text-truncate" style={{ fontSize: "0.85rem" }}>
+                        {admin.name}
+                      </h6>
+                      <p className="mb-0 text-truncate" style={{ fontSize: "0.75rem", color: "#25D366" }}>
+                        Support Team
+                      </p>
+                    </div>
+                    <svg
+                      className="text-muted flex-shrink-0"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                      width="14"
+                      height="14"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8-1.083 0-2.12-.17-3.08-.484L3 20l1.514-4.03A7.947 7.947 0 013 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"
+                      />
+                    </svg>
+                  </div>
+                );
+              })}
+            </div>
+          ) : (
+            <p className="text-muted small mb-0">No admins available</p>
+          )}
         </div>
+      )}
+
+      <div className="px-3 py-3 border-bottom border-light flex-shrink-0">
+        {!isVendor && (
+          <>
+            <SearchConversation value={searchQuery} onChange={setSearchQuery} />
+            {/* <div className="mt-2.5 mt-2">
+              <NewChatButton onClick={() => setIsNewChatModalOpen(true)} />
+            </div> */}
+          </>
+        )}
       </div>
 
       <div className="chat-conversations-list flex-grow-1 overflow-auto">
@@ -233,9 +299,11 @@ const ChatSidebar = () => {
             ))}
           </>
         ) : data?.data && data.data.length > 0 ? (
-          data.data.map((conversation) => (
-            <ConversationItem key={conversation._id} conversation={conversation} />
-          ))
+          data.data
+            .filter((conversation) => !conversation.isEnded)
+            .map((conversation) => (
+              <ConversationItem key={conversation._id} conversation={conversation} />
+            ))
         ) : (
           <EmptyState />
         )}

@@ -38,6 +38,7 @@ import VendorAddWarehousePage from './pages/vendor/VendorAddWarehousePage'
 import VendorEditWarehousePage from './pages/vendor/VendorEditWarehousePage'
 import VendorOrdersPage from './pages/vendor/VendorOrdersPage'
 import VendorCartSettingsPage from './pages/vendor/VendorCartSettingsPage'
+import VendorSupportPage from './pages/vendor/VendorSupportPage'
 import { ROUTES, VENDOR_ROUTES } from './routes'
 
 function App() {
@@ -61,6 +62,7 @@ function App() {
         <Route path="/vendor/warehouses/:warehouseId/edit" element={<VendorEditWarehousePage />} />
         <Route path={VENDOR_ROUTES.orders} element={<VendorOrdersPage />} />
         <Route path={VENDOR_ROUTES.cartSettings} element={<VendorCartSettingsPage />} />
+        <Route path={VENDOR_ROUTES.support} element={<VendorSupportPage />} />
       </Route>
       <Route element={<AdminProtectedRoute />}>
         <Route path={ROUTES.dashboard} element={<DashboardPage />} />

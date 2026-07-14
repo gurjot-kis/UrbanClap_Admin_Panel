@@ -3,11 +3,14 @@ import ChatHeader from "./header/ChatHeader";
 import ChatBody from "./body/ChatBody";
 import ChatFooter from "./footer/ChatFooter";
 import { useAppSelector } from "../../store/hooks";
+import "./chatLayout.css";
 
 const ChatLayout = () => {
   const selectedConversation = useAppSelector(
     (state) => state.chat.selectedConversation,
   );
+
+  const pendingFiles = useAppSelector((state) => state.chat.pendingFiles);
 
   return (
     <div
@@ -16,8 +19,8 @@ const ChatLayout = () => {
     >
       {/* Sidebar container */}
       <div
-        className={`${selectedConversation ? "d-none d-md-flex" : "d-flex w-100"} h-100 flex-shrink-0`}
-        style={{ width: selectedConversation ? "320px" : "100%" }}
+        className={`chat-sidebar-wrapper ${selectedConversation ? "d-none d-md-flex" : "d-flex"} h-100 flex-shrink-0`}
+        style={{ width: "100%" }}
       >
         <ChatSidebar />
       </div>
@@ -59,7 +62,7 @@ const ChatLayout = () => {
           <div className="d-flex flex-column w-100 h-100 position-relative overflow-hidden">
             <ChatHeader />
             <ChatBody />
-            <ChatFooter />
+            {!selectedConversation.isEnded && pendingFiles.length === 0 && <ChatFooter />}{" "}
           </div>
         )}
       </div>

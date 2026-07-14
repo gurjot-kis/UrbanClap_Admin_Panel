@@ -22,6 +22,7 @@ const getInitialState = (): AuthState => {
       gender: "unknown",
       status: localUser.status?.toString() || "active",
       avatar: localUser.profilePicture,
+      role: localUser.role,
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
       token: localToken,

@@ -9,9 +9,14 @@ export const store = configureStore({
     auth: authReducer,
     chat: chatReducer,
   },
-  middleware: (getDefaultMiddleware) =>
-    getDefaultMiddleware().concat(baseApi.middleware),
-});
+   middleware: (getDefaultMiddleware) =>
+     getDefaultMiddleware({
+       serializableCheck: {
+         ignoredActions: ["chat/addPendingFiles"],
+         ignoredPaths: ["chat.pendingFiles"],
+       },
+     }).concat(baseApi.middleware),
+  });
 
 export type RootState = ReturnType<typeof store.getState>;
 export type AppDispatch = typeof store.dispatch;

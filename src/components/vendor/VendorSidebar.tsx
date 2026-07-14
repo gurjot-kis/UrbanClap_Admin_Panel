@@ -71,6 +71,17 @@ const NAV_ITEMS = [
     ),
   },
   {
+    id: 'Support',
+    label: 'Support',
+    path: VENDOR_ROUTES.support,
+    activePaths: [VENDOR_ROUTES.support],
+    icon: (
+      <svg viewBox="0 0 24 24" fill="currentColor" width="16" height="16">
+        <path d="M20 2H4a2 2 0 0 0-2 2v18l4-4h14a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2zM7 11a1 1 0 1 1 0-2 1 1 0 0 1 0 2zm5 0a1 1 0 1 1 0-2 1 1 0 0 1 0 2zm5 0a1 1 0 1 1 0-2 1 1 0 0 1 0 2z" />
+      </svg>
+    ),
+  },
+  {
     id: 'Profile',
     label: 'Profile',
     path: VENDOR_ROUTES.profile,

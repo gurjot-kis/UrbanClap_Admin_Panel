@@ -1,18 +1,29 @@
-interface DeleteConfirmModalProps {
+import { useEndConversationMutation } from "../../../features/chat/chatApi";
+import { useAppDispatch } from "../../../store/hooks";
+import { clearSelectedConversation } from "../../../features/chat/chatSlice";
+
+interface EndChatModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onConfirm: () => void;
-  title: string;
-  isDeleting: boolean;
+  userName: string;
+  conversationId: string;
 }
 
-export default function DeleteConfirmModal({
-  isOpen,
-  onClose,
-  onConfirm,
-  title,
-  isDeleting,
-}: DeleteConfirmModalProps) {
+const EndChatModal = ({ isOpen, onClose, userName, conversationId }: EndChatModalProps) => {
+  const dispatch = useAppDispatch();
+  const [endConversation, { isLoading }] = useEndConversationMutation();
+
+  const handleEndChat = async () => {
+    try {
+      await endConversation({ conversationId, end_chat: true }).unwrap();
+      dispatch(clearSelectedConversation());
+      localStorage.removeItem("activeConversationId");
+      onClose();
+    } catch (error) {
+      console.error("Failed to end conversation:", error);
+    }
+  };
+
   if (!isOpen) return null;
 
   return (
@@ -25,9 +36,8 @@ export default function DeleteConfirmModal({
       <div className="modal-dialog modal-dialog-centered modal-sm">
         <div className="modal-content border-0 rounded-4 shadow-lg">
           <div className="modal-body p-4 text-center">
-            {/* Red Trash Icon */}
             <div
-              className="d-inline-flex align-items-center justify-content-center bg-danger bg-opacity-10 text-danger rounded-circle mb-3"
+              className="d-inline-flex align-items-center justify-content-center bg-warning bg-opacity-10 text-warning rounded-circle mb-3"
               style={{ width: "48px", height: "48px" }}
             >
               <svg
@@ -41,16 +51,15 @@ export default function DeleteConfirmModal({
                   strokeLinecap="round"
                   strokeLinejoin="round"
                   strokeWidth={2}
-                  d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+                  d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z"
                 />
               </svg>
             </div>
 
-            <h5 className="modal-title fw-bold mb-2">Delete Conversation</h5>
+            <h5 className="modal-title fw-bold mb-2">End Chat</h5>
             <p className="text-muted small mb-4">
-              Are you sure you want to delete your conversation with{" "}
-              <span className="fw-bold text-dark">{title}</span> from your
-              sidebar?
+              Are you sure you want to end the chat with{" "}
+              <span className="fw-bold text-dark">{userName}</span>?
             </p>
 
             <div className="d-flex justify-content-center gap-2">
@@ -61,26 +70,26 @@ export default function DeleteConfirmModal({
                   e.stopPropagation();
                   onClose();
                 }}
-                disabled={isDeleting}
+                disabled={isLoading}
               >
                 Cancel
               </button>
               <button
                 type="button"
-                className="btn btn-danger rounded-pill btn-sm px-4 d-flex align-items-center gap-1"
+                className="btn btn-warning rounded-pill btn-sm px-4 d-flex align-items-center gap-1"
                 onClick={(e) => {
                   e.stopPropagation();
-                  onConfirm();
+                  handleEndChat();
                 }}
-                disabled={isDeleting}
+                disabled={isLoading}
               >
-                {isDeleting && (
+                {isLoading && (
                   <span
                     className="spinner-border spinner-border-sm"
                     role="status"
                   />
                 )}
-                {isDeleting ? "Deleting..." : "Delete"}
+                {isLoading ? "Ending..." : "End Chat"}
               </button>
             </div>
           </div>
@@ -88,4 +97,6 @@ export default function DeleteConfirmModal({
       </div>
     </div>
   );
-}
+};
+
+export default EndChatModal;

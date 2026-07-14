@@ -8,6 +8,7 @@ import { useAppDispatch, useAppSelector } from "../../../store/hooks";
 import {
   addMessage,
   setReplyingToMessage,
+  addPendingFiles,
 } from "../../../features/chat/chatSlice";
 import type { Message } from "../../../features/chat/chatTypes";
 import {
@@ -16,6 +17,8 @@ import {
 } from "../../../features/chat/chatApi";
 import AttachmentMenu from "./AttachmentMenu";
 import PastePreviewModal from "./PastePreviewModal";
+import { FaImage, FaVideo } from "react-icons/fa6";
+import { IoDocumentText } from "react-icons/io5";
 
 const ChatFooter = () => {
   const dispatch = useAppDispatch();
@@ -131,77 +134,79 @@ const ChatFooter = () => {
     _type: "document" | "media",
   ) => {
     if (!conversation) return;
+    dispatch(addPendingFiles(Array.from(files)));
+    setIsAttachmentMenuOpen(false);
 
-    try {
-      const formData = new FormData();
-      for (let i = 0; i < files.length; i++) {
-        formData.append("files", files[i]);
-      }
+    // try {
+    //   const formData = new FormData();
+    //   for (let i = 0; i < files.length; i++) {
+    //     formData.append("files", files[i]);
+    //   }
 
-      const uploadResponse = await uploadMultipleMedia(formData).unwrap();
+    //   const uploadResponse = await uploadMultipleMedia(formData).unwrap();
 
-      if (uploadResponse.success && uploadResponse.data) {
-        const socket = getSocket();
-        if (!socket) return;
+    //   if (uploadResponse.success && uploadResponse.data) {
+    //     const socket = getSocket();
+    //     if (!socket) return;
 
-        for (const fileData of uploadResponse.data) {
-          const { mediaUrl, messageType } = fileData;
-          socket.emit(
-            "send_message",
-            {
-              conversationId: conversation._id,
-              text: "",
-              messageType: messageType,
-              mediaUrl: mediaUrl,
-              parentMessageId: replyingToMessage?._id,
-            },
-            (response: { success: boolean; data?: { message: Message } }) => {
-              if (response.success && response.data?.message) {
-                const sentMessage = response.data.message;
-                dispatch(addMessage(sentMessage));
+    //     for (const fileData of uploadResponse.data) {
+    //       const { mediaUrl, messageType } = fileData;
+    //       socket.emit(
+    //         "send_message",
+    //         {
+    //           conversationId: conversation._id,
+    //           text: "",
+    //           messageType: messageType,
+    //           mediaUrl: mediaUrl,
+    //           parentMessageId: replyingToMessage?._id,
+    //         },
+    //         (response: { success: boolean; data?: { message: Message } }) => {
+    //           if (response.success && response.data?.message) {
+    //             const sentMessage = response.data.message;
+    //             dispatch(addMessage(sentMessage));
 
-                dispatch(
-                  chatApi.util.updateQueryData(
-                    "getConversations",
-                    undefined,
-                    (draft) => {
-                      const conv = draft.data.find(
-                        (c) => c._id === conversation._id,
-                      );
-                      if (conv) {
-                        conv.lastMessage = {
-                          _id: sentMessage._id,
-                          conversation: sentMessage.conversation,
-                          sender: sentMessage.sender._id,
-                          messageType: sentMessage.messageType,
-                          text: sentMessage.text,
-                          mediaUrl: sentMessage.mediaUrl,
-                          readBy: sentMessage.readBy,
-                          deliveredTo: sentMessage.deliveredTo,
-                          createdAt: sentMessage.createdAt,
-                          updatedAt: sentMessage.updatedAt,
-                        };
+    //             dispatch(
+    //               chatApi.util.updateQueryData(
+    //                 "getConversations",
+    //                 undefined,
+    //                 (draft) => {
+    //                   const conv = draft.data.find(
+    //                     (c) => c._id === conversation._id,
+    //                   );
+    //                   if (conv) {
+    //                     conv.lastMessage = {
+    //                       _id: sentMessage._id,
+    //                       conversation: sentMessage.conversation,
+    //                       sender: sentMessage.sender._id,
+    //                       messageType: sentMessage.messageType,
+    //                       text: sentMessage.text,
+    //                       mediaUrl: sentMessage.mediaUrl,
+    //                       readBy: sentMessage.readBy,
+    //                       deliveredTo: sentMessage.deliveredTo,
+    //                       createdAt: sentMessage.createdAt,
+    //                       updatedAt: sentMessage.updatedAt,
+    //                     };
 
-                        const index = draft.data.indexOf(conv);
-                        if (index > -1) {
-                          draft.data.splice(index, 1);
-                          draft.data.unshift(conv);
-                        }
-                      }
-                    },
-                  ),
-                );
-              }
-            },
-          );
-        }
-      }
-    } catch (error) {
-      console.error("Failed to upload media:", error);
-    } finally {
-      setIsAttachmentMenuOpen(false);
-      dispatch(setReplyingToMessage(null));
-    }
+    //                     const index = draft.data.indexOf(conv);
+    //                     if (index > -1) {
+    //                       draft.data.splice(index, 1);
+    //                       draft.data.unshift(conv);
+    //                     }
+    //                   }
+    //                 },
+    //               ),
+    //             );
+    //           }
+    //         },
+    //       );
+    //     }
+    //   }
+    // } catch (error) {
+    //   console.error("Failed to upload media:", error);
+    // } finally {
+    //   setIsAttachmentMenuOpen(false);
+    //   dispatch(setReplyingToMessage(null));
+    // }
   };
 
   const handleSelectEmoji = (emoji: string) => {
@@ -309,6 +314,37 @@ const ChatFooter = () => {
     }
   };
 
+  const renderReplyPreview = (message: Message) => {
+    switch (message.messageType) {
+      case "image":
+        return (
+          <span className="d-inline-flex align-items-center gap-1">
+            <FaImage size={13} className="text-muted" />
+            Photo
+          </span>
+        );
+
+      case "video":
+        return (
+          <span className="d-inline-flex align-items-center gap-1">
+            <FaVideo size={13} className="text-muted" />
+            Video
+          </span>
+        );
+
+      case "file":
+        return (
+          <span className="d-inline-flex align-items-center gap-1">
+            <IoDocumentText size={14} className="text-muted" />
+            File
+          </span>
+        );
+
+      default:
+        return message.text;
+    }
+  };
+
   return (
     <footer className="chat-main-footer w-100 position-relative d-flex flex-column gap-2 px-3 py-3 border-top border-light bg-white">
       {/* Replying Preview Container */}
@@ -325,13 +361,7 @@ const ChatFooter = () => {
               className="text-muted text-truncate"
               style={{ maxWidth: "350px" }}
             >
-              {replyingToMessage.messageType === "image"
-                ? "📷 Photo"
-                : replyingToMessage.messageType === "video"
-                  ? "🎥 Video"
-                  : replyingToMessage.messageType === "file"
-                    ? "📄 File"
-                    : replyingToMessage.text}
+              {renderReplyPreview(replyingToMessage)}
             </span>
           </div>
           <button

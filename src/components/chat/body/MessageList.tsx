@@ -21,14 +21,14 @@ const MessageList = ({ unreadMarkerId, unreadCount = 0 }: MessageListProps) => {
   const loggedInUser = useAppSelector((state) => state.auth.user);
 
   useEffect(() => {
-    if (!selectedConversation) return;
+    if (!selectedConversation || selectedConversation.isEnded) return;
 
     const loadMessages = async () => {
       try {
         const response = await getMessages({
           conversationId: selectedConversation._id,
           page: 1,
-          limit: 20,
+          limit: 30,
         }).unwrap();
 
         dispatch(

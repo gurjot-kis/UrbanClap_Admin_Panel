@@ -48,4 +48,5 @@ export const VENDOR_ROUTES = {
   warehouseEdit: (warehouseId: string | number) => `/vendor/warehouses/${warehouseId}/edit`,
   orders: '/vendor/orders',
   cartSettings: '/vendor/cart-settings',
+  support: '/vendor/support',
 } as const

@@ -247,7 +247,10 @@ export default function InfiniteScrollContainer({
         className="w-100 h-100 px-4 py-3 flex-grow-1"
         style={{ overflowY: "auto", minHeight: 0 }}
       >
-        <div className="d-flex flex-column justify-content-end min-vh-100 pb-2">
+        <div
+          className="d-flex flex-column justify-content-end pb-2 "
+          style={{ minHeight: "100%" }}
+        >
           {children}
         </div>
       </div>
