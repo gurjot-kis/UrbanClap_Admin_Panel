@@ -14,9 +14,12 @@ import {
   setUserTyping,
   setUserStopTyping,
   markMessagesAsRead,
+  setMessages,
+  removeConversation,
+  clearMessages,
 } from "../features/chat/chatSlice";
 import type { Message } from "../features/chat/chatTypes";
-import { chatApi } from "../features/chat/chatApi";
+import { chatApi, useLazyGetMessagesQuery } from "../features/chat/chatApi";
 import "../styles/Dashboard.css";
 import "../styles/Chat.css";
 
@@ -25,6 +28,8 @@ function SupportPage() {
   const dispatch = useAppDispatch();
   const adminToken = getStoredToken();
   const adminUser = getStoredUser();
+
+  const [getMessages] = useLazyGetMessagesQuery();
 
   const selectedConversation = useAppSelector(
     (state) => state.chat.selectedConversation,
@@ -191,15 +196,8 @@ function SupportPage() {
       );
 
       socket.on(
-        "conversation_rated",
-        (_data: { conversationId: string; rating: number; feedback?: string }) => {
-          dispatch(chatApi.util.invalidateTags(["Conversation"]));
-        },
-      );
-
-      socket.on(
         "end_chat",
-        (data: { conversationId: string; end_chat: boolean }) => {
+        async (data: { conversationId: string; end_chat: boolean }) => {
           dispatch(
             chatApi.util.updateQueryData(
               "getConversations",
@@ -214,6 +212,63 @@ function SupportPage() {
               },
             ),
           );
+
+          const currentSelected = selectedConversationRef.current;
+          if (currentSelected && currentSelected._id === data.conversationId) {
+            // Reload messages when chat is ended
+            try {
+              const response = await getMessages({
+                conversationId: data.conversationId,
+                page: 1,
+                limit: 30,
+              }).unwrap();
+
+              dispatch(
+                setMessages({
+                  messages: response.data.messages,
+                  hasMore: response.data.hasMore,
+                  page: response.data.page,
+                })
+              );
+            } catch (error) {
+              console.error("Failed to reload messages after end chat:", error);
+            }
+          }
+        },
+      );
+
+      socket.on(
+        "conversation_rated",
+        (_data: { conversationId: string; rating: number; feedback?: string }) => {
+          dispatch(chatApi.util.invalidateTags(["Conversation"]));
+        },
+      );
+
+      socket.on(
+        "conversation_removed",
+        (data: { conversationId: string; reason?: string }) => {
+          const currentSelected = selectedConversationRef.current;
+
+          dispatch(
+            chatApi.util.updateQueryData(
+              "getConversations",
+              undefined,
+              (draft) => {
+                const index = draft.data.findIndex(
+                  (c) => c._id === data.conversationId
+                );
+                if (index > -1) {
+                  draft.data.splice(index, 1);
+                }
+              }
+            ),
+          );
+
+          if (currentSelected && currentSelected._id === data.conversationId) {
+            dispatch(removeConversation(data.conversationId));
+            dispatch(clearMessages());
+            localStorage.removeItem("activeConversationId");
+          }
         },
       );
     }
@@ -227,12 +282,13 @@ function SupportPage() {
         socket.off("messages_read");
         socket.off("user_typing");
         socket.off("user_stop_typing");
-        socket.off("conversation_rated");
         socket.off("end_chat");
+        socket.off("conversation_rated");
+        socket.off("conversation_removed");
       }
       disconnectSocket();
     };
-  }, [adminToken, dispatch]);
+  }, [adminToken, dispatch, getMessages]);
 
   return (
     <div className="d-flex min-vh-100 bg-light">

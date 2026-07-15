@@ -192,16 +192,14 @@ const MessageBubble: React.FC<MessageBubbleProps> = ({ message }) => {
     return (
       <div
         onClick={() => handleScrollToParent(parent._id)}
-        className="msg-reply-preview mb-2 p-2 text-start border-start border-4"
+        className={`msg-reply-preview mb-2 p-2 text-start border-start border-4 ${isOwn ? "msg-reply-border-own" : "msg-reply-border-received"}`}
         style={{
           fontSize: "0.75rem",
-          borderColor: isOwn ? "#a7f3d0" : "#10b981",
           cursor: "pointer",
         }}
       >
         <div
-          className="fw-semibold"
-          style={{ color: isOwn ? "#ffffff" : "#059669" }}
+          className={`fw-semibold ${isOwn ? "msg-reply-sender-own" : "msg-reply-sender-received"}`}
         >
           {parent.senderName}
         </div>

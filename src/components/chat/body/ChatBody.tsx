@@ -56,6 +56,7 @@ const ChatBody = () => {
   const [unreadMarkerId, setUnreadMarkerId] = useState<string | null>(null);
   const [isDragging, setIsDragging] = useState(false);
   const [isFocused, setIsFocused] = useState(true);
+  const [previewCaption, setPreviewCaption] = useState("");
   const [rating, setRating] = useState(0);
   const [hoverRating, setHoverRating] = useState(0);
   const [ratingSubmitted, setRatingSubmitted] = useState(false);
@@ -100,15 +101,18 @@ const ChatBody = () => {
     }
   };
 
-  const handleUploadFiles = async (files: File[]) => {
+  useEffect(() => {
+    setPreviewCaption("");
+  }, [pendingFiles]);
+
+  const handleUploadFiles = async (files: File[], caption: string = "") => {
     if (!conversationId || files.length === 0) return;
 
     try {
       const formData = new FormData();
-      // for (let i = 0; i < files.length; i++) {
-      //   formData.append("files", files[i]);
-      // }
-      files.forEach((file) => formData.append("files", file));
+      for (let i = 0; i < files.length; i++) {
+        formData.append("files", files[i]);
+      }
 
       const uploadResponse = await uploadMultipleMedia(formData).unwrap();
 
@@ -116,13 +120,16 @@ const ChatBody = () => {
         const socket = getSocket();
         if (!socket) return;
 
-        for (const fileData of uploadResponse.data) {
+        for (let i = 0; i < uploadResponse.data.length; i++) {
+          const fileData = uploadResponse.data[i];
           const { mediaUrl, messageType } = fileData;
+          const msgCaption = caption;
+
           socket.emit(
             "send_message",
             {
               conversationId,
-              text: "",
+              text: msgCaption,
               messageType,
               mediaUrl,
             },
@@ -172,10 +179,11 @@ const ChatBody = () => {
     }
   };
 
-  const handleSendPendingFiles = async () => {
+  const handleSendPendingFiles = async (caption?: string) => {
     if (pendingFiles.length === 0) return;
-    await handleUploadFiles(pendingFiles);
+    await handleUploadFiles(pendingFiles, caption || previewCaption);
     dispatch(clearPendingFiles());
+    setPreviewCaption("");
   };
 
   const handleRemovePendingFile = (index: number) => {
@@ -358,7 +366,7 @@ const ChatBody = () => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === "Enter" && !isUploading) {
         e.preventDefault();
-        handleSendPendingFiles();
+        handleSendPendingFiles(previewCaption);
       } else if (e.key === "Escape" && !isUploading) {
         e.preventDefault();
         handleCancelPendingFiles();
@@ -369,7 +377,7 @@ const ChatBody = () => {
     return () => {
       window.removeEventListener("keydown", handleKeyDown);
     };
-  }, [pendingFiles, isUploading]);
+  }, [pendingFiles, isUploading, previewCaption, handleSendPendingFiles]);
 
   const handleLoadMore = async () => {
     if (!conversationId || loadingOlder || !hasMore || isFetchingMore) return;
@@ -586,20 +594,42 @@ const ChatBody = () => {
           </div>
 
           {/* Bottom send bar */}
-          <div className="d-flex align-items-center justify-content-end px-3 py-3 border-top flex-shrink-0 gap-2">
+          <div className="d-flex align-items-center gap-2 px-3 py-3 border-top border-light bg-white flex-shrink-0">
+            <input
+              type="text"
+              placeholder="Add a caption..."
+              value={previewCaption}
+              onChange={(e) => setPreviewCaption(e.target.value)}
+              disabled={isUploading}
+              onKeyDown={(e) => {
+                if (e.key === "Enter" && !e.shiftKey && !isUploading) {
+                  e.preventDefault();
+                  handleSendPendingFiles(previewCaption);
+                } else if (e.key === "Escape") {
+                  handleCancelPendingFiles();
+                }
+              }}
+              className="form-control rounded-pill border bg-light flex-grow-1"
+              style={{
+                fontSize: "0.85rem",
+                paddingTop: "0.55rem",
+                paddingBottom: "0.55rem",
+                minHeight: "40px",
+              }}
+            />
             {isUploading && (
               <span className="small text-muted me-2">Uploading...</span>
             )}
             <button
               type="button"
-              className="btn rounded-circle d-flex align-items-center justify-content-center p-0"
+              className="btn rounded-circle d-flex align-items-center justify-content-center p-0 flex-shrink-0"
               style={{
                 width: "52px",
                 height: "52px",
                 backgroundColor: "#25D366",
                 border: "none",
               }}
-              onClick={handleSendPendingFiles}
+              onClick={() => handleSendPendingFiles(previewCaption)}
               disabled={isUploading}
             >
               {isUploading ? (

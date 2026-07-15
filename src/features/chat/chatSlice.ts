@@ -194,6 +194,17 @@ const chatSlice = createSlice({
       state.replyingToMessage = null;
       state.pendingFiles = [];
     },
+
+    removeConversation: (state, action: PayloadAction<string>) => {
+      const conversationId = action.payload;
+      if (state.selectedConversation && state.selectedConversation._id === conversationId) {
+        state.selectedConversation = null;
+        state.messages = [];
+        state.hasMore = false;
+        state.currentPage = 1;
+        state.replyingToMessage = null;
+      }
+    },
   },
 });
 
@@ -215,6 +226,7 @@ export const {
   removePendingFile,
   clearPendingFiles,
   resetChatState,
+  removeConversation,
 } = chatSlice.actions;
 
 export default chatSlice.reducer;

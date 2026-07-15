@@ -6,6 +6,7 @@ interface Props {
   onKeyDown?: (e: React.KeyboardEvent<HTMLTextAreaElement>) => void;
   onPaste?: (e: React.ClipboardEvent<HTMLTextAreaElement>) => void;
   disabled?: boolean;
+  placeholder?: string;
 }
 
 const MessageInput: React.FC<Props> = ({
@@ -14,6 +15,7 @@ const MessageInput: React.FC<Props> = ({
   onKeyDown,
   onPaste,
   disabled = false,
+  placeholder = "Type a message...",
 }) => {
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
@@ -43,7 +45,7 @@ const MessageInput: React.FC<Props> = ({
         onKeyDown={onKeyDown}
         onPaste={onPaste}
         disabled={disabled}
-        placeholder="Type a message..."
+        placeholder={placeholder}
         className="form-control rounded-4 bg-light border-0 py-2 px-3 small resize-none"
         style={{
           height: "38px",

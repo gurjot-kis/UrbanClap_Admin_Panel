@@ -62,7 +62,7 @@ const ChatLayout = () => {
           <div className="d-flex flex-column w-100 h-100 position-relative overflow-hidden">
             <ChatHeader />
             <ChatBody />
-            {!selectedConversation.isEnded && pendingFiles.length === 0 && <ChatFooter />}{" "}
+            {pendingFiles.length === 0 && <ChatFooter disabled={selectedConversation.isEnded} />}{" "}
           </div>
         )}
       </div>

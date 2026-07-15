@@ -98,9 +98,9 @@ const MessageList = ({ unreadMarkerId, unreadCount = 0 }: MessageListProps) => {
       if (currentMediaGroup.length === 1) {
         processedItems.push(currentMediaGroup[0]);
       } else {
-        const lastMsg = currentMediaGroup[currentMediaGroup.length - 1];
+        const firstMsg = currentMediaGroup[0];
         processedItems.push({
-          ...lastMsg,
+          ...firstMsg,
           messageType: "media_group",
           mediaItems: currentMediaGroup.map((msg) => ({
             id: msg._id,
@@ -128,7 +128,7 @@ const MessageList = ({ unreadMarkerId, unreadCount = 0 }: MessageListProps) => {
           new Date(message.createdAt).getTime() -
             new Date(lastMsgInGroup.createdAt).getTime(),
         ) <
-          2 * 60 * 1000;
+          10 * 1000;
 
       if (isMedia) {
         if (canGroup) {

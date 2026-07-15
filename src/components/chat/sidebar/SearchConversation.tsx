@@ -10,15 +10,15 @@ const SearchConversation: React.FC<SearchConversationProps> = ({ value, onChange
     <div className="position-relative">
       <div
         className="position-absolute top-50 start-0 translate-middle-y ps-3 pointer-events-none d-flex align-items-center"
-        style={{ pointerEvents: "none" }}
+        style={{ pointerEvents: "none", zIndex: 2 }}
       >
         <svg
           className="text-secondary"
           fill="none"
           stroke="currentColor"
           viewBox="0 0 24 24"
-          width="16"
-          height="16"
+          width="18"
+          height="18"
         >
           <path
             strokeLinecap="round"
@@ -32,9 +32,16 @@ const SearchConversation: React.FC<SearchConversationProps> = ({ value, onChange
         type="text"
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        className="form-control rounded-pill bg-light border-0 small"
-        placeholder="Search chats..."
-        style={{ paddingLeft: "2.5rem", fontSize: "0.85rem" }}
+        className="form-control rounded-pill border bg-light"
+        placeholder="Search conversations..."
+        style={{
+          paddingLeft: "2.75rem",
+          paddingTop: "0.65rem",
+          paddingBottom: "0.65rem",
+          fontSize: "0.9rem",
+          minHeight: "44px",
+          transition: "border-color 0.2s ease, box-shadow 0.2s ease",
+        }}
       />
     </div>
   );

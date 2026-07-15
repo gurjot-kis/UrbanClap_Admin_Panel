@@ -1,8 +1,508 @@
 /* ── Sidebar (Bootstrap cannot do themed dark nav sidebar) ── */
 .db-sidebar {
-  width: 210px;
-  background: #1b3a5c;
+  width: 240px;
+  background: linear-gradient(180deg, #1e3a5f 0%, #1b3a5c 100%);
   color: #fff;
+  box-shadow: 4px 0 24px rgba(0, 0, 0, 0.15);
+  position: relative;
+  z-index: 10;
+}
+
+.db-sidebar::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: 1px;
+  background: linear-gradient(180deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.05) 100%);
+}
+
+.db-avatar {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  overflow: hidden;
+  border: 3px solid rgba(255, 255, 255, 0.2);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.db-avatar:hover {
+  transform: scale(1.05);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.25);
+}
+
+.db-avatar svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.db-nav-btn {
+  background: none;
+  color: rgba(255, 255, 255, 0.65);
+  font-size: 0.9rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  border-radius: 10px;
+  margin: 3px 10px;
+  padding: 11px 14px !important;
+  position: relative;
+  overflow: hidden;
+  letter-spacing: 0.01em;
+}
+
+.db-nav-btn::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 3px;
+  height: 0;
+  background: #38bdf8;
+  border-radius: 0 3px 3px 0;
+  transition: height 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.db-nav-btn:hover {
+  background: rgba(255, 255, 255, 0.08);
+  color: #fff;
+  transform: translateX(3px);
+}
+
+.db-nav-btn.active {
+  background: rgba(255, 255, 255, 0.12);
+  color: #fff;
+  box-shadow: none;
+  font-weight: 600;
+}
+
+.db-nav-btn.active::before {
+  height: 60%;
+}
+
+.nav-icon {
+  width: 20px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  opacity: 0.75;
+  transition: opacity 0.2s ease;
+}
+
+.db-nav-btn:hover .nav-icon,
+.db-nav-btn.active .nav-icon {
+  opacity: 1;
+}
+
+/* ── Stat card dollar badge ── */
+.stat-badge {
+  width: 26px;
+  height: 26px;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.8rem;
+  font-weight: 700;
+}
+
+/* ── Orange "Check Now" button (custom brand color) ── */
+.btn-check-orange {
+  background: #f5a623;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  transition: background 0.18s;
+}
+
+.btn-check-orange:hover {
+  background: #e09515;
+  color: #fff;
+}
+
+/* ── Legend dots ── */
+.leg-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 2px;
+  display: inline-block;
+  flex-shrink: 0;
+}
+
+.navy-dot  { background: #1b3a5c; }
+.orange-dot { background: #f5a623; }
+
+/* ── Donut centre label ── */
+.donut-ring-wrap {
+  position: relative;
+  width: 130px;
+  height: 130px;
+  flex-shrink: 0;
+}
+
+.donut-pct {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 1.1rem;
+  font-weight: 700;
+}
+
+/* ===== Dark Mode ===== */
+@media (prefers-color-scheme: dark) {
+  .db-sidebar {
+    background: linear-gradient(180deg, #0f172a 0%, #1e293b 100%);
+  }
+
+  .db-nav-btn {
+    color: rgba(255, 255, 255, 0.6);
+  }
+
+  .db-nav-btn:hover,
+  .db-nav-btn.active {
+    background: rgba(255, 255, 255, 0.08);
+    color: #f1f5f9;
+  }
+
+  .db-nav-btn::before {
+    background: #38bdf8;
+  }
+
+  .db-avatar {
+    border-color: rgba(255, 255, 255, 0.25);
+  }
+
+  .vendor-layout-root {
+    background: #0f172a !important;
+  }
+
+  .vendor-header {
+    background: #1e293b !important;
+    border-bottom: 1px solid #334155;
+  }
+
+  .vendor-title {
+    color: #f1f5f9 !important;
+  }
+
+  .vendor-subtitle {
+    color: #94a3b8 !important;
+  }
+
+  .vendor-content {
+    background: #0f172a;
+  }
+
+  .chat-sidebar {
+    background-color: #1e293b !important;
+    border-right-color: #334155 !important;
+  }
+
+  .chat-sidebar-header {
+    border-bottom-color: #334155 !important;
+  }
+
+  .chat-search-wrapper {
+    border-bottom-color: #334155 !important;
+  }
+
+  .conversation-item {
+    color: #e2e8f0;
+  }
+
+  .conversation-item:hover {
+    background-color: #334155 !important;
+  }
+
+  .conversation-item.active {
+    background-color: #1e3a8a !important;
+    border-left-color: #38bdf8 !important;
+  }
+
+  .conversation-item-name {
+    color: #f1f5f9 !important;
+  }
+
+  .conversation-item-lastmsg {
+    color: #94a3b8 !important;
+  }
+
+  .conversation-item-time {
+    color: #64748b !important;
+  }
+
+  .chat-main-area {
+    background-color: #0f172a !important;
+  }
+
+  .chat-empty-state {
+    color: #94a3b8;
+  }
+
+  .chat-empty-icon {
+    color: #64748b;
+  }
+
+  .chat-main-header {
+    background-color: #1e293b !important;
+    border-bottom-color: #334155 !important;
+  }
+
+  .chat-messages-body {
+    background-color: #0f172a !important;
+  }
+
+  .message-row.sent .message-bubble {
+    background-color: #059669 !important;
+    color: #f0fdf4 !important;
+  }
+
+  .message-row.received .message-bubble {
+    background-color: #1e293b !important;
+    color: #e2e8f0 !important;
+    border-color: #334155 !important;
+  }
+
+  .message-time {
+    color: #94a3b8 !important;
+  }
+
+  .message-row.received .message-time {
+    color: #94a3b8 !important;
+  }
+
+  .message-row.sent .message-time {
+    color: #a7f3d0 !important;
+  }
+
+  .chat-main-footer {
+    background-color: #1e293b !important;
+    border-top-color: #334155 !important;
+  }
+
+  .chat-input-field {
+    background-color: #0f172a !important;
+    border-color: #334155 !important;
+    color: #e2e8f0 !important;
+  }
+
+  .chat-input-field:focus {
+    border-color: #38bdf8 !important;
+  }
+
+  .chat-input-field::placeholder {
+    color: #64748b !important;
+  }
+
+  .chat-action-btn {
+    color: #94a3b8 !important;
+  }
+
+  .chat-action-btn:hover {
+    background-color: #334155 !important;
+    color: #f1f5f9 !important;
+  }
+
+  .chat-action-btn.send {
+    background-color: #059669 !important;
+    color: #ffffff !important;
+  }
+
+  .chat-action-btn.send:hover {
+    background-color: #047857 !important;
+    color: #ffffff !important;
+  }
+
+  .seen-indicator {
+    color: #38bdf8 !important;
+  }
+
+  .typing-indicator-bubble {
+    background-color: #1e293b !important;
+    border: 1px solid #334155 !important;
+  }
+
+  .typing-dot {
+    background-color: #94a3b8 !important;
+  }
+
+  .attachment-menu-container {
+    background: #1e293b !important;
+    border-color: #334155 !important;
+  }
+
+  .attachment-option {
+    color: #e2e8f0 !important;
+  }
+
+  .attachment-option:hover {
+    background-color: #334155 !important;
+  }
+
+  .empty-state {
+    color: #94a3b8 !important;
+  }
+
+  .scroll-to-bottom-btn {
+    background-color: #1e293b !important;
+    border: 1px solid #334155 !important;
+    color: #e2e8f0 !important;
+  }
+
+  .scroll-to-bottom-btn:hover {
+    background-color: #334155 !important;
+  }
+
+  .unread-badge-gradient {
+    background: linear-gradient(135deg, #dc2626, #ef4444) !important;
+    color: #ffffff !important;
+  }
+
+  .floating-date-pill {
+    background-color: #1e293b !important;
+    border: 1px solid #334155 !important;
+    color: #e2e8f0 !important;
+  }
+
+  .chat-conversations-list {
+    scrollbar-color: #475569 #1e293b !important;
+  }
+
+  .chat-conversations-list::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  .chat-conversations-list::-webkit-scrollbar-track {
+    background: #1e293b !important;
+  }
+
+  .chat-conversations-list::-webkit-scrollbar-thumb {
+    background: #475569 !important;
+    border-radius: 3px;
+  }
+
+  .conversation-item-details {
+    color: #e2e8f0;
+  }
+}
+
+.db-avatar {
+  width: 76px;
+  height: 76px;
+  border-radius: 50%;
+  overflow: hidden;
+  border: 3px solid rgba(255, 255, 255, 0.18);
+}
+
+.db-avatar svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.db-nav-btn {
+  background: none;
+  color: rgba(255, 255, 255, 0.62);
+  font-size: 0.87rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border-radius: 8px;
+  margin: 2px 8px;
+  padding: 10px 12px !important;
+}
+
+.db-nav-btn:hover {
+  background: rgba(255, 255, 255, 0.08);
+  color: #fff;
+  transform: translateX(2px);
+}
+
+.db-nav-btn.active {
+  background: rgba(255, 255, 255, 0.12);
+  color: #fff;
+  box-shadow: inset 3px 0 0 #38bdf8;
+}
+
+.nav-icon {
+  width: 18px;
+  height: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  opacity: 0.8;
+}
+
+.db-nav-btn.active .nav-icon {
+  opacity: 1;
+}
+
+/* ── Stat card dollar badge ── */
+.stat-badge {
+  width: 26px;
+  height: 26px;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.8rem;
+  font-weight: 700;
+}
+
+/* ── Orange "Check Now" button (custom brand color) ── */
+.btn-check-orange {
+  background: #f5a623;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  transition: background 0.18s;
+}
+
+.btn-check-orange:hover {
+  background: #e09515;
+  color: #fff;
+}
+
+/* ── Legend dots ── */
+.leg-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 2px;
+  display: inline-block;
+  flex-shrink: 0;
+}
+
+.navy-dot  { background: #1b3a5c; }
+.orange-dot { background: #f5a623; }
+
+/* ── Donut centre label ── */
+.donut-ring-wrap {
+  position: relative;
+  width: 130px;
+  height: 130px;
+  flex-shrink: 0;
+}
+
+.donut-pct {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 1.1rem;
+  font-weight: 700;
 }
 
 .db-avatar {

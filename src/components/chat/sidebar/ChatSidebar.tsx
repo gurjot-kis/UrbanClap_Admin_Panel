@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import {
   useGetConversationsQuery,
   useLazyGetMessagesQuery,
-  useGetUsersQuery,
+  useGetConversationUsersQuery,
   useGetSuperadminsQuery,
   useCreatePrivateConversationMutation,
 } from "../../../features/chat/chatApi";
@@ -12,12 +12,11 @@ import type { User } from "../../../features/auth/authTypes";
 import { isVendorRole } from "../../../utils/roles";
 import UserAvatar from "../shared/UserAvatar";
 import ConversationItem from "./ConversationItem";
-import NewChatButton from "./NewChatButton";
 import SearchConversation from "./SearchConversation";
 import NewChatModal from "./NewChatModal";
 
 const ConversationSkeleton = () => (
-  <div className="d-flex align-items-center gap-3 px-3 py-2.5 placeholder-glow border-bottom border-light">
+  <div className="d-flex align-items-center gap-3 px-3 py-2.5 placeholder-glow border-bottom">
     <div
       className="placeholder rounded-circle flex-shrink-0"
       style={{ width: "42px", height: "42px" }}
@@ -67,13 +66,15 @@ const ChatSidebar = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [error, setError] = useState("");
 
-  const { data: usersResponse, isLoading: isUsersLoading } = useGetUsersQuery(searchQuery, {
-    skip: !searchQuery.trim(),
-  });
+  const { data: conversationUsersResponse, isLoading: isConversationUsersLoading } =
+    useGetConversationUsersQuery(searchQuery, {
+      skip: !searchQuery.trim() || !data?.data || data.data.length === 0,
+    });
   const { data: superadminsResponse, isLoading: isSuperadminsLoading } = useGetSuperadminsQuery();
   const [createConversation, { isLoading: isCreating }] = useCreatePrivateConversationMutation();
 
   const isVendor = isVendorRole(currentUser?.role);
+  const hasConversations = data?.data && data.data.length > 0;
 
   useEffect(() => {
     if (isLoading || !data?.data || selectedConversation) return;
@@ -110,7 +111,7 @@ const ChatSidebar = () => {
     setError("");
     try {
       const existingConv = data?.data?.find((c) => c.user?._id === user._id);
-      if (existingConv && !existingConv.isEnded) {
+      if (existingConv) {
         dispatch(setSelectedConversation(existingConv));
         localStorage.setItem("activeConversationId", existingConv._id);
 
@@ -160,12 +161,12 @@ const ChatSidebar = () => {
   };
 
   return (
-    <aside className="chat-sidebar border-end border-light d-flex flex-column h-100 bg-white">
+    <aside className="chat-sidebar d-flex flex-column h-100">
       {/* <SidebarHeader /> */}
 
       {isVendor && (
-        <div className="px-3 py-3 border-bottom border-light flex-shrink-0">
-          <h6 className="fw-bold mb-2 text-dark" style={{ fontSize: "0.85rem" }}>
+        <div className="px-3 py-3 border-bottom flex-shrink-0">
+          <h6 className="fw-bold mb-2" style={{ fontSize: "0.85rem" }}>
             Chat with Admin
           </h6>
           {isSuperadminsLoading ? (
@@ -176,10 +177,10 @@ const ChatSidebar = () => {
           ) : superadminsResponse?.data && superadminsResponse.data.length > 0 ? (
             <div className="list-group list-group-flush px-1">
               {superadminsResponse.data.map((admin: User) => {
-                const existingActiveConv = data?.data?.find(
-                  (c) => c.user?._id === admin._id && !c.isEnded,
+                const existingConv = data?.data?.find(
+                  (c) => c.user?._id === admin._id,
                 );
-                if (existingActiveConv) return null;
+                if (existingConv) return null;
                 return (
                   <div
                     key={admin._id}
@@ -221,8 +222,8 @@ const ChatSidebar = () => {
         </div>
       )}
 
-      <div className="px-3 py-3 border-bottom border-light flex-shrink-0">
-        {!isVendor && (
+      <div className="px-3 py-3 border-bottom flex-shrink-0">
+        {hasConversations && (
           <>
             <SearchConversation value={searchQuery} onChange={setSearchQuery} />
             {/* <div className="mt-2.5 mt-2">
@@ -240,14 +241,14 @@ const ChatSidebar = () => {
         )}
 
         {searchQuery.trim() ? (
-          isUsersLoading || isCreating ? (
+          isConversationUsersLoading || isCreating ? (
             <div className="d-flex flex-column align-items-center justify-content-center py-5 text-muted small">
               <span className="spinner-border spinner-border-sm mb-2" role="status" />
               Loading users...
             </div>
-          ) : usersResponse?.data && usersResponse.data.length > 0 ? (
+          ) : conversationUsersResponse?.data && conversationUsersResponse.data.length > 0 ? (
             <div className="list-group list-group-flush px-1">
-              {usersResponse.data.map((user: User) => (
+              {conversationUsersResponse.data.map((user: User) => (
                 <div
                   key={user._id}
                   onClick={() => handleSelectUser(user)}
@@ -299,11 +300,9 @@ const ChatSidebar = () => {
             ))}
           </>
         ) : data?.data && data.data.length > 0 ? (
-          data.data
-            .filter((conversation) => !conversation.isEnded)
-            .map((conversation) => (
-              <ConversationItem key={conversation._id} conversation={conversation} />
-            ))
+          data.data.map((conversation) => (
+            <ConversationItem key={conversation._id} conversation={conversation} />
+          ))
         ) : (
           <EmptyState />
         )}

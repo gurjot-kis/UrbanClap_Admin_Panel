@@ -22,10 +22,10 @@ function VendorLayout({ title, subtitle, backTo, backTitle = 'Back', children }:
   }
 
   return (
-    <div className="d-flex min-vh-100" style={{ background: '#eef1f6' }}>
+    <div className="d-flex min-vh-100 vendor-layout-root">
       <VendorSidebar />
       <div className="d-flex flex-column flex-grow-1 min-w-0">
-        <header className="d-flex align-items-center justify-content-between px-4 py-3 bg-white shadow-sm">
+        <header className="d-flex align-items-center justify-content-between px-4 py-3 vendor-header shadow-sm">
           <div className="d-flex align-items-center gap-2">
             {backTo && (
               <button
@@ -40,9 +40,9 @@ function VendorLayout({ title, subtitle, backTo, backTitle = 'Back', children }:
               </button>
             )}
             <div>
-              <h6 className="mb-0 fw-semibold text-dark">{title}</h6>
+              <h6 className="mb-0 fw-semibold vendor-title">{title}</h6>
               {subtitle && (
-                <small className="text-muted" style={{ fontSize: '0.75rem' }}>
+                <small className="vendor-subtitle" style={{ fontSize: '0.75rem' }}>
                   {subtitle}
                 </small>
               )}
@@ -52,7 +52,7 @@ function VendorLayout({ title, subtitle, backTo, backTitle = 'Back', children }:
             Logout
           </button>
         </header>
-        <div className="p-4 d-flex flex-column gap-3 flex-grow-1">{children}</div>
+        <div className="p-4 d-flex flex-column gap-3 flex-grow-1 vendor-content">{children}</div>
       </div>
     </div>
   )

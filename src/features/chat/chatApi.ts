@@ -91,6 +91,13 @@ export const chatApi = baseApi.injectEndpoints({
       },
     }),
 
+    getConversationUsers: builder.query<ApiResponse<User[]>, string>({
+      query: (search = "") => `/users/conversation-search${search ? `?search=${encodeURIComponent(search)}` : ""}`,
+      extraOptions: {
+        requiresAuth: true,
+      },
+    }),
+
     getSuperadmins: builder.query<ApiResponse<User[]>, void>({
       query: () => ({
         url: "/users/superadmins",
@@ -157,6 +164,7 @@ export const {
   useUploadMediaMutation,
   useUploadMultipleMediaMutation,
   useGetUsersQuery,
+  useGetConversationUsersQuery,
   useGetSuperadminsQuery,
   useCreatePrivateConversationMutation,
   useDeleteConversationMutation,

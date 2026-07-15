@@ -14,9 +14,12 @@ import {
   setUserStopTyping,
   markMessagesAsRead,
   setSelectedConversation,
+  setMessages,
+  removeConversation,
+  clearMessages,
 } from "../../features/chat/chatSlice";
 import type { Message } from "../../features/chat/chatTypes";
-import { chatApi } from "../../features/chat/chatApi";
+import { chatApi, useLazyGetMessagesQuery } from "../../features/chat/chatApi";
 import VendorLayout from "../../components/vendor/VendorLayout";
 import "../../styles/Chat.css";
 
@@ -24,6 +27,8 @@ function VendorSupportPage() {
   const dispatch = useAppDispatch();
   const vendorToken = getStoredToken();
   const vendorUser = getStoredUser();
+
+  const [getMessages] = useLazyGetMessagesQuery();
 
   const selectedConversation = useAppSelector(
     (state) => state.chat.selectedConversation,
@@ -182,7 +187,7 @@ function VendorSupportPage() {
 
       socket.on(
         "end_chat",
-        (data: { conversationId: string; end_chat: boolean }) => {
+        async (data: { conversationId: string; end_chat: boolean }) => {
           dispatch(
             chatApi.util.updateQueryData(
               "getConversations",
@@ -206,6 +211,25 @@ function VendorSupportPage() {
                 isEnded: true,
               }),
             );
+
+            // Reload messages when chat is ended
+            try {
+              const response = await getMessages({
+                conversationId: data.conversationId,
+                page: 1,
+                limit: 30,
+              }).unwrap();
+
+              dispatch(
+                setMessages({
+                  messages: response.data.messages,
+                  hasMore: response.data.hasMore,
+                  page: response.data.page,
+                })
+              );
+            } catch (error) {
+              console.error("Failed to reload messages after end chat:", error);
+            }
           }
         },
       );
@@ -214,6 +238,34 @@ function VendorSupportPage() {
         "conversation_rated",
         (_data: { conversationId: string; rating: number; feedback?: string }) => {
           dispatch(chatApi.util.invalidateTags(["Conversation"]));
+        },
+      );
+
+      socket.on(
+        "conversation_removed",
+        (data: { conversationId: string; reason?: string }) => {
+          const currentSelected = selectedConversationRef.current;
+
+          dispatch(
+            chatApi.util.updateQueryData(
+              "getConversations",
+              undefined,
+              (draft) => {
+                const index = draft.data.findIndex(
+                  (c) => c._id === data.conversationId
+                );
+                if (index > -1) {
+                  draft.data.splice(index, 1);
+                }
+              }
+            ),
+          );
+
+          if (currentSelected && currentSelected._id === data.conversationId) {
+            dispatch(removeConversation(data.conversationId));
+            dispatch(clearMessages());
+            localStorage.removeItem("activeConversationId");
+          }
         },
       );
     }
@@ -229,10 +281,11 @@ function VendorSupportPage() {
         socket.off("user_stop_typing");
         socket.off("end_chat");
         socket.off("conversation_rated");
+        socket.off("conversation_removed");
       }
       disconnectSocket();
     };
-  }, [vendorToken, dispatch]);
+  }, [vendorToken, dispatch, getMessages]);
 
   return (
     <VendorLayout title="Support">

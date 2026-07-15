@@ -20,7 +20,7 @@ import PastePreviewModal from "./PastePreviewModal";
 import { FaImage, FaVideo } from "react-icons/fa6";
 import { IoDocumentText } from "react-icons/io5";
 
-const ChatFooter = () => {
+const ChatFooter = ({ disabled = false }: { disabled?: boolean }) => {
   const dispatch = useAppDispatch();
   const [text, setText] = useState("");
   const [isTyping, setIsTyping] = useState(false);
@@ -347,8 +347,15 @@ const ChatFooter = () => {
 
   return (
     <footer className="chat-main-footer w-100 position-relative d-flex flex-column gap-2 px-3 py-3 border-top border-light bg-white">
+      {/* Disabled State Message */}
+      {disabled && (
+        <div className="d-flex align-items-center justify-content-center w-100 text-muted small">
+          This chat has been ended. You can no longer send messages.
+        </div>
+      )}
+
       {/* Replying Preview Container */}
-      {replyingToMessage && (
+      {replyingToMessage && !disabled && (
         <div
           className="d-flex align-items-center justify-content-between w-100 px-3 py-2 bg-light border-start border-4 border-success rounded mb-1"
           style={{ fontSize: "0.8rem" }}
@@ -383,12 +390,12 @@ const ChatFooter = () => {
         />
         <PremiumEmojiPicker
           onSelectEmoji={handleSelectEmoji}
-          disabled={isUploading}
+          disabled={isUploading || disabled}
         />
         <AttachmentButton
           isOpen={isAttachmentMenuOpen}
           onClick={() => setIsAttachmentMenuOpen(!isAttachmentMenuOpen)}
-          disabled={isUploading}
+          disabled={isUploading || disabled}
         />
         <MessageInput
           value={text}
@@ -404,10 +411,11 @@ const ChatFooter = () => {
             }
           }}
           onPaste={handlePaste}
-          disabled={isUploading}
+          disabled={isUploading || disabled}
+          placeholder={disabled ? "Chat ended" : undefined}
         />
         <SendButton
-          disabled={!text.trim() || isUploading}
+          disabled={!text.trim() || isUploading || disabled}
           onClick={handleSend}
         />
       </div>

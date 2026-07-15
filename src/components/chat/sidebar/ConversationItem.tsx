@@ -154,6 +154,7 @@ const renderLastMessage = () => {
   );
   const isActive = selectedConversation?._id === conversation._id;
   const hasUnread = !!conversation.unreadCount && conversation.unreadCount > 0;
+  const isEnded = conversation.isEnded;
   const { icon, text } = renderLastMessage();
 
   return (
@@ -203,6 +204,7 @@ const renderLastMessage = () => {
             style={{ fontSize: "0.8rem" }}
           >
             {icon && <span className="me-1">{icon}</span>}
+            {isEnded ? <span className="text-danger small me-1">(Ended)</span> : null}
             {text}
           </p>
 
