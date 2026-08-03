@@ -68,13 +68,13 @@ const ChatSidebar = () => {
 
   const { data: conversationUsersResponse, isLoading: isConversationUsersLoading } =
     useGetConversationUsersQuery(searchQuery, {
-      skip: !searchQuery.trim() || !data?.data || data.data.length === 0,
+      skip: !searchQuery.trim(),
     });
   const { data: superadminsResponse, isLoading: isSuperadminsLoading } = useGetSuperadminsQuery();
   const [createConversation, { isLoading: isCreating }] = useCreatePrivateConversationMutation();
+  const onlineUsers = useAppSelector((state) => state.chat.onlineUsers);
 
   const isVendor = isVendorRole(currentUser?.role);
-  const hasConversations = data?.data && data.data.length > 0;
 
   useEffect(() => {
     if (isLoading || !data?.data || selectedConversation) return;
@@ -164,149 +164,158 @@ const ChatSidebar = () => {
     <aside className="chat-sidebar d-flex flex-column h-100">
       {/* <SidebarHeader /> */}
 
-      {isVendor && (
-        <div className="px-3 py-3 border-bottom flex-shrink-0">
-          <h6 className="fw-bold mb-2" style={{ fontSize: "0.85rem" }}>
-            Chat with Admin
-          </h6>
-          {isSuperadminsLoading ? (
-            <div className="d-flex align-items-center justify-content-center py-3 text-muted small">
+      {isVendor ? (
+        <div className="chat-conversations-list flex-grow-1 overflow-auto">
+          <div className="px-3 py-3 border-bottom flex-shrink-0">
+            <h6 className="fw-bold mb-0" style={{ fontSize: "0.85rem", color: "#1b3a5c" }}>
+              Support Team Contacts
+            </h6>
+          </div>
+          {error && (
+            <div className="alert alert-danger py-2 small mx-3 my-2" role="alert">
+              {error}
+            </div>
+          )}
+          {isSuperadminsLoading || isCreating ? (
+            <div className="d-flex align-items-center justify-content-center py-5 text-muted small">
               <span className="spinner-border spinner-border-sm me-2" role="status" />
               Loading admins...
             </div>
           ) : superadminsResponse?.data && superadminsResponse.data.length > 0 ? (
-            <div className="list-group list-group-flush px-1">
+            <div className="list-group list-group-flush">
               {superadminsResponse.data.map((admin: User) => {
                 const existingConv = data?.data?.find(
                   (c) => c.user?._id === admin._id,
                 );
-                if (existingConv) return null;
+                const isActiveAdmin = selectedConversation?.user?._id === admin._id;
+                const isOnline = onlineUsers.includes(admin._id);
+                const hasUnread = !!existingConv?.unreadCount && existingConv.unreadCount > 0;
+
                 return (
                   <div
                     key={admin._id}
                     onClick={() => handleSelectUser(admin)}
-                    className="list-group-item list-group-item-action d-flex align-items-center gap-3 border-0 px-3 py-2 rounded-3 cursor-pointer mb-1"
-                    style={{ cursor: "pointer" }}
+                    role="button"
+                    tabIndex={0}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter" || e.key === " ") handleSelectUser(admin);
+                    }}
+                    className={`conversation-item position-relative ${isActiveAdmin ? "active" : ""}`}
+                    style={{ outline: "none", cursor: "pointer" }}
                   >
-                    <UserAvatar name={admin.name} imageUrl={admin.profilePicture} size="md" />
-                    <div className="flex-grow-1 min-w-0">
-                      <h6 className="mb-0 fw-bold text-dark text-truncate" style={{ fontSize: "0.85rem" }}>
-                        {admin.name}
-                      </h6>
-                      <p className="mb-0 text-truncate" style={{ fontSize: "0.75rem", color: "#25D366" }}>
-                        Support Team
-                      </p>
+                    <UserAvatar name={admin.name} imageUrl={admin.profilePicture || admin.avatar} isOnline={isOnline} size="md" />
+                    <div className="conversation-item-details flex-grow-1 overflow-hidden">
+                      <div className="d-flex align-items-center justify-content-between gap-2">
+                        <h6
+                          className={`conversation-item-name mb-0 text-truncate ${
+                            hasUnread ? "fw-bold text-dark" : "fw-semibold text-secondary"
+                          }`}
+                          style={{ fontSize: "0.9rem" }}
+                        >
+                          {admin.name}
+                        </h6>
+                      </div>
+                      <div className="d-flex align-items-center justify-content-between gap-2 mt-1">
+                        <p className="conversation-item-lastmsg mb-0 text-truncate text-muted" style={{ fontSize: "0.8rem" }}>
+                          Support Team
+                        </p>
+                        {hasUnread && !isActiveAdmin && (
+                          <span className="badge rounded-pill bg-danger d-flex align-items-center justify-content-center px-1.5" style={{ minWidth: "20px", height: "20px", fontSize: "0.7rem" }}>
+                            {existingConv.unreadCount! > 99 ? "99+" : existingConv.unreadCount}
+                          </span>
+                        )}
+                      </div>
                     </div>
-                    <svg
-                      className="text-muted flex-shrink-0"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                      width="14"
-                      height="14"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8-1.083 0-2.12-.17-3.08-.484L3 20l1.514-4.03A7.947 7.947 0 013 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"
-                      />
-                    </svg>
                   </div>
                 );
               })}
             </div>
           ) : (
-            <p className="text-muted small mb-0">No admins available</p>
+            <p className="text-muted small mb-0 text-center py-5">No admins available</p>
           )}
         </div>
-      )}
-
-      <div className="px-3 py-3 border-bottom flex-shrink-0">
-        {hasConversations && (
-          <>
+      ) : (
+        <>
+          <div className="px-3 py-3 border-bottom flex-shrink-0">
             <SearchConversation value={searchQuery} onChange={setSearchQuery} />
-            {/* <div className="mt-2.5 mt-2">
-              <NewChatButton onClick={() => setIsNewChatModalOpen(true)} />
-            </div> */}
-          </>
-        )}
-      </div>
-
-      <div className="chat-conversations-list flex-grow-1 overflow-auto">
-        {error && (
-          <div className="alert alert-danger py-2 small mx-3 my-2" role="alert">
-            {error}
           </div>
-        )}
 
-        {searchQuery.trim() ? (
-          isConversationUsersLoading || isCreating ? (
-            <div className="d-flex flex-column align-items-center justify-content-center py-5 text-muted small">
-              <span className="spinner-border spinner-border-sm mb-2" role="status" />
-              Loading users...
-            </div>
-          ) : conversationUsersResponse?.data && conversationUsersResponse.data.length > 0 ? (
-            <div className="list-group list-group-flush px-1">
-              {conversationUsersResponse.data.map((user: User) => (
-                <div
-                  key={user._id}
-                  onClick={() => handleSelectUser(user)}
-                  className="list-group-item list-group-item-action d-flex align-items-center gap-3 border-0 px-3 py-2 rounded-3 cursor-pointer mb-1"
-                  style={{ cursor: "pointer" }}
-                >
-                  <UserAvatar name={user.name} imageUrl={user.profilePicture} size="md" />
-                  <div className="flex-grow-1 min-w-0">
-                    <h6 className="mb-0 fw-bold text-dark text-truncate" style={{ fontSize: "0.85rem" }}>
-                      {user.name}
-                    </h6>
-                    <p className="mb-0 text-muted text-truncate" style={{ fontSize: "0.75rem" }}>
-                      {user.bio || "Hey there! I am using Chat."}
-                    </p>
-                  </div>
-                  <svg
-                    className="text-muted flex-shrink-0"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                    width="14"
-                    height="14"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M9 5l7 7-7 7"
-                    />
-                  </svg>
+          <div className="chat-conversations-list flex-grow-1 overflow-auto">
+            {error && (
+              <div className="alert alert-danger py-2 small mx-3 my-2" role="alert">
+                {error}
+              </div>
+            )}
+
+            {searchQuery.trim() ? (
+              isConversationUsersLoading || isCreating ? (
+                <div className="d-flex flex-column align-items-center justify-content-center py-5 text-muted small">
+                  <span className="spinner-border spinner-border-sm mb-2" role="status" />
+                  Loading users...
                 </div>
-              ))}
-            </div>
-          ) : (
-            <div className="d-flex flex-column align-items-center justify-content-center py-5 text-center text-muted">
-              <span className="fs-4 mb-1">🔍</span>
-              <h6 className="fw-bold mb-1" style={{ fontSize: "0.85rem" }}>
-                No users found
-              </h6>
-              <p className="small mb-0" style={{ fontSize: "0.75rem" }}>
-                Try a different name or phone number
-              </p>
-            </div>
-          )
-        ) : isLoading ? (
-          <>
-            {Array.from({ length: 6 }).map((_, i) => (
-              <ConversationSkeleton key={i} />
-            ))}
-          </>
-        ) : data?.data && data.data.length > 0 ? (
-          data.data.map((conversation) => (
-            <ConversationItem key={conversation._id} conversation={conversation} />
-          ))
-        ) : (
-          <EmptyState />
-        )}
-      </div>
+              ) : conversationUsersResponse?.data && conversationUsersResponse.data.length > 0 ? (
+                <div className="list-group list-group-flush px-1">
+                  {conversationUsersResponse.data.map((user: User) => (
+                    <div
+                      key={user._id}
+                      onClick={() => handleSelectUser(user)}
+                      className="list-group-item list-group-item-action d-flex align-items-center gap-3 border-0 px-3 py-2 rounded-3 cursor-pointer mb-1"
+                      style={{ cursor: "pointer" }}
+                    >
+                      <UserAvatar name={user.name} imageUrl={user.profilePicture} size="md" />
+                      <div className="flex-grow-1 min-w-0">
+                        <h6 className="mb-0 fw-bold text-dark text-truncate" style={{ fontSize: "0.85rem" }}>
+                          {user.name}
+                        </h6>
+                        <p className="mb-0 text-muted text-truncate" style={{ fontSize: "0.75rem" }}>
+                          {user.bio || "Hey there! I am using Chat."}
+                        </p>
+                      </div>
+                      <svg
+                        className="text-muted flex-shrink-0"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                        width="14"
+                        height="14"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M9 5l7 7-7 7"
+                        />
+                      </svg>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="d-flex flex-column align-items-center justify-content-center py-5 text-center text-muted">
+                  <span className="fs-4 mb-1">🔍</span>
+                  <h6 className="fw-bold mb-1" style={{ fontSize: "0.85rem" }}>
+                    No users found
+                  </h6>
+                  <p className="small mb-0" style={{ fontSize: "0.75rem" }}>
+                    Try a different name or phone number
+                  </p>
+                </div>
+              )
+            ) : isLoading ? (
+              <>
+                {Array.from({ length: 6 }).map((_, i) => (
+                  <ConversationSkeleton key={i} />
+                ))}
+              </>
+            ) : data?.data && data.data.length > 0 ? (
+              data.data.map((conversation) => (
+                <ConversationItem key={conversation._id} conversation={conversation} />
+              ))
+            ) : (
+              <EmptyState />
+            )}
+          </div>
+        </>
+      )}
 
       <NewChatModal
         isOpen={isNewChatModalOpen}

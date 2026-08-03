@@ -52,7 +52,7 @@ function VendorLayout({ title, subtitle, backTo, backTitle = 'Back', children }:
             Logout
           </button>
         </header>
-        <div className="p-4 d-flex flex-column gap-3 flex-grow-1 vendor-content">{children}</div>
+        <div className="d-flex flex-column gap-3 flex-grow-1 vendor-content" style={{padding:"10px 10px 0"}}>{children}</div>
       </div>
     </div>
   )
