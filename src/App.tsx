@@ -2,7 +2,6 @@ import { Navigate, Route, Routes } from 'react-router-dom'
 import './App.css'
 import { AdminProtectedRoute, VendorProtectedRoute } from './components/ProtectedRoute'
 import DashboardPage from './pages/DashboardPage'
-import CategoryPage from './pages/CategoryPage'
 import SubCategoryPage from './pages/SubCategoryPage'
 import ProductListPage from './pages/ProductListPage'
 import AddProductPage from './pages/AddProductPage'
@@ -39,7 +38,10 @@ import VendorEditWarehousePage from './pages/vendor/VendorEditWarehousePage'
 import VendorOrdersPage from './pages/vendor/VendorOrdersPage'
 import VendorCartSettingsPage from './pages/vendor/VendorCartSettingsPage'
 import VendorSupportPage from './pages/vendor/VendorSupportPage'
-import { ROUTES, VENDOR_ROUTES } from './routes'
+import { VENDOR_ROUTES, ROUTES } from './routes'
+import CategoryList from './pages/admin/category/CategoryList'
+import Layout from './layout/Layout'
+import AddCategory from './pages/admin/category/AddCategory'
 
 function App() {
   return (
@@ -65,28 +67,31 @@ function App() {
         <Route path={VENDOR_ROUTES.support} element={<VendorSupportPage />} />
       </Route>
       <Route element={<AdminProtectedRoute />}>
-        <Route path={ROUTES.dashboard} element={<DashboardPage />} />
-        <Route path={ROUTES.categories} element={<CategoryPage />} />
-        <Route path="/admin/sub-categories/:categoryId" element={<SubCategoryPage />} />
-        <Route path={ROUTES.products} element={<ProductListPage />} />
-        <Route path={ROUTES.orders} element={<OrdersPage />} />
-        <Route path="/admin/orders/:orderId" element={<OrderDetailsPage />} />
-        <Route path={ROUTES.productsNew} element={<AddProductPage />} />
-        <Route path="/admin/products/:productId/edit" element={<EditProductPage />} />
-        <Route path={ROUTES.banners} element={<BannerPage />} />
-        <Route path={ROUTES.cartSettings} element={<CartSettingsPage />} />
-        <Route path={ROUTES.users} element={<UserListPage />} />
-        <Route path={ROUTES.usersNew} element={<AddUserPage />} />
-        <Route path="/admin/users/:userId/edit" element={<EditUserPage />} />
-        <Route path={ROUTES.vendors} element={<VendorListPage />} />
-        <Route path={ROUTES.vendorsNew} element={<AddWarehousePage />} />
-        <Route path={ROUTES.vendorsCreate} element={<AddVendorPage />} />
-        <Route path="/admin/vendors/:vendorId/edit" element={<EditVendorPage />} />
-        <Route path="/admin/vendors/:vendorId/warehouses" element={<WarehouseListPage />} />
-        <Route path="/admin/vendors/:vendorId/warehouses/new" element={<AddWarehousePage />} />
-        <Route path="/admin/vendors/:vendorId/warehouses/:warehouseId/edit" element={<EditWarehousePage />} />
-        <Route path={ROUTES.profile} element={<ProfilePage />} />
-        <Route path={ROUTES.support} element={<SupportPage />} />
+        <Route element={<Layout />}>
+          <Route path={ROUTES.dashboard} element={<DashboardPage />} />
+          <Route path={ROUTES.categories} element={<CategoryList />} />
+          <Route path={ROUTES.addCategory} element={<AddCategory />} />
+          <Route path="/admin/sub-categories/:categoryId" element={<SubCategoryPage />} />
+          <Route path={ROUTES.products} element={<ProductListPage />} />
+          <Route path={ROUTES.orders} element={<OrdersPage />} />
+          <Route path="/admin/orders/:orderId" element={<OrderDetailsPage />} />
+          <Route path={ROUTES.productsNew} element={<AddProductPage />} />
+          <Route path="/admin/products/:productId/edit" element={<EditProductPage />} />
+          <Route path={ROUTES.banners} element={<BannerPage />} />
+          <Route path={ROUTES.cartSettings} element={<CartSettingsPage />} />
+          <Route path={ROUTES.users} element={<UserListPage />} />
+          <Route path={ROUTES.usersNew} element={<AddUserPage />} />
+          <Route path="/admin/users/:userId/edit" element={<EditUserPage />} />
+          <Route path={ROUTES.vendors} element={<VendorListPage />} />
+          <Route path={ROUTES.vendorsNew} element={<AddWarehousePage />} />
+          <Route path={ROUTES.vendorsCreate} element={<AddVendorPage />} />
+          <Route path="/admin/vendors/:vendorId/edit" element={<EditVendorPage />} />
+          <Route path="/admin/vendors/:vendorId/warehouses" element={<WarehouseListPage />} />
+          <Route path="/admin/vendors/:vendorId/warehouses/new" element={<AddWarehousePage />} />
+          <Route path="/admin/vendors/:vendorId/warehouses/:warehouseId/edit" element={<EditWarehousePage />} />
+          <Route path={ROUTES.profile} element={<ProfilePage />} />
+          <Route path={ROUTES.support} element={<SupportPage />} />
+        </Route>
       </Route>
       <Route path="*" element={<Navigate to={ROUTES.login} replace />} />
     </Routes>

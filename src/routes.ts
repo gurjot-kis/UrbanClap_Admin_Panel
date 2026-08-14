@@ -1,5 +1,3 @@
-/** Client-side portal routes (not API endpoints). */
-
 export const PUBLIC_ROUTES = {
   login: '/login',
   forgotPassword: '/forgot-password',
@@ -11,6 +9,7 @@ export const ROUTES = {
   ...PUBLIC_ROUTES,
   dashboard: '/admin/dashboard',
   categories: '/admin/categories',
+  addCategory: '/admin/categories/new',
   subCategories: (categoryId: string | number) => `/admin/sub-categories/${categoryId}`,
   products: '/admin/products',
   productsNew: '/admin/products/new',

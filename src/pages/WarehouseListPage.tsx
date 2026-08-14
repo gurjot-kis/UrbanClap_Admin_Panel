@@ -1,11 +1,11 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react'
 import { Navigate, useNavigate, useParams, useLocation } from 'react-router-dom'
-import { clearAuthSession, getStoredToken, getStoredUser } from '../utils/auth'
-import Sidebar from '../components/Sidebar'
+import { getStoredToken, getStoredUser } from '../utils/auth'
 import DeleteConfirmModal from '../components/DeleteConfirmModal'
 import WarehouseViewModal from '../components/WarehouseViewModal'
 import { ROUTES } from '../routes'
 import '../styles/Dashboard.css'
+import { useHeader } from '../layout/LayoutContext'
 
 interface WarehouseItem {
   warehouse_id?: string
@@ -44,6 +44,16 @@ function WarehouseListPage() {
   const { vendorId } = useParams<{ vendorId: string }>()
   const location = useLocation()
   const vendorName = (location.state as { vendorName?: string } | null)?.vendorName ?? 'Vendor'
+  const { setHeaderConfig } = useHeader()
+
+  useEffect(() => {
+    setHeaderConfig({
+      title: 'Warehouses',
+      subtitle: vendorName,
+      backTo: ROUTES.vendors,
+      backTitle: 'Back to Vendors'
+    })
+  }, [vendorName, setHeaderConfig])
 
   const token = getStoredToken()
   const user = getStoredUser()
@@ -115,10 +125,7 @@ function WarehouseListPage() {
     fetchWarehouses()
   }, [fetchWarehouses])
 
-  const handleLogout = () => {
-    clearAuthSession()
-    navigate(ROUTES.login, { replace: true })
-  }
+
 
   const totalPages = Math.max(1, Math.ceil(total / pageSize))
   const currentPage = Math.min(page, totalPages)
@@ -128,28 +135,8 @@ function WarehouseListPage() {
   )
 
   return (
-    <div className="d-flex min-vh-100" style={{ background: '#eef1f6' }}>
-      <Sidebar />
-
-      <div className="d-flex flex-column flex-grow-1 min-w-0">
-        <header className="d-flex align-items-center justify-content-between px-4 py-3 bg-white shadow-sm">
-          <div className="d-flex align-items-center gap-2">
-            <button type="button" className="subcat-back-btn" onClick={() => navigate(ROUTES.vendors)} title="Back to Vendors">
-              <svg viewBox="0 0 24 24" fill="currentColor" width="16" height="16">
-                <path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z" />
-              </svg>
-            </button>
-            <div>
-              <h6 className="mb-0 fw-semibold text-dark">Warehouses</h6>
-              <small className="text-muted" style={{ fontSize: '0.75rem' }}>{vendorName}</small>
-            </div>
-          </div>
-          <button type="button" className="btn btn-danger btn-sm px-3 fw-semibold" onClick={handleLogout}>
-            Logout
-          </button>
-        </header>
-
-        <div className="p-4 d-flex flex-column gap-3 flex-grow-1">
+    <>
+      <div className="p-4 d-flex flex-column gap-3 flex-grow-1">
           <div className="card border-0 rounded-3 shadow-sm">
             <div className="card-body p-4">
               <div className="d-flex flex-wrap align-items-center justify-content-between gap-3 mb-4">
@@ -366,7 +353,6 @@ function WarehouseListPage() {
             </div>
           </div>
         </div>
-      </div>
 
       {viewing && (
         <WarehouseViewModal
@@ -385,7 +371,7 @@ function WarehouseListPage() {
           onSuccess={fetchWarehouses}
         />
       )}
-    </div>
+    </>
   )
 }
 

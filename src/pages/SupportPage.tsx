@@ -1,9 +1,9 @@
 import { useEffect, useRef } from "react";
-import { Navigate, useNavigate } from "react-router-dom";
-import { clearAuthSession, getStoredToken, getStoredUser } from "../utils/auth";
-import Sidebar from "../components/Sidebar";
+import { Navigate } from "react-router-dom";
+import { getStoredToken, getStoredUser } from "../utils/auth";
 import ChatLayout from "../components/chat/ChatLayout";
 import { ROUTES } from "../routes";
+import { useHeader } from "../layout/LayoutContext";
 import { connectSocket, disconnectSocket } from "../services/socket";
 import { useAppDispatch, useAppSelector } from "../store/hooks";
 import {
@@ -24,7 +24,12 @@ import "../styles/Dashboard.css";
 import "../styles/Chat.css";
 
 function SupportPage() {
-  const navigate = useNavigate();
+  const { setHeaderConfig } = useHeader();
+
+  useEffect(() => {
+    setHeaderConfig({ title: 'Support Hub' })
+  }, [setHeaderConfig]);
+
   const dispatch = useAppDispatch();
   const adminToken = getStoredToken();
   const adminUser = getStoredUser();
@@ -51,11 +56,7 @@ function SupportPage() {
     return <Navigate to={ROUTES.login} replace />;
   }
 
-  const handleLogout = () => {
-    disconnectSocket();
-    clearAuthSession();
-    navigate(ROUTES.login, { replace: true });
-  };
+
 
   useEffect(() => {
     if (!adminToken) return;
@@ -291,35 +292,12 @@ function SupportPage() {
   }, [adminToken, dispatch, getMessages]);
 
   return (
-    <div className="d-flex min-vh-100 bg-light">
-      <Sidebar />
-      <div className="flex-grow-1 db-main-layout">
-        {/* Top Navbar */}
-        <div className="db-navbar d-flex align-items-center justify-content-between px-4 py-3 bg-white border-bottom shadow-sm">
-          <h5 className="fw-bold mb-0 text-navy">Support Hub</h5>
-          <button
-            className="btn btn-sm btn-outline-danger"
-            onClick={handleLogout}
-          >
-            Logout
-          </button>
-        </div>
-
-        {/* Page Content: Embedded Chat module */}
-        <div className="db-main-content">
-          <div
-            className="card border-0 rounded-3 shadow-sm"
-            style={{ padding: "10px 10px 0" }}
-          >
-            {/* <div className="mb-4">
-              <h4 className="fw-bold text-navy mb-1">Customer Support Chat</h4>
-              <p className="text-muted small mb-0">
-                Connect and assist customers in real-time.
-              </p>
-            </div> */}
-            <ChatLayout />
-          </div>
-        </div>
+    <div className="db-main-content p-4">
+      <div
+        className="card border-0 rounded-3 shadow-sm"
+        style={{ padding: "10px 10px 0" }}
+      >
+        <ChatLayout />
       </div>
     </div>
   );

@@ -1,13 +1,23 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import type { FormEvent } from 'react'
 import { Navigate, useNavigate } from 'react-router-dom'
-import { clearAuthSession, getStoredToken, getStoredUser } from '../utils/auth'
-import Sidebar from '../components/Sidebar'
+import { getStoredToken, getStoredUser } from '../utils/auth'
 import { ROUTES } from '../routes'
 import '../styles/Dashboard.css'
+import { useHeader } from '../layout/LayoutContext'
 
 function AddUserPage() {
   const navigate = useNavigate()
+  const { setHeaderConfig } = useHeader()
+
+  useEffect(() => {
+    setHeaderConfig({
+      title: 'Add User',
+      backTo: ROUTES.users,
+      backTitle: 'Back to Users'
+    })
+  }, [setHeaderConfig])
+
   const token = getStoredToken()
   const user = getStoredUser()
 
@@ -24,10 +34,7 @@ function AddUserPage() {
     return <Navigate to={ROUTES.login} replace />
   }
 
-  const handleLogout = () => {
-    clearAuthSession()
-    navigate(ROUTES.login, { replace: true })
-  }
+
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault()
@@ -66,24 +73,8 @@ function AddUserPage() {
   }
 
   return (
-    <div className="d-flex min-vh-100" style={{ background: '#eef1f6' }}>
-      <Sidebar />
-      <div className="d-flex flex-column flex-grow-1 min-w-0">
-        <header className="d-flex align-items-center justify-content-between px-4 py-3 bg-white shadow-sm">
-          <div className="d-flex align-items-center gap-2">
-            <button type="button" className="subcat-back-btn" onClick={() => navigate(ROUTES.users)} title="Back to Users">
-              <svg viewBox="0 0 24 24" fill="currentColor" width="16" height="16">
-                <path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z" />
-              </svg>
-            </button>
-            <h6 className="mb-0 fw-semibold text-dark">Add User</h6>
-          </div>
-          <button type="button" className="btn btn-danger btn-sm px-3 fw-semibold" onClick={handleLogout}>
-            Logout
-          </button>
-        </header>
-
-        <div className="p-4">
+    <>
+      <div className="p-4">
           <div className="card border-0 rounded-3 shadow-sm" style={{ maxWidth: 700 }}>
             <div className="card-body p-4">
               <form onSubmit={handleSubmit} className="d-flex flex-column gap-3">
@@ -172,8 +163,7 @@ function AddUserPage() {
             </div>
           </div>
         </div>
-      </div>
-    </div>
+    </>
   )
 }
 

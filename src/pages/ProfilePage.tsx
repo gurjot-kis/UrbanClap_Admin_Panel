@@ -1,11 +1,11 @@
 import { useCallback, useEffect, useState } from 'react'
 import type { FormEvent } from 'react'
-import { Navigate, useNavigate } from 'react-router-dom'
-import { clearAuthSession, getStoredToken, getStoredUser, setAuthSession } from '../utils/auth'
+import { Navigate } from 'react-router-dom'
+import { getStoredToken, getStoredUser, setAuthSession } from '../utils/auth'
 import { resolveMediaUrl } from '../config/api'
-import Sidebar from '../components/Sidebar'
 import { ROUTES } from '../routes'
 import '../styles/Dashboard.css'
+import { useHeader } from '../layout/LayoutContext'
 
 interface AdminProfileResponse {
   fullName?: string
@@ -21,7 +21,12 @@ interface AdminProfileResponse {
 }
 
 function ProfilePage() {
-  const navigate = useNavigate()
+  const { setHeaderConfig } = useHeader()
+
+  useEffect(() => {
+    setHeaderConfig({ title: 'Profile' })
+  }, [setHeaderConfig])
+
   const token = getStoredToken()
   const currentUser = getStoredUser()
 
@@ -42,10 +47,7 @@ function ProfilePage() {
     return <Navigate to={ROUTES.login} replace />
   }
 
-  const handleLogout = () => {
-    clearAuthSession()
-    navigate(ROUTES.login, { replace: true })
-  }
+
 
   const fetchProfile = useCallback(async () => {
     setLoading(true)
@@ -140,17 +142,8 @@ function ProfilePage() {
   }
 
   return (
-    <div className="d-flex min-vh-100" style={{ background: '#eef1f6' }}>
-      <Sidebar />
-      <div className="d-flex flex-column flex-grow-1 min-w-0">
-        <header className="d-flex align-items-center justify-content-between px-4 py-3 bg-white shadow-sm">
-          <h6 className="mb-0 fw-semibold text-dark">Profile</h6>
-          <button type="button" className="btn btn-danger btn-sm px-3 fw-semibold" onClick={handleLogout}>
-            Logout
-          </button>
-        </header>
-
-        <div className="p-4">
+    <>
+      <div className="p-4">
           <div className="card border-0 rounded-3 shadow-sm" style={{ maxWidth: 700 }}>
             <div className="card-body p-4">
               {loading ? (
@@ -306,8 +299,7 @@ function ProfilePage() {
             </div>
           </div>
         </div>
-      </div>
-    </div>
+    </>
   )
 }
 
