@@ -48,3 +48,18 @@ export interface FlatCategoryOption {
   level: number;
   depth: number;
 }
+
+
+//Add Category Types
+export interface SlotConfig {
+  allowInstant: boolean;
+  allowSchedule: boolean;
+}
+
+export interface FormState {
+  name: string;
+  parent_id: string; 
+  description: string;
+  category_image: File | null;
+  slotConfig: SlotConfig;
+}

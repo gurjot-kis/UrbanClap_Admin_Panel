@@ -3,9 +3,6 @@ import './App.css'
 import { AdminProtectedRoute, VendorProtectedRoute } from './components/ProtectedRoute'
 import DashboardPage from './pages/DashboardPage'
 import SubCategoryPage from './pages/SubCategoryPage'
-import ProductListPage from './pages/ProductListPage'
-import AddProductPage from './pages/AddProductPage'
-import EditProductPage from './pages/EditProductPage'
 import OrdersPage from './pages/OrdersPage'
 import OrderDetailsPage from './pages/OrderDetailsPage'
 import UserListPage from './pages/UserListPage'
@@ -42,10 +39,15 @@ import { VENDOR_ROUTES, ROUTES } from './routes'
 import CategoryList from './pages/admin/category/CategoryList'
 import Layout from './layout/Layout'
 import AddCategory from './pages/admin/category/AddCategory'
+import { CustomToaster } from './components/common/CustomToaster'
+import ProductList from './pages/admin/product/ProductList'
+import AddProduct from './pages/admin/product/AddProduct'
 
 function App() {
   return (
-    <Routes>
+    <>
+      <CustomToaster />
+      <Routes>
       <Route path="/" element={<Navigate to={ROUTES.login} replace />} />
       <Route path={ROUTES.login} element={<LoginPage />} />
       <Route path={ROUTES.forgotPassword} element={<ForgotPasswordPage />} />
@@ -69,14 +71,19 @@ function App() {
       <Route element={<AdminProtectedRoute />}>
         <Route element={<Layout />}>
           <Route path={ROUTES.dashboard} element={<DashboardPage />} />
+          {/* Worked by Kshitish on routes start */}
           <Route path={ROUTES.categories} element={<CategoryList />} />
           <Route path={ROUTES.addCategory} element={<AddCategory />} />
+          <Route path={ROUTES.editCategory} element={<AddCategory/>}/>
+
+          <Route path={ROUTES.products} element={<ProductList/>}/>
+          <Route path={ROUTES.productsNew} element = {<AddProduct/>}/>
+          <Route path={ROUTES.productEdit} element = {<AddProduct/>}/>
+          {/* Worked by Kshitish on routes end */}
+
           <Route path="/admin/sub-categories/:categoryId" element={<SubCategoryPage />} />
-          <Route path={ROUTES.products} element={<ProductListPage />} />
           <Route path={ROUTES.orders} element={<OrdersPage />} />
           <Route path="/admin/orders/:orderId" element={<OrderDetailsPage />} />
-          <Route path={ROUTES.productsNew} element={<AddProductPage />} />
-          <Route path="/admin/products/:productId/edit" element={<EditProductPage />} />
           <Route path={ROUTES.banners} element={<BannerPage />} />
           <Route path={ROUTES.cartSettings} element={<CartSettingsPage />} />
           <Route path={ROUTES.users} element={<UserListPage />} />
@@ -95,6 +102,7 @@ function App() {
       </Route>
       <Route path="*" element={<Navigate to={ROUTES.login} replace />} />
     </Routes>
+    </>
   )
 }
 

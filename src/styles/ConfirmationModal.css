@@ -1,0 +1,157 @@
+.pm-backdrop {
+  position: fixed;
+  inset: 0;
+  background-color: rgba(15, 23, 42, 0.65);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1050;
+  padding: 1rem;
+  animation: pmFadeIn 0.2s ease-out;
+}
+
+.pm-dialog {
+  background: #ffffff;
+  border-radius: 16px;
+  max-width: 420px;
+  width: 100%;
+  padding: 1.75rem;
+  position: relative;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  animation: pmSlideUp 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.pm-close-btn {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  background: transparent;
+  border: none;
+  color: #94a3b8;
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 50%;
+  display: flex;
+  transition: all 0.2s ease;
+}
+
+.pm-close-btn:hover {
+  background-color: #f1f5f9;
+  color: #334155;
+}
+
+.pm-content {
+  text-align: center;
+  margin-bottom: 1.5rem;
+}
+
+.pm-icon-wrapper {
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 1.25rem;
+}
+
+.pm-icon--danger {
+  background-color: #fee2e2;
+  color: #ef4444;
+}
+
+.pm-icon--warning {
+  background-color: #fef3c7;
+  color: #f59e0b;
+}
+
+.pm-icon--primary {
+  background-color: #e0f2fe;
+  color: #0284c7;
+}
+
+.pm-title {
+  font-size: 1.15rem;
+  font-weight: 600;
+  color: #0f172a;
+  margin: 0 0 0.5rem;
+}
+
+.pm-message {
+  font-size: 0.9rem;
+  color: #64748b;
+  margin: 0;
+  line-height: 1.5;
+}
+
+.pm-actions {
+  display: flex;
+  gap: 0.75rem;
+}
+
+.pm-btn {
+  flex: 1;
+  padding: 0.65rem 1rem;
+  font-size: 0.9rem;
+  font-weight: 500;
+  border-radius: 8px;
+  border: 1px solid transparent;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.pm-btn--secondary {
+  background: #ffffff;
+  border-color: #e2e8f0;
+  color: #475569;
+}
+
+.pm-btn--secondary:hover:not(:disabled) {
+  background: #f8fafc;
+  border-color: #cbd5e1;
+}
+
+.pm-btn--danger {
+  background: #ef4444;
+  color: #ffffff;
+}
+
+.pm-btn--danger:hover:not(:disabled) {
+  background: #dc2626;
+}
+
+.pm-btn:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+}
+
+.pm-loader {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+.pm-spinner {
+  width: 14px;
+  height: 14px;
+  border: 2px solid #ffffff;
+  border-top-color: transparent;
+  border-radius: 50%;
+  animation: pmSpin 0.7s linear infinite;
+}
+
+@keyframes pmFadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes pmSlideUp {
+  from { transform: translateY(12px) scale(0.98); opacity: 0; }
+  to { transform: translateY(0) scale(1); opacity: 1; }
+}
+
+@keyframes pmSpin {
+  to { transform: rotate(360deg); }
+}

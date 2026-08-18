@@ -1,4 +1,8 @@
-import type { Category, CategoryRow, FlatCategoryOption } from "./categoryTypes";
+import type {
+  Category,
+  CategoryRow,
+  FlatCategoryOption,
+} from "./categoryTypes";
 
 const ASSET_BASE_URL = import.meta.env.VITE_API_ASSET_URL ?? "";
 
@@ -9,10 +13,15 @@ export const resolveImageUrl = (path?: string): string | null => {
   return `${ASSET_BASE_URL}${normalized}`;
 };
 
-export const LEVEL_LABEL: Record<number, string> = { 1: "L1", 2: "L2", 3: "L3" };
+export const LEVEL_LABEL: Record<number, string> = {
+  1: "L1",
+  2: "L2",
+  3: "L3",
+};
 
-// Counts within whatever categories are currently loaded (i.e. this page)
-export const countAll = (categories: Category[]): { total: number; byLevel: Record<number, number> } => {
+export const countAll = (
+  categories: Category[],
+): { total: number; byLevel: Record<number, number> } => {
   const byLevel: Record<number, number> = { 1: 0, 2: 0, 3: 0 };
   let total = 0;
   const walk = (list: Category[]) => {
@@ -26,8 +35,7 @@ export const countAll = (categories: Category[]): { total: number; byLevel: Reco
   return { total, byLevel };
 };
 
-// Search/level filtering now happens server-side, so this just handles
-// tree flattening for expand/collapse rendering.
+
 export const flattenRows = (
   categories: Category[],
   depth: number,
@@ -48,10 +56,20 @@ export const flattenRows = (
 };
 
 // Builds a compact page-number window, e.g. [1, '…', 4, 5, 6, '…', 12]
-export const buildPageWindow = (current: number, totalPages: number): (number | "…")[] => {
-  if (totalPages <= 7) return Array.from({ length: totalPages }, (_, i) => i + 1);
+export const buildPageWindow = (
+  current: number,
+  totalPages: number,
+): (number | "…")[] => {
+  if (totalPages <= 7)
+    return Array.from({ length: totalPages }, (_, i) => i + 1);
 
-  const pages = new Set<number>([1, totalPages, current, current - 1, current + 1]);
+  const pages = new Set<number>([
+    1,
+    totalPages,
+    current,
+    current - 1,
+    current + 1,
+  ]);
   const sorted = Array.from(pages)
     .filter((p) => p >= 1 && p <= totalPages)
     .sort((a, b) => a - b);
@@ -71,11 +89,37 @@ export const flattenForParentOptions = (
   const options: FlatCategoryOption[] = [];
   categories.forEach((category) => {
     if (category.level <= 2) {
-      options.push({ _id: category._id, name: category.name, level: category.level, depth });
+      options.push({
+        _id: category._id,
+        name: category.name,
+        level: category.level,
+        depth,
+      });
     }
     if (category.children?.length) {
       options.push(...flattenForParentOptions(category.children, depth + 1));
     }
   });
   return options;
+};
+
+export const getAncestorChain = (
+  tree: Category[] | undefined,
+  targetId: string,
+): Category[] => {
+  if (!tree) return [];
+
+  const walk = (nodes: Category[], trail: Category[]): Category[] | null => {
+    for (const node of nodes) {
+      const nextTrail = [...trail, node];
+      if (node._id === targetId) return nextTrail;
+      if (node.children?.length) {
+        const found = walk(node.children, nextTrail);
+        if (found) return found;
+      }
+    }
+    return null;
+  };
+
+  return walk(tree, []) ?? [];
 };

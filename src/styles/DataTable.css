@@ -1,0 +1,402 @@
+.dt-page {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 16px;
+}
+
+.dt-header-card {
+  border-left: 3px solid #1b3a5c;
+}
+.dt-title {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #1b2733;
+  letter-spacing: -0.01em;
+}
+
+.dt-stat-pill {
+  font-size: 0.72rem;
+  font-weight: 600;
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: #f1f4f8;
+  color: #4a5b6c;
+  white-space: nowrap;
+}
+.dt-stat-pill--navy {
+  background: #1b3a5c;
+  color: #fff;
+}
+
+.dt-filter-wrap {
+  position: relative;
+  min-width: 140px;
+}
+.dt-filter-select {
+  height: 42px !important;
+  font-size: 0.88rem !important;
+  font-weight: 500 !important;
+  color: #1e2a35 !important;
+  background-color: #fff !important;
+  border: 1.5px solid #e2e8f0 !important;
+  border-radius: 8px !important;
+  padding: 0 32px 0 12px !important;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+}
+.dt-filter-select:hover {
+  border-color: #cbd5e1 !important;
+  background-color: #f8fafc !important;
+}
+.dt-filter-select:focus {
+  border-color: #1b3a5c !important;
+  box-shadow: 0 0 0 3px rgba(27, 58, 92, 0.12) !important;
+  background-color: #fff !important;
+  outline: none;
+}
+
+.dt-search-wrap {
+  position: relative;
+  min-width: 280px;
+}
+.dt-search-icon {
+  position: absolute;
+  left: 13px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #94a3b8;
+  display: flex;
+  align-items: center;
+  pointer-events: none;
+}
+.dt-search-input {
+  height: 42px !important;
+  font-size: 0.88rem !important;
+  font-weight: 400 !important;
+  color: #1e2a35 !important;
+  background-color: #fff !important;
+  border: 1.5px solid #e2e8f0 !important;
+  border-radius: 8px !important;
+  padding-left: 36px !important;
+  padding-right: 14px !important;
+  transition: all 0.2s ease;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+}
+.dt-search-input::placeholder {
+  color: #94a3b8;
+}
+.dt-search-input:hover {
+  border-color: #cbd5e1 !important;
+}
+.dt-search-input:focus {
+  border-color: #1b3a5c !important;
+  box-shadow: 0 0 0 3px rgba(27, 58, 92, 0.12) !important;
+  outline: none;
+}
+
+.dt-create-btn {
+  height: 42px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  border: 1px solid #1b3a5c;
+  background: #1b3a5c;
+  color: #fff;
+  font-size: 0.88rem;
+  font-weight: 600;
+  padding: 0 18px;
+  border-radius: 8px;
+  cursor: pointer;
+  box-shadow: 0 2px 5px rgba(27, 58, 92, 0.2);
+  transition: all 0.15s ease;
+  white-space: nowrap;
+}
+.dt-create-btn:hover {
+  background: #234a72;
+  border-color: #234a72;
+  box-shadow: 0 4px 10px rgba(27, 58, 92, 0.28);
+  transform: translateY(-1px);
+}
+.dt-create-btn:active {
+  transform: translateY(0);
+}
+.dt-create-plus {
+  font-size: 1.1rem;
+  line-height: 1;
+  font-weight: 700;
+}
+
+.dt-table-card {
+  overflow: hidden;
+  position: relative;
+}
+.dt-table-scroll {
+  overflow-x: auto;
+}
+.dt-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  font-size: 0.86rem;
+}
+.dt-table thead th {
+  position: sticky;
+  top: 0;
+  background: #fafbfc;
+  text-align: left;
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: #8a97a3;
+  font-weight: 700;
+  padding: 12px 16px;
+  border-bottom: 1px solid #edf0f3;
+  white-space: nowrap;
+}
+.dt-table tbody td {
+  padding: 16px 16px;
+  border-bottom: 1px solid #f2f4f6;
+  vertical-align: middle;
+}
+
+.dt-row {
+  transition: background-color 0.15s ease;
+}
+.dt-row:hover {
+  background: #f7f9fb;
+}
+.dt-row--depth-1 {
+  background: #fbfcfd;
+}
+.dt-row--depth-2 {
+  background: #f6f9fc;
+}
+
+.dt-name-cell {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.dt-expand-btn {
+  border: none;
+  background: #eef1f4;
+  color: #1b3a5c;
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 7px;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+.dt-expand-btn:hover {
+  background: #1b3a5c;
+  color: #fff;
+}
+.dt-expand-spacer {
+  width: 24px;
+  flex-shrink: 0;
+}
+.dt-chevron {
+  transition: transform 0.18s ease;
+}
+.dt-chevron--open {
+  transform: rotate(90deg);
+}
+
+.dt-switch {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  border: none;
+  background: transparent;
+  padding: 0;
+  cursor: pointer;
+}
+.dt-switch-track {
+  position: relative;
+  width: 40px;
+  height: 22px;
+  border-radius: 999px;
+  transition:
+    background 0.25s ease,
+    box-shadow 0.25s ease;
+}
+.dt-switch--on .dt-switch-track {
+  background: linear-gradient(135deg, #22c55e, #16a34a);
+  box-shadow:
+    inset 0 0 0 1px rgba(22, 163, 74, 0.35),
+    0 2px 6px rgba(34, 197, 94, 0.35);
+}
+.dt-switch--off .dt-switch-track {
+  background: linear-gradient(135deg, #f87171, #dc2626);
+  box-shadow:
+    inset 0 0 0 1px rgba(220, 38, 38, 0.35),
+    0 2px 6px rgba(239, 68, 68, 0.3);
+}
+.dt-switch-thumb {
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.25);
+  transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.dt-switch--on .dt-switch-thumb {
+  transform: translateX(18px);
+}
+.dt-switch--off .dt-switch-thumb {
+  transform: translateX(0);
+}
+.dt-switch-label {
+  font-size: 0.72rem;
+  font-weight: 700;
+  min-width: 46px;
+  text-align: left;
+}
+.dt-switch--on .dt-switch-label {
+  color: #16a34a;
+}
+.dt-switch--off .dt-switch-label {
+  color: #dc2626;
+}
+.dt-switch:focus-visible .dt-switch-track {
+  outline: 2px solid #1b3a5c;
+  outline-offset: 2px;
+}
+.dt-switch:hover .dt-switch-track {
+  filter: brightness(1.05);
+}
+.dt-switch--busy {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+.dt-switch:disabled {
+  cursor: not-allowed;
+}
+
+.dt-state {
+  padding: 32px 16px;
+  text-align: center;
+  color: #8a97a3;
+  font-size: 0.85rem;
+}
+.dt-state--error {
+  color: #a13a3a;
+}
+
+.dt-row-skeleton td {
+  padding: 12px 16px;
+}
+.dt-skeleton-bar {
+  height: 14px;
+  border-radius: 6px;
+  background: linear-gradient(90deg, #eef1f4 25%, #f6f8fa 37%, #eef1f4 63%);
+  background-size: 400% 100%;
+  animation: dt-shimmer 1.4s ease infinite;
+}
+@keyframes dt-shimmer {
+  0% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0 50%;
+  }
+}
+
+.dt-refetch-bar {
+  height: 2px;
+  background: linear-gradient(90deg, transparent, #f5a623, transparent);
+  animation: dt-refetch-sweep 1.1s ease infinite;
+}
+@keyframes dt-refetch-sweep {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+.dt-pagination {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px 16px;
+  border-top: 1px solid #edf0f3;
+  background: #fafbfc;
+}
+.dt-pagination-info {
+  font-size: 0.78rem;
+  color: #6b7a87;
+}
+.dt-pagination-info strong {
+  color: #1e2a35;
+  font-weight: 700;
+}
+.dt-pagination-controls {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.dt-pagination-btn,
+.dt-pagination-num {
+  min-width: 30px;
+  height: 30px;
+  padding: 0 8px;
+  border-radius: 7px;
+  border: 1px solid #e5e9ed;
+  background: #fff;
+  color: #4a5b6c;
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.15s ease;
+}
+.dt-pagination-btn:hover:not(:disabled),
+.dt-pagination-num:hover {
+  border-color: #1b3a5c;
+  color: #1b3a5c;
+}
+.dt-pagination-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+.dt-pagination-num--active {
+  background: #1b3a5c;
+  border-color: #1b3a5c;
+  color: #fff;
+}
+.dt-pagination-ellipsis {
+  color: #b3bcc4;
+  padding: 0 4px;
+  font-size: 0.8rem;
+}
+@media (max-width: 576px) {
+  .dt-pagination {
+    justify-content: center;
+    text-align: center;
+  }
+}
+
+@media (max-width: 767px) {
+  .dt-table thead th,
+  .dt-table tbody td {
+    padding: 10px 12px;
+  }
+  .dt-search-wrap {
+    width: 100%;
+  }
+}

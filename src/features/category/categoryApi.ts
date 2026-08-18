@@ -23,7 +23,14 @@ export const categoryApi = baseApi.injectEndpoints({
       extraOptions: { requiresAuth: true },
       providesTags: ["Category"],
     }),
-
+    getActiveCategories: builder.query<GetCategoriesResponse, void>({
+      query: () => ({
+        url: "/categories",
+        method: "GET",
+      }),
+      extraOptions: { requiresAuth: true },
+      providesTags: ["Category"],
+    }),
     upadteCategoryStatus: builder.mutation<unknown, string>({
       query: (categoryId) => ({
         url: `/categories/${categoryId}/status`,
@@ -41,11 +48,46 @@ export const categoryApi = baseApi.injectEndpoints({
       extraOptions: { requiresAuth: true },
       invalidatesTags: ["Category"],
     }),
+
+    getCategoryById: builder.query<unknown, string>({
+      query: (categoryId) => ({
+        url: `/categories/${categoryId}`,
+        method: "GET",
+      }),
+      extraOptions: { requiresAuth: true },
+      providesTags: ["Category"],
+    }),
+
+    updateCategory: builder.mutation<
+      unknown,
+      { categoryId: string; formData: FormData }
+    >({
+      query: ({ categoryId, formData }) => ({
+        url: `/categories/${categoryId}`,
+        method: "PUT",
+        body: formData,
+      }),
+      extraOptions: { requiresAuth: true },
+      invalidatesTags: ["Category"],
+    }),
+
+    deleteCategory: builder.mutation<unknown, string>({
+      query: (categoryId: string) => ({
+        url: `/categories/${categoryId}`,
+        method: "DELETE",
+      }),
+      extraOptions: { requiresAuth: true },
+      invalidatesTags: ["Category"],
+    }),
   }),
 });
 
 export const {
   useGetCategoriesQuery,
+  useGetActiveCategoriesQuery,
   useUpadteCategoryStatusMutation,
   useCreateCategoryMutation,
+  useGetCategoryByIdQuery,
+  useUpdateCategoryMutation, 
+  useDeleteCategoryMutation,
 } = categoryApi;

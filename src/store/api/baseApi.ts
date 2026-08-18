@@ -8,7 +8,9 @@ import type { RootState } from "../store";
 import { getStoredToken } from "../../utils/auth";
 
 const baseQuery = fetchBaseQuery({
-  baseUrl: (import.meta.env.VITE_CHAT_API_URL as string) || "http://localhost:5000/api",
+  baseUrl:
+    (import.meta.env.VITE_CHAT_API_URL as string) ||
+    "http://localhost:5000/api",
   credentials: "include",
 });
 
@@ -18,8 +20,7 @@ const baseQueryWithAuth: BaseQueryFn<
   FetchBaseQueryError,
   { requiresAuth?: boolean }
 > = async (args, api, extraOptions) => {
-  const token =
-    (api.getState() as RootState).auth.token ?? getStoredToken();
+  const token = (api.getState() as RootState).auth.token ?? getStoredToken();
 
   if (extraOptions?.requiresAuth && token) {
     if (typeof args === "string") {
@@ -46,6 +47,6 @@ const baseQueryWithAuth: BaseQueryFn<
 export const baseApi = createApi({
   reducerPath: "api",
   baseQuery: baseQueryWithAuth,
-  tagTypes: ["Auth", "Conversation", "Message", "Category"],
+  tagTypes: ["Auth", "Conversation", "Message", "Category", "Product"],
   endpoints: () => ({}),
 });
