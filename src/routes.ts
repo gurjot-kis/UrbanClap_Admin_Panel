@@ -16,13 +16,16 @@ export const ROUTES = {
   products: "/admin/products",
   productsNew: "/admin/products/add",
   productEdit: "/admin/products/:productId/edit",
-  //Worked by kshitish end
+  productDetails: "/admin/products/:productId/details",
 
   orders: "/admin/orders",
-  orderDetails: (orderId: string | number) => `/admin/orders/${orderId}`,
+  orderDetails: "/admin/orders/:orderId/details",
+  
+  users: "/admin/users",
+  //Worked by kshitish end
+
   banners: "/admin/banners",
   cartSettings: "/admin/cart-settings",
-  users: "/admin/users",
   usersNew: "/admin/users/new",
   userEdit: (userId: string | number) => `/admin/users/${userId}/edit`,
   vendors: "/admin/vendors",

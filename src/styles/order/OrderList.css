@@ -1,0 +1,487 @@
+/* Order Number & Meta */
+.ol-order-info {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    min-width: 0;
+}
+
+.ol-order-number {
+    font-weight: 600;
+    color: #1b3a5c;
+    font-family: monospace;
+    font-size: 0.85rem;
+    letter-spacing: 0.02em;
+}
+
+.ol-order-date {
+    font-size: 0.72rem;
+    color: #8a97a3;
+}
+
+/* Customer Column */
+.ol-customer {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    min-width: 0;
+}
+
+.ol-customer-name {
+    font-weight: 600;
+    color: #1e2a35;
+    font-size: 0.82rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 180px;
+}
+
+.ol-customer-email {
+    font-size: 0.75rem;
+    color: #8a97a3;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 180px;
+}
+
+/* Amount & Items */
+.ol-price {
+    font-weight: 600;
+    color: #1b3a5c;
+    white-space: nowrap;
+    font-size: 0.85rem;
+}
+
+.ol-items {
+    font-weight: 600;
+    color: #64748b;
+    font-size: 0.82rem;
+}
+
+.ol-date {
+    color: #667685;
+    font-size: 0.82rem;
+    white-space: nowrap;
+}
+
+/* Payment Column */
+.ol-payment-col {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.ol-payment-method {
+    font-size: 0.68rem;
+    font-weight: 700;
+    color: #475569;
+    background: #f1f5f9;
+    padding: 2px 6px;
+    border-radius: 4px;
+    letter-spacing: 0.03em;
+}
+
+.ol-badge {
+    font-size: 0.7rem;
+    font-weight: 600;
+    padding: 2px 7px;
+    border-radius: 9999px;
+    text-transform: capitalize;
+}
+
+.ol-badge--paid {
+    background: #ecfdf5;
+    color: #065f46;
+}
+
+.ol-badge--pending {
+    background: #fffbeb;
+    color: #92400e;
+}
+
+.ol-badge--failed {
+    background: #fef2f2;
+    color: #991b1b;
+}
+
+.ol-badge--refunded {
+    background: #f1f5f9;
+    color: #475569;
+}
+
+/* ==================================================================== */
+/* Status Custom Dropdown                                               */
+/* ==================================================================== */
+
+.ol-status-dropdown {
+    position: relative;
+    display: inline-block;
+}
+
+/* Trigger Button */
+.ol-status-trigger {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    padding: 5px 12px;
+    border-radius: 9999px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    border: 1px solid transparent;
+    cursor: pointer;
+    background: #ffffff;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+}
+
+.ol-status-trigger:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.08);
+}
+
+.ol-status-label {
+    line-height: 1;
+    letter-spacing: 0.01em;
+}
+
+/* Pulse Dot */
+.ol-status-dot-pulse {
+    width: 6.5px;
+    height: 6.5px;
+    border-radius: 50%;
+    flex-shrink: 0;
+    display: inline-block;
+}
+
+/* Chevron */
+.ol-status-chevron {
+    transition: transform 0.2s ease;
+    opacity: 0.65;
+    margin-left: 1px;
+}
+
+.ol-status-chevron--rotate {
+    transform: rotate(180deg);
+    opacity: 1;
+}
+
+/* Status Theme Variants */
+.ol-status-trigger--pending {
+    background: #fffbeb;
+    color: #92400e;
+    border-color: #fde68a;
+}
+
+.ol-status-trigger--pending .ol-status-dot-pulse {
+    box-shadow: 0 0 0 2.5px rgba(245, 158, 11, 0.2);
+}
+
+.ol-status-trigger--confirmed {
+    background: #eff6ff;
+    color: #1e40af;
+    border-color: #bfdbfe;
+}
+
+.ol-status-trigger--confirmed .ol-status-dot-pulse {
+    box-shadow: 0 0 0 2.5px rgba(59, 130, 246, 0.2);
+}
+
+.ol-status-trigger--processing {
+    background: #f5f3ff;
+    color: #5b21b6;
+    border-color: #ddd6fe;
+}
+
+.ol-status-trigger--processing .ol-status-dot-pulse {
+    box-shadow: 0 0 0 2.5px rgba(139, 92, 246, 0.2);
+}
+
+.ol-status-trigger--shipped {
+    background: #ecfeff;
+    color: #155e75;
+    border-color: #a5f3fc;
+}
+
+.ol-status-trigger--shipped .ol-status-dot-pulse {
+    box-shadow: 0 0 0 2.5px rgba(6, 182, 212, 0.2);
+}
+
+.ol-status-trigger--delivered,
+.ol-status-trigger--completed {
+    background: #ecfdf5;
+    color: #065f46;
+    border-color: #a7f3d0;
+}
+
+.ol-status-trigger--delivered .ol-status-dot-pulse,
+.ol-status-trigger--completed .ol-status-dot-pulse {
+    box-shadow: 0 0 0 2.5px rgba(16, 185, 129, 0.2);
+}
+
+.ol-status-trigger--cancelled {
+    background: #fef2f2;
+    color: #991b1b;
+    border-color: #fecaca;
+}
+
+.ol-status-trigger--cancelled .ol-status-dot-pulse {
+    box-shadow: 0 0 0 2.5px rgba(239, 68, 68, 0.2);
+}
+
+/* Portaled Dropdown Menu Overlay */
+.ol-status-menu {
+    min-width: 145px;
+    background: #ffffff;
+    border: 1px solid #edf2f7;
+    border-radius: 10px;
+    box-shadow:
+        0 10px 25px -5px rgba(15, 23, 42, 0.16),
+        0 4px 8px -2px rgba(15, 23, 42, 0.08);
+    padding: 4px;
+    animation: olSlideDown 0.18s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.ol-status-menu--up {
+    animation: olSlideUp 0.18s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes olSlideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-6px) scale(0.97);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+@keyframes olSlideUp {
+    from {
+        opacity: 0;
+        transform: translateY(6px) scale(0.97);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+/* Menu Option */
+.ol-status-option {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 7px 10px;
+    border: none;
+    background: transparent;
+    border-radius: 6px;
+    cursor: pointer;
+    text-align: left;
+    transition: background 0.15s ease;
+}
+
+.ol-status-option:hover {
+    background: #f8fafc;
+}
+
+.ol-status-option--selected {
+    background: #f1f5f9;
+}
+
+.ol-status-option-dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+
+.ol-status-option-text {
+    font-size: 0.78rem;
+    font-weight: 500;
+    color: #334155;
+    flex: 1;
+}
+
+.ol-status-option--selected .ol-status-option-text {
+    font-weight: 600;
+    color: #0f172a;
+}
+
+.ol-status-check {
+    color: #1b3a5c;
+    flex-shrink: 0;
+}
+
+.ol-status-dropdown--busy {
+    opacity: 0.6;
+    pointer-events: none;
+}
+
+/* Actions */
+.ol-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 6px;
+}
+
+.ol-icon-btn {
+    width: 28px;
+    height: 28px;
+    border-radius: 6px;
+    border: 1px solid #e5e9ed;
+    background: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.15s ease;
+}
+
+.ol-icon-btn:hover {
+    border-color: #1b3a5c;
+    background: #f8fafc;
+}
+
+@media (max-width: 767px) {
+
+    .ol-customer-name,
+    .ol-customer-email {
+        max-width: 130px;
+    }
+}
+
+/* ==================================================================== */
+/* Header Filter Dropdown (Before Search Bar)                           */
+/* ==================================================================== */
+
+.ol-filter-dropdown {
+    position: relative;
+    display: inline-block;
+}
+
+.ol-filter-trigger {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    height: 38px;
+    padding: 0 14px;
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    font-size: 0.82rem;
+    font-weight: 500;
+    color: #475569;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.02);
+}
+
+.ol-filter-trigger:hover {
+    border-color: #cbd5e1;
+    background: #f8fafc;
+    color: #1e293b;
+}
+
+.ol-filter-trigger--active {
+    border-color: #1b3a5c;
+    box-shadow: 0 0 0 3px rgba(27, 58, 92, 0.1);
+}
+
+.ol-filter-trigger--highlighted {
+    border-color: #93c5fd;
+    background: #eff6ff;
+    color: #1e40af;
+    font-weight: 600;
+}
+
+.ol-filter-icon {
+    font-size: 0.9rem;
+    opacity: 0.8;
+}
+
+.ol-filter-label {
+    line-height: 1;
+}
+
+.ol-filter-chevron {
+    transition: transform 0.2s ease;
+    opacity: 0.65;
+    margin-left: 2px;
+}
+
+.ol-filter-chevron--rotate {
+    transform: rotate(180deg);
+}
+
+.ol-filter-menu {
+    position: absolute;
+    top: calc(100% + 6px);
+    left: 0;
+    min-width: 170px;
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 10px;
+    box-shadow:
+        0 10px 25px -5px rgba(15, 23, 42, 0.12),
+        0 4px 8px -2px rgba(15, 23, 42, 0.04);
+    padding: 5px;
+    z-index: 1000;
+    animation: olSlideDown 0.18s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.ol-filter-option {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    padding: 8px 10px;
+    border: none;
+    background: transparent;
+    border-radius: 6px;
+    cursor: pointer;
+    text-align: left;
+    transition: background 0.15s ease;
+}
+
+.ol-filter-option:hover {
+    background: #f8fafc;
+}
+
+.ol-filter-option--selected {
+    background: #f1f5f9;
+}
+
+.ol-filter-option-dot {
+    width: 7.5px;
+    height: 7.5px;
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+
+.ol-filter-option-dot--all {
+    background-color: #64748b;
+}
+
+.ol-filter-option-text {
+    font-size: 0.8rem;
+    font-weight: 500;
+    color: #334155;
+    flex: 1;
+}
+
+.ol-filter-option--selected .ol-filter-option-text {
+    font-weight: 600;
+    color: #0f172a;
+}
+
+.ol-filter-check {
+    font-size: 0.9rem;
+    color: #1b3a5c;
+    flex-shrink: 0;
+}

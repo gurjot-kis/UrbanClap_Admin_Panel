@@ -1,57 +1,25 @@
-import { useState } from "react";
-import type { FormEvent } from "react";
+import React, { useState, type FormEvent } from "react";
 import { Link, Navigate, useNavigate } from "react-router-dom";
+import { toast } from "sonner";
+import { LuMail, LuLock, LuEye, LuEyeOff, LuShieldCheck } from "react-icons/lu";
 
-const EyeIcon = ({ open }: { open: boolean }) =>
-  open ? (
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      width="18"
-      height="18"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
-      <circle cx="12" cy="12" r="3" />
-    </svg>
-  ) : (
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      width="18"
-      height="18"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94" />
-      <path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19" />
-      <line x1="1" y1="1" x2="23" y2="23" />
-    </svg>
-  );
-import type { LoginApiResponse } from "../types/auth";
 import { ROUTES } from "../routes";
 import { getStoredToken, getStoredUser, setAuthSession } from "../utils/auth";
 import { getPostLoginRoute } from "../utils/roles";
 import { useAppDispatch } from "../store/hooks";
 import { setCredentials } from "../features/auth/authSlice";
+import { useAdminLoginMutation } from "../features/auth/authApi"; // Adjust path to your authApi
+import "../styles/LoginPage.css";
 
-const LOGIN_ENDPOINT = "/api/login";
-
-function LoginPage() {
+export default function LoginPage(): React.ReactElement {
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
+
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
   const [showPassword, setShowPassword] = useState(false);
+
+  const [adminLogin, { isLoading }] = useAdminLoginMutation();
 
   if (getStoredToken()) {
     return <Navigate to={getPostLoginRoute(getStoredUser()?.role)} replace />;
@@ -59,173 +27,186 @@ function LoginPage() {
 
   const handleLogin = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    setError("");
-    setLoading(true);
+
+    if (!email.trim() || !password.trim()) {
+      toast.error("Validation error", {
+        description: "Please enter both your email address and password.",
+      });
+      return;
+    }
 
     try {
-      const response = await fetch(LOGIN_ENDPOINT, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password }),
-      });
+      const response = await adminLogin({
+        email: email.trim(),
+        password: password.trim(),
+      }).unwrap();
+      const authData = response?.data;
 
-      const result = (await response.json()) as LoginApiResponse;
-
-      if (!response.ok || !result.success || !result.data) {
-        throw new Error(result.message || "Unable to login right now.");
+      if (!authData) {
+        throw new Error(
+          response?.message || "Invalid response received from server.",
+        );
       }
 
+      // Handle both nested user response ({ user: {...}, token }) and flat response
+      const rawData = authData as any;
+      const userPayload = rawData.user || rawData;
+
       const authUser = {
-        ...result.data,
-        role:
-          result.data.role ??
-          ((result.data as Record<string, unknown>).role as string | undefined),
-        profilePicture: (result.data as Record<string, unknown>)
-          .profilePicture as string | undefined,
+        ...userPayload,
+        _id: String(userPayload._id || userPayload.user_id || ""),
+        user_id: String(userPayload.user_id || userPayload._id || ""),
+        name: String(userPayload.name || userPayload.fullName || "Admin"),
+        email: String(userPayload.email || email.trim()),
+        role: String(userPayload.role || rawData.role || "admin"),
+        profilePicture:
+          userPayload.profilePicture ||
+          userPayload.profile_picture ||
+          userPayload.avatar ||
+          rawData.profilePicture ||
+          "",
+        token: String(rawData.token || userPayload.token || ""),
       };
+
+      // Store in LocalStorage / Cookie Session
       setAuthSession(authUser);
-      // ← ADD THIS BLOCK
+
+      // Sync Redux Auth Store
       dispatch(
         setCredentials({
           user: {
             _id: authUser._id,
             name: authUser.name,
-            phone: authUser.email,
-            gender: "unknown",
-            status: authUser.status?.toString() || "active",
+            phone: userPayload.phone || authUser.email,
+            gender: userPayload.gender || "unknown",
+            status: userPayload.status?.toString() || "active",
             avatar: authUser.profilePicture,
-            createdAt: new Date().toISOString(),
-            updatedAt: new Date().toISOString(),
+            createdAt: userPayload.createdAt || new Date().toISOString(),
+            updatedAt: userPayload.updatedAt || new Date().toISOString(),
             token: authUser.token,
           },
           token: authUser.token,
         }),
       );
 
+      toast.success("Welcome back!", {
+        description: "Successfully authenticated to dashboard.",
+      });
+
       navigate(getPostLoginRoute(authUser.role), { replace: true });
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Something went wrong.");
-    } finally {
-      setLoading(false);
+    } catch (err: any) {
+      console.error("Login failed:", err);
+      const errMsg =
+        err?.data?.message ||
+        err?.message ||
+        "Invalid credentials. Please verify and try again.";
+
+      toast.error("Authentication failed", {
+        description: errMsg,
+      });
     }
   };
 
   return (
-    <div className="min-vh-100 d-flex align-items-center justify-content-center login-bg">
-      <div
-        className="card shadow-lg border-0 rounded-4"
-        style={{ width: "100%", maxWidth: 420 }}
-      >
-        <div className="card-body p-4 p-md-5">
-          {/* Header */}
-          <div className="text-center mb-4">
-            <div className="login-avatar-wrap mx-auto mb-3">
-              <svg
-                viewBox="0 0 80 80"
-                xmlns="http://www.w3.org/2000/svg"
-                width="64"
-                height="64"
-              >
-                <circle cx="40" cy="40" r="40" fill="#1b3a5c" />
-                <circle cx="40" cy="30" r="15" fill="#7da8cc" />
-                <ellipse cx="40" cy="70" rx="26" ry="18" fill="#7da8cc" />
-              </svg>
-            </div>
-            <h4 className="fw-bold mb-1" style={{ color: "#1b3a5c" }}>
-              Portal Login
-            </h4>
-            <p className="text-muted small mb-0">
-              Sign in to access your dashboard
-            </p>
+    <div className="login-page-wrapper">
+      {/* Decorative ambient background accents */}
+      <div className="login-ambient-shape login-ambient-shape-1" />
+      <div className="login-ambient-shape login-ambient-shape-2" />
+
+      <div className="login-card-container">
+        {/* Header Branding */}
+        <div className="login-card-header">
+          <div className="login-logo-badge">
+            <LuShieldCheck size={28} />
           </div>
+          <h2 className="login-brand-title">
+            <span>Urban</span>Clap
+          </h2>
+          <p className="login-brand-subtitle">
+            Welcome back! Enter your credentials to access the admin portal.
+          </p>
+        </div>
 
-          {/* Error alert */}
-          {error && (
-            <div className="alert alert-danger py-2 small" role="alert">
-              {error}
-            </div>
-          )}
-
-          {/* Form */}
-          <form onSubmit={handleLogin}>
-            <div className="mb-3">
-              <label htmlFor="email" className="form-label fw-semibold small">
-                Email address
-              </label>
+        {/* Login Form */}
+        <form onSubmit={handleLogin} className="login-form-body">
+          {/* Email Field */}
+          <div className="login-input-group">
+            <label className="login-input-label" htmlFor="loginEmail">
+              Email Address
+            </label>
+            <div className="login-field-box">
+              <LuMail className="login-field-icon" size={18} />
               <input
-                id="email"
+                id="loginEmail"
                 type="email"
-                className="form-control form-control-lg"
-                placeholder="admin@example.com"
+                className="login-input-control"
+                placeholder="name@domain.com"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
+                autoComplete="email"
               />
             </div>
+          </div>
 
-            <div className="mb-4">
-              <div className="d-flex justify-content-between align-items-center mb-1">
-                <label
-                  htmlFor="password"
-                  className="form-label fw-semibold small mb-0"
-                >
-                  Password
-                </label>
-                <Link
-                  to={ROUTES.forgotPassword}
-                  className="small text-decoration-none"
-                  style={{ color: "#1b3a5c" }}
-                >
-                  Forgot Password?
-                </Link>
-              </div>
-              <div className="input-group">
-                <input
-                  id="password"
-                  type={showPassword ? "text" : "password"}
-                  className="form-control form-control-lg"
-                  placeholder="Enter your password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  required
-                />
-                <button
-                  type="button"
-                  className="btn btn-outline-secondary"
-                  onClick={() => setShowPassword((v) => !v)}
-                  tabIndex={-1}
-                  aria-label={showPassword ? "Hide password" : "Show password"}
-                >
-                  <EyeIcon open={showPassword} />
-                </button>
-              </div>
+          {/* Password Field */}
+          <div className="login-input-group">
+            <div className="login-label-row">
+              <label className="login-input-label" htmlFor="loginPassword">
+                Password
+              </label>
+              <Link to={ROUTES.forgotPassword} className="login-forgot-link">
+                Forgot password?
+              </Link>
             </div>
-
-            <div className="d-grid">
+            <div className="login-field-box">
+              <LuLock className="login-field-icon" size={18} />
+              <input
+                id="loginPassword"
+                type={showPassword ? "text" : "password"}
+                className="login-input-control login-input-control--password"
+                placeholder="••••••••••••"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+                autoComplete="current-password"
+              />
               <button
-                type="submit"
-                className="btn btn-lg fw-semibold text-white"
-                style={{ background: "#1b3a5c" }}
-                disabled={loading}
+                type="button"
+                className="login-toggle-eye"
+                onClick={() => setShowPassword((prev) => !prev)}
+                aria-label={showPassword ? "Hide password" : "Show password"}
+                tabIndex={-1}
               >
-                {loading ? (
-                  <>
-                    <span
-                      className="spinner-border spinner-border-sm me-2"
-                      role="status"
-                    />
-                    Logging in...
-                  </>
-                ) : (
-                  "Login"
-                )}
+                {showPassword ? <LuEyeOff size={18} /> : <LuEye size={18} />}
               </button>
             </div>
-          </form>
+          </div>
+
+          {/* Submit CTA */}
+          <button
+            type="submit"
+            className="login-submit-btn"
+            disabled={isLoading}
+          >
+            {isLoading ? (
+              <div className="login-btn-loading">
+                <span
+                  className="spinner-border spinner-border-sm"
+                  role="status"
+                />
+                <span>Signing in...</span>
+              </div>
+            ) : (
+              "Sign In to Account"
+            )}
+          </button>
+        </form>
+
+        <div className="login-card-footer">
+          <span>Protected system • Authorized personnel only</span>
         </div>
       </div>
     </div>
   );
 }
-
-export default LoginPage;

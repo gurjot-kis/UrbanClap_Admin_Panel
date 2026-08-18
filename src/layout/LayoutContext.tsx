@@ -1,33 +1,45 @@
-import { createContext, useContext, useState, ReactNode } from 'react'
+import React, { createContext, useContext, useState, type ReactNode } from 'react';
 
 export interface HeaderConfig {
-  title: string
-  subtitle?: string
-  backTo?: string
-  backTitle?: string
+  title?: string;
+  subtitle?: string;
+  backTo?: string | null;
+  backTitle?: string;
 }
 
 interface LayoutContextType {
-  headerConfig: HeaderConfig
-  setHeaderConfig: (config: HeaderConfig) => void
+  headerConfig: HeaderConfig;
+  setHeaderConfig: React.Dispatch<React.SetStateAction<HeaderConfig>>;
+  isSidebarOpen: boolean;
+  setIsSidebarOpen: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
-const LayoutContext = createContext<LayoutContextType | undefined>(undefined)
+const LayoutContext = createContext<LayoutContextType | undefined>(undefined);
 
 export function LayoutProvider({ children }: { children: ReactNode }) {
-  const [headerConfig, setHeaderConfig] = useState<HeaderConfig>({ title: '' })
+  const [headerConfig, setHeaderConfig] = useState<HeaderConfig>({
+    title: 'Dashboard',
+    subtitle: '',
+    backTo: null,
+  });
+  const [isSidebarOpen, setIsSidebarOpen] = useState<boolean>(false);
 
   return (
-    <LayoutContext.Provider value={{ headerConfig, setHeaderConfig }}>
+    <LayoutContext.Provider
+      value={{ headerConfig, setHeaderConfig, isSidebarOpen, setIsSidebarOpen }}
+    >
       {children}
     </LayoutContext.Provider>
-  )
+  );
 }
 
-export function useHeader() {
-  const context = useContext(LayoutContext)
+export function useLayout(): LayoutContextType {
+  const context = useContext(LayoutContext);
   if (!context) {
-    throw new Error('useHeader must be used within a LayoutProvider')
+    throw new Error('useLayout must be used within a LayoutProvider');
   }
-  return context
+  return context;
 }
+
+// Backward compatibility if you have other files importing useHeader
+export const useHeader = useLayout;

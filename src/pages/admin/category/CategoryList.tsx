@@ -20,6 +20,7 @@ import {
   DataTableStatusToggle,
 } from "../../../components/common/DataTable/DataTable";
 import type { DataTableColumn } from "../../../components/common/DataTable/DataTable.types";
+import { useHeader } from "../../../layout/LayoutContext";
 
 const PAGE_LIMIT = 10;
 
@@ -57,6 +58,14 @@ const CategoryList = () => {
   );
 
   const navigate = useNavigate();
+
+  const { setHeaderConfig } = useHeader();
+
+  useEffect(() => {
+    setHeaderConfig({
+      title: "Categories",
+    });
+  }, [setHeaderConfig]);
 
   useEffect(() => {
     const t = setTimeout(() => {
@@ -219,7 +228,7 @@ const CategoryList = () => {
   return (
     <>
       <DataTable
-        title="Categories"
+        // title="Categories"
         statPills={[
           { label: `${pagination?.total ?? stats.total} total`, navy: true },
           { label: `${stats.byLevel[2] ?? 0} sub-categories · this page` },

@@ -12,6 +12,11 @@ export interface LoginRequest {
   password: string;
 }
 
+export interface AdminLoginRequest {
+  email: string;
+  password: string;
+}
+
 export interface LoginData {
   user: User;
   token: string;

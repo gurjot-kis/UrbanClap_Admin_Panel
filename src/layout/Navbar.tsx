@@ -1,44 +1,45 @@
-import { useNavigate } from 'react-router-dom'
-import { useHeader } from './LayoutContext'
-import { clearAuthSession } from '../utils/auth'
-import { ROUTES } from '../routes'
+import React from 'react';
+import { useNavigate } from 'react-router-dom';
+import { LuArrowLeft, LuMenu } from 'react-icons/lu';
+import { useLayout } from './LayoutContext';
 
-export default function Navbar() {
-  const navigate = useNavigate()
-  const { headerConfig } = useHeader()
-
-  const handleLogout = () => {
-    clearAuthSession()
-    navigate(ROUTES.login, { replace: true })
-  }
+export default function Navbar(): React.ReactElement {
+  const navigate = useNavigate();
+  const { headerConfig, setIsSidebarOpen } = useLayout();
 
   return (
-    <header className="d-flex align-items-center justify-content-between px-4 py-3 bg-white shadow-sm">
-      <div className="d-flex align-items-center gap-2">
+    <header className="d-flex align-items-center justify-content-between px-3 px-md-4 py-3 bg-white border-bottom border-light sticky-top shadow-xs">
+      <div className="d-flex align-items-center gap-2 gap-md-3">
+        {/* Mobile Toggle Button */}
+        <button
+          type="button"
+          className="btn btn-light d-lg-none d-flex align-items-center justify-content-center p-2 rounded-3 border"
+          onClick={() => setIsSidebarOpen((prev) => !prev)}
+          aria-label="Toggle navigation"
+        >
+          <LuMenu size={20} className="text-secondary" />
+        </button>
+
         {headerConfig.backTo && (
           <button
             type="button"
-            className="subcat-back-btn"
+            className="btn btn-outline-secondary d-flex align-items-center justify-content-center p-2 rounded-3"
             onClick={() => navigate(headerConfig.backTo!)}
             title={headerConfig.backTitle || 'Back'}
           >
-            <svg viewBox="0 0 24 24" fill="currentColor" width="16" height="16">
-              <path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z" />
-            </svg>
+            <LuArrowLeft size={18} />
           </button>
         )}
+        
         <div>
-          <h6 className="mb-0 fw-semibold text-dark">{headerConfig.title}</h6>
+          <h5 className="mb-0 fw-bold text-dark">{headerConfig.title || 'Dashboard'}</h5>
           {headerConfig.subtitle && (
-            <small className="text-muted" style={{ fontSize: '0.75rem' }}>
+            <small className="text-muted d-block" style={{ fontSize: '0.8rem', marginTop: '-2px' }}>
               {headerConfig.subtitle}
             </small>
           )}
         </div>
       </div>
-      <button type="button" className="btn btn-danger btn-sm px-3 fw-semibold" onClick={handleLogout}>
-        Logout
-      </button>
     </header>
-  )
+  );
 }

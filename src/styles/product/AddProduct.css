@@ -687,7 +687,7 @@
   }
 
   .cpf-variant-row {
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: 56px 1fr 1fr;
   }
 
   .cpf-media-grid {
@@ -699,4 +699,103 @@
   .cpf-btn {
     transition: none;
   }
+}
+
+
+.cpf-spin {
+  width: 15px;
+  height: 15px;
+  animation: cpf-spin 0.7s linear infinite;
+}
+
+@keyframes cpf-spin {
+  to { transform: rotate(360deg); }
+}
+
+.cpf-page-loader {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  min-height: 60vh;
+  color: var(--ink-soft);
+  font-size: 14px;
+}
+
+.cpf-page-loader svg {
+  width: 28px;
+  height: 28px;
+  color: var(--pine);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cpf-spin {
+    animation: none;
+  }
+}
+
+.cpf-variant-row {
+  display: grid;
+  grid-template-columns: 56px 1.4fr 1fr 1fr auto;
+  gap: 10px;
+  align-items: center;
+  background: #fbfaf7;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 10px;
+}
+
+.cpf-variant-thumb {
+  position: relative;
+  width: 56px;
+  height: 56px;
+  border-radius: 9px;
+  overflow: hidden;
+  border: 1px dashed var(--line);
+  background: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--ink-soft);
+  cursor: pointer;
+}
+
+.cpf-variant-thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.cpf-variant-thumb svg {
+  width: 18px;
+  height: 18px;
+}
+
+.cpf-variant-thumb-clear {
+  position: absolute;
+  top: 3px;
+  right: 3px;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  border: none;
+  background: rgba(20, 24, 31, 0.7);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.cpf-variant-thumb-clear svg {
+  width: 8px;
+  height: 8px;
+}
+
+/* was repeat(3, ...) — variant images no longer live in this grid */
+.cpf-media-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 20px;
 }

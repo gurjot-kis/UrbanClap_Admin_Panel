@@ -14,6 +14,7 @@ export interface ProductVariant {
   key: string;
   label: string;
   price: number;
+  costPrice: number;
   image: string | null;
 }
 
@@ -37,8 +38,14 @@ export interface Product {
   includes: string[];
   mainImage: string;
   images: string[];
+
   category: ProductCategory;
   subCategory: ProductCategory;
+
+  // Used by product detail/edit API
+  category_id: string;
+  sub_category_id?: string | null;
+
   vendor_id: string | null;
   basePrice: number;
   variantLabel: string;
@@ -49,6 +56,10 @@ export interface Product {
   status: ProductStatus;
   createdAt: string;
   updatedAt: string;
+
+  // Used by product detail/edit API
+  category_name?: string | null;
+  sub_category_name?: string | null;
 }
 
 export interface ProductPagination {
@@ -68,7 +79,16 @@ export interface GetProductsResponse {
   pagination: ProductPagination;
 }
 
-// ---------------- CREATE PRODUCT ----------------
+// ---------------- PRODUCT DETAIL ----------------
+
+export interface GetProductByIdResponse {
+  success: boolean;
+  code: number;
+  message: string;
+  data: Product;
+}
+
+// ---------------- CREATE / EDIT PRODUCT ----------------
 
 export interface Category {
   _id: string;
@@ -93,13 +113,23 @@ export interface Vendor {
 }
 
 /**
- * Variant used by the Create Product form.
+ * Variant used by the Create/Edit Product form.
+ *
+ * key:
+ * - Optional because new variants don't have a server key yet.
+ * - Existing variants have a key when editing.
+ *
+ * existingImage:
+ * - Existing server-side image shown during edit.
+ * - null when the variant has no existing image.
  */
 export interface CreateProductVariant {
+  key?: string;
   label: string;
   price: number | "";
   costPrice: number | "";
-  imageIndex: number | null;
+  imageFile: File | null;   
+  existingImage?: string | null;
 }
 
 export interface ProductFormState {
@@ -116,7 +146,7 @@ export interface ProductFormState {
   variants: CreateProductVariant[];
   mainImage: File | null;
   featuredImages: File[];
-  variantImages: File[];
+  // ❌ remove variantImages: File[] — variants carry their own imageFile now
 }
 
 export interface ProductPayloadPreview {
@@ -130,8 +160,14 @@ export interface ProductPayloadPreview {
   variantLabel: string;
   durationMinutes: number | "";
   includes: string[];
-  variants: CreateProductVariant[];
+  variants: Array<{           // ✅ serializable shape, not CreateProductVariant
+    key?: string;
+    label: string;
+    price: number | "";
+    costPrice: number | "";
+    image: string;            // file name or existing URL, never a File object
+  }>;
   mainImage: string;
   featuredImages: string[];
-  variantImages: string[];
+  // ❌ remove variantImages: string[]
 }

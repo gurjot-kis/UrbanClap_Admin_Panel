@@ -260,6 +260,7 @@
   color: #065f46;
   border-color: #a7f3d0;
 }
+
 .pl-status-trigger--active .pl-status-dot-pulse {
   background-color: #10b981;
   box-shadow: 0 0 0 2.5px rgba(16, 185, 129, 0.2);
@@ -270,6 +271,7 @@
   color: #92400e;
   border-color: #fde68a;
 }
+
 .pl-status-trigger--pending .pl-status-dot-pulse {
   background-color: #f59e0b;
   box-shadow: 0 0 0 2.5px rgba(245, 158, 11, 0.2);
@@ -280,6 +282,7 @@
   color: #991b1b;
   border-color: #fecaca;
 }
+
 .pl-status-trigger--rejected .pl-status-dot-pulse {
   background-color: #ef4444;
   box-shadow: 0 0 0 2.5px rgba(239, 68, 68, 0.2);
@@ -328,6 +331,7 @@
     opacity: 0;
     transform: translateY(-6px) scale(0.97);
   }
+
   to {
     opacity: 1;
     transform: translateY(0) scale(1);
@@ -392,8 +396,51 @@
     width: 30px;
     height: 30px;
   }
+
   .pl-name,
   .pl-short-desc {
     max-width: 160px;
+  }
+}
+
+
+/* Portaled Dropdown Menu Overlay */
+.pl-status-menu {
+  min-width: 140px;
+  background: #ffffff;
+  border: 1px solid #edf2f7;
+  border-radius: 10px;
+  box-shadow:
+    0 10px 25px -5px rgba(15, 23, 42, 0.16),
+    0 4px 8px -2px rgba(15, 23, 42, 0.08);
+  padding: 4px;
+  animation: plSlideDown 0.18s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.pl-status-menu--up {
+  animation: plSlideUp 0.18s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes plSlideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-6px) scale(0.97);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes plSlideUp {
+  from {
+    opacity: 0;
+    transform: translateY(6px) scale(0.97);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
   }
 }

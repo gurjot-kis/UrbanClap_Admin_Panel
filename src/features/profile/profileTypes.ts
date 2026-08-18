@@ -1,0 +1,24 @@
+export interface AdminProfile {
+  user_id: string
+  fullName: string
+  email: string
+  phone: string
+  address: string
+  profilePicture: string
+}
+
+export interface GetAdminProfileResponse {
+  success: boolean
+  code: number
+  message: string
+  data: AdminProfile
+}
+
+export type UpdateAdminProfilePayload = any
+
+export interface UpdateAdminProfileResponse {
+  success: boolean
+  code: number
+  message: string
+  data: AdminProfile
+}

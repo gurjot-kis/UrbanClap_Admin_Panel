@@ -1,18 +1,25 @@
-import { useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import type { ChangeEvent, FormEvent } from "react";
+import { useNavigate, useParams } from "react-router-dom";
 import { useGetActiveCategoriesQuery } from "../../../features/category/categoryApi";
+import {
+  useCreateProductMutation,
+  useGetProductByIdQuery,
+  useUpdateProductMutation,
+} from "../../../features/product/productApi";
 import type {
   ProductFormState,
   CreateProductVariant,
 } from "../../../features/product/productTypes";
 import "../../../styles/product/AddProduct.css";
 import type { Category } from "../../../features/category/categoryTypes";
+import {FullScreenLoader} from "../../../components/common/FullScreenLoader"
 
 const emptyVariant = (): CreateProductVariant => ({
   label: "",
   price: 0,
   costPrice: "",
-  imageIndex: null,
+  imageFile: null,
 });
 
 const initialForm: ProductFormState = {
@@ -29,7 +36,6 @@ const initialForm: ProductFormState = {
   variants: [],
   mainImage: null,
   featuredImages: [],
-  variantImages: [],
 };
 
 // ---- tiny inline icon set (no external icon dependency) --------------------
@@ -131,9 +137,27 @@ const Icon = {
       <path d="M12 5v14M5 12h14" strokeLinecap="round" />
     </svg>
   ),
+  Spinner: () => (
+    <svg viewBox="0 0 24 24" fill="none" className="cpf-spin">
+      <circle
+        cx="12"
+        cy="12"
+        r="9"
+        stroke="currentColor"
+        strokeWidth="2.5"
+        strokeLinecap="round"
+        strokeDasharray="42 100"
+      />
+    </svg>
+  ),
 };
 
 export default function CreateProductForm() {
+  const { productId } = useParams<{ productId: string }>();
+  const isEditMode = Boolean(productId);
+  const navigate = useNavigate();
+  const API_ASSET_URL = import.meta.env.VITE_API_ASSET_URL;
+
   const {
     data: categoriesResponse,
     isLoading: categoriesLoading,
@@ -142,53 +166,95 @@ export default function CreateProductForm() {
 
   const categories: Category[] = categoriesResponse?.data ?? [];
 
+  const {
+    data: productResponse,
+    isLoading: productLoading,
+    isError: productError,
+  } = useGetProductByIdQuery(productId as string, { skip: !isEditMode });
+
+  const [createProduct, { isLoading: creating }] = useCreateProductMutation();
+  const [updateProduct, { isLoading: updating }] = useUpdateProductMutation();
+  const submitting = creating || updating;
+
   const [form, setForm] = useState<ProductFormState>(initialForm);
   const [selectedL1, setSelectedL1] = useState("");
-  const [selectedL2, setSelectedL2] = useState("");
-  const [selectedL3, setSelectedL3] = useState("");
+  const [selectedSubCategory, setSelectedSubCategory] = useState("");
   const [includeDraft, setIncludeDraft] = useState("");
-  const [submitting, setSubmitting] = useState(false);
   const [submitMessage, setSubmitMessage] = useState<string | null>(null);
+  const [submitError, setSubmitError] = useState<string | null>(null);
+
+  const [existingMainImage, setExistingMainImage] = useState<string | null>(
+    null,
+  );
+  const [existingFeaturedImages, setExistingFeaturedImages] = useState<
+    string[]
+  >([]);
 
   const mainImageRef = useRef<HTMLInputElement>(null);
   const featuredImagesRef = useRef<HTMLInputElement>(null);
-  const variantImagesRef = useRef<HTMLInputElement>(null);
+
+  // ---- populate form from fetched product (edit mode) --------------------
+  useEffect(() => {
+    const product = productResponse?.data;
+    if (!product) return;
+
+    setForm({
+      name: product.name,
+      description: product.description,
+      shortDescription: product.shortDescription,
+      category_id: product.category_id,
+      sub_category_id: product.sub_category_id ?? "",
+      vendor_id: product.vendor_id ?? "",
+      basePrice: product.basePrice,
+      variantLabel: product.variantLabel,
+      durationMinutes: product.durationMinutes,
+      includes: product.includes ?? [],
+      variants: (product.variants ?? []).map((v) => ({
+        key: v.key,
+        label: v.label,
+        price: v.price,
+        costPrice: v.costPrice,
+        imageFile: null,
+        existingImage: getAssetUrl(v.image),
+      })),
+      mainImage: null,
+      featuredImages: [],
+    });
+
+    setSelectedL1(product.category_id);
+    setSelectedSubCategory(product.sub_category_id ?? "");
+    setExistingMainImage(getAssetUrl(product.mainImage));
+
+    setExistingFeaturedImages(
+      (product.images ?? [])
+        .map((image) => getAssetUrl(image))
+        .filter((image): image is string => Boolean(image)),
+    );
+  }, [productResponse]);
 
   // ---- category cascade ------------------------------------------------
   const l1 = useMemo(
     () => categories.find((c) => c._id === selectedL1),
     [categories, selectedL1],
   );
-  const l2options = l1?.children ?? [];
-  const l2 = useMemo(
-    () => l2options.find((c) => c._id === selectedL2),
-    [l2options, selectedL2],
-  );
-  const l3options = l2?.children ?? [];
-  const l3 = useMemo(
-    () => l3options.find((c) => c._id === selectedL3),
-    [l3options, selectedL3],
+  const subCategoryOptions = l1?.children ?? [];
+  const subCategory = useMemo(
+    () => subCategoryOptions.find((c) => c._id === selectedSubCategory),
+    [subCategoryOptions, selectedSubCategory],
   );
 
-  const categoryPath = [l1?.name, l2?.name, l3?.name]
+  const categoryPath = [l1?.name, subCategory?.name]
     .filter(Boolean)
     .join(" / ");
 
   const handleSelectL1 = (id: string) => {
     setSelectedL1(id);
-    setSelectedL2("");
-    setSelectedL3("");
+    setSelectedSubCategory("");
     setForm((f) => ({ ...f, category_id: id, sub_category_id: "" }));
   };
 
-  const handleSelectL2 = (id: string) => {
-    setSelectedL2(id);
-    setSelectedL3("");
-    setForm((f) => ({ ...f, sub_category_id: id }));
-  };
-
-  const handleSelectL3 = (id: string) => {
-    setSelectedL3(id);
+  const handleSelectSubCategory = (id: string) => {
+    setSelectedSubCategory(id);
     setForm((f) => ({ ...f, sub_category_id: id }));
   };
 
@@ -239,21 +305,32 @@ export default function CreateProductForm() {
       form.variants.filter((_, i) => i !== index),
     );
 
-  // ---- images -----------------------------------------------------------
-  const handleMainImage = (e: ChangeEvent<HTMLInputElement>) =>
-    setField("mainImage", e.target.files?.[0] ?? null);
+  // Each variant owns its own image directly now — no shared pool, no index
+  // to keep in sync. Picking a file for variant #2 can never accidentally
+  // affect variant #0.
+  const handleVariantImageChange =
+    (index: number) => (e: ChangeEvent<HTMLInputElement>) => {
+      const file = e.target.files?.[0] ?? null;
+      updateVariant(index, { imageFile: file });
+      e.target.value = ""; // allow re-selecting the same file later
+    };
 
-  const handleFeaturedImages = (e: ChangeEvent<HTMLInputElement>) =>
+  const clearVariantImage = (index: number) =>
+    updateVariant(index, { imageFile: null, existingImage: null });
+
+  // ---- images -----------------------------------------------------------
+  const handleMainImage = (e: ChangeEvent<HTMLInputElement>) => {
+    setField("mainImage", e.target.files?.[0] ?? null);
+    setExistingMainImage(null); // new file replaces the preview entirely
+  };
+
+  const handleFeaturedImages = (e: ChangeEvent<HTMLInputElement>) => {
     setField("featuredImages", [
       ...form.featuredImages,
       ...Array.from(e.target.files ?? []),
     ]);
-
-  const handleVariantImages = (e: ChangeEvent<HTMLInputElement>) =>
-    setField("variantImages", [
-      ...form.variantImages,
-      ...Array.from(e.target.files ?? []),
-    ]);
+    setExistingFeaturedImages([]); // backend replaces all featured images on new upload
+  };
 
   const removeFeaturedImage = (index: number) =>
     setField(
@@ -261,11 +338,20 @@ export default function CreateProductForm() {
       form.featuredImages.filter((_, i) => i !== index),
     );
 
-  const removeVariantImage = (index: number) =>
-    setField(
-      "variantImages",
-      form.variantImages.filter((_, i) => i !== index),
-    );
+  // ---- validation -----------------------------------------------------------
+  const validate = (): string | null => {
+    if (!form.name.trim()) return "Product name is required.";
+    if (form.basePrice === "" || Number(form.basePrice) < 0)
+      return "A valid base price is required.";
+    if (!form.category_id) return "Please select a category.";
+    if (!isEditMode && !form.mainImage) return "Main image is required.";
+    for (const v of form.variants) {
+      if (!v.label.trim()) return "Every variant needs a label.";
+      if (v.price === "" || Number(v.price) < 0)
+        return "Every variant needs a valid price.";
+    }
+    return null;
+  };
 
   // ---- submit -------------------------------------------------------------
   const buildFormData = () => {
@@ -280,82 +366,214 @@ export default function CreateProductForm() {
     fd.append("variantLabel", form.variantLabel);
     fd.append("durationMinutes", String(form.durationMinutes));
     fd.append("includes", JSON.stringify(form.includes));
-    fd.append("variants", JSON.stringify(form.variants));
-    if (form.mainImage) fd.append("mainImage", form.mainImage);
+
+    // 1. Send variants with their retained existing relative path / null
+    fd.append(
+      "variants",
+      JSON.stringify(
+        form.variants.map((v) => ({
+          key: v.key,
+          label: v.label,
+          price: v.price,
+          costPrice: v.costPrice,
+          image: v.existingImage
+            ? v.existingImage.replace(API_ASSET_URL, "")
+            : null,
+        })),
+      ),
+    );
+
+    // 2. Track new variant images
+    const variantImageSlots: number[] = [];
+    form.variants.forEach((variant, index) => {
+      if (variant.imageFile) {
+        variantImageSlots.push(index);
+        fd.append("variantImages", variant.imageFile);
+      }
+    });
+    fd.append("variantImageSlots", JSON.stringify(variantImageSlots));
+
+    // 3. Main image file & existing main image state
+    if (form.mainImage) {
+      fd.append("mainImage", form.mainImage);
+    } else {
+      fd.append(
+        "existingMainImage",
+        existingMainImage ? existingMainImage.replace(API_ASSET_URL, "") : "",
+      );
+    }
+
+    // 4. Retained existing featured images + new featured image files
+    const cleanedExistingImages = existingFeaturedImages.map((img) =>
+      img.replace(API_ASSET_URL, ""),
+    );
+    fd.append("existingFeaturedImages", JSON.stringify(cleanedExistingImages));
     form.featuredImages.forEach((file) => fd.append("featuredImages", file));
-    form.variantImages.forEach((file) => fd.append("variantImages", file));
+
     return fd;
+  };
+
+  const resetForm = () => {
+    setForm(initialForm);
+    setSelectedL1("");
+    setSelectedSubCategory("");
+    setIncludeDraft("");
+    setExistingMainImage(null);
+    setExistingFeaturedImages([]);
   };
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
-    setSubmitting(true);
     setSubmitMessage(null);
+    setSubmitError(null);
+
+    const validationError = validate();
+    if (validationError) {
+      setSubmitMessage("error");
+      setSubmitError(validationError);
+      return;
+    }
+
     try {
       const formData = buildFormData();
-      // Wire this up to your create-product mutation, e.g.:
-      // await createProduct(formData).unwrap();
-      await new Promise((resolve) => setTimeout(resolve, 700));
-      void formData;
-      setSubmitMessage("success");
-    } catch {
+      if (isEditMode && productId) {
+        await updateProduct({ productId, formData }).unwrap();
+        setSubmitMessage("success");
+        navigate("/admin/products");
+      } else {
+        await createProduct(formData).unwrap();
+        setSubmitMessage("success");
+        navigate("/admin/products");
+        resetForm();
+      }
+    } catch (err) {
       setSubmitMessage("error");
-    } finally {
-      setSubmitting(false);
+      setSubmitError(
+        (err as { data?: { message?: string } })?.data?.message ||
+          "Something went wrong. Please try again.",
+      );
     }
   };
 
-  const previewJson = {
-    name: form.name || "—",
-    description: form.description || "—",
-    shortDescription: form.shortDescription || "—",
-    category_id: form.category_id || "—",
-    sub_category_id: form.sub_category_id || "—",
-    vendor_id: form.vendor_id || "—",
-    basePrice: form.basePrice === "" ? "—" : form.basePrice,
-    variantLabel: form.variantLabel || "—",
-    durationMinutes: form.durationMinutes === "" ? "—" : form.durationMinutes,
-    includes: form.includes,
-    variants: form.variants,
-    mainImage: form.mainImage?.name ?? "—",
-    featuredImages: form.featuredImages.map((f) => f.name),
-    variantImages: form.variantImages.map((f) => f.name),
+  // const previewJson = {
+  //   name: form.name || "—",
+  //   description: form.description || "—",
+  //   shortDescription: form.shortDescription || "—",
+  //   category_id: form.category_id || "—",
+  //   sub_category_id: form.sub_category_id || "—",
+  //   vendor_id: form.vendor_id || "—",
+  //   basePrice: form.basePrice === "" ? "—" : form.basePrice,
+  //   variantLabel: form.variantLabel || "—",
+  //   durationMinutes: form.durationMinutes === "" ? "—" : form.durationMinutes,
+  //   includes: form.includes,
+  //   variants: form.variants.map((v) => ({
+  //     key: v.key,
+  //     label: v.label,
+  //     price: v.price,
+  //     costPrice: v.costPrice,
+  //     image: v.imageFile?.name ?? v.existingImage ?? "—",
+  //   })),
+  //   mainImage: form.mainImage?.name ?? existingMainImage ?? "—",
+  //   featuredImages: form.featuredImages.length
+  //     ? form.featuredImages.map((f) => f.name)
+  //     : existingFeaturedImages,
+  // };
+
+  const getAssetUrl = (image: string | null | undefined) => {
+    if (!image) return null;
+
+    // If backend already returns a complete URL, don't prepend it again
+    if (image.startsWith("http://") || image.startsWith("https://")) {
+      return image;
+    }
+
+    return `${API_ASSET_URL}${image.startsWith("/") ? "" : "/"}${image}`;
   };
+
+  // Clear existing main image
+  const clearMainImage = () => {
+    setExistingMainImage(null);
+    setField("mainImage", null);
+  };
+
+  // Remove single existing featured image
+  const removeExistingFeaturedImage = (index: number) => {
+    setExistingFeaturedImages((prev) => prev.filter((_, i) => i !== index));
+  };
+
+  // ---- full-page loader while fetching the existing product ---------------
+  if (isEditMode && productLoading) {
+    return (
+     <FullScreenLoader
+        title="Loading Product"
+        subtitle="Getting everything ready...."
+      />
+    );
+  }
+
+  if (isEditMode && productError) {
+    return (
+      <div className="cpf-page-loader">
+        <p>Couldn't load this product. It may have been removed.</p>
+        <button
+          type="button"
+          className="cpf-btn cpf-btn--ghost"
+          onClick={() => navigate(-1)}
+        >
+          Go back
+        </button>
+      </div>
+    );
+  }
 
   return (
     <div className="cpf">
       <form className="cpf-form" onSubmit={handleSubmit}>
         <header className="cpf-header">
           <div>
-            <p className="cpf-eyebrow">Catalog / New listing</p>
-            <h1 className="cpf-title">Create product</h1>
+            <p className="cpf-eyebrow">
+              Catalog / {isEditMode ? "Edit listing" : "New listing"}
+            </p>
+            <h1 className="cpf-title">
+              {isEditMode ? "Edit product" : "Create product"}
+            </h1>
             <p className="cpf-subtitle">
-              Fill in each section — the spec sheet on the right updates as you
-              go.
+              {isEditMode
+                ? "Update any section — the spec sheet on the right reflects your changes."
+                : "Fill in each section — the spec sheet on the right updates as you go."}
             </p>
           </div>
           <div className="cpf-header-actions">
-            <button type="button" className="cpf-btn cpf-btn--ghost">
+            {/* <button type="button" className="cpf-btn cpf-btn--ghost">
               Save draft
-            </button>
+            </button> */}
             <button
               type="submit"
               className="cpf-btn cpf-btn--primary"
               disabled={submitting}
             >
-              {submitting ? "Publishing…" : "Publish product"}
+              {submitting && <Icon.Spinner />}
+              {submitting
+                ? isEditMode
+                  ? "Saving…"
+                  : "Publishing…"
+                : isEditMode
+                  ? "Save changes"
+                  : "Publish product"}
             </button>
           </div>
         </header>
 
         {submitMessage === "success" && (
           <div className="cpf-banner cpf-banner--success">
-            Product payload built and ready to send.
+            {isEditMode
+              ? "Product updated successfully."
+              : "Product published successfully."}
           </div>
         )}
         {submitMessage === "error" && (
           <div className="cpf-banner cpf-banner--error">
-            Something went wrong. Please try again.
+            {submitError || "Something went wrong. Please try again."}
           </div>
         )}
 
@@ -440,39 +658,22 @@ export default function CreateProductForm() {
             <label className="cpf-field">
               <span>Sub-category</span>
               <select
-                value={selectedL2}
-                onChange={(e) => handleSelectL2(e.target.value)}
-                disabled={!l2options.length}
+                value={selectedSubCategory}
+                onChange={(e) => handleSelectSubCategory(e.target.value)}
+                disabled={!subCategoryOptions.length}
               >
                 <option value="">
-                  {l2options.length
+                  {subCategoryOptions.length
                     ? "Select sub-category"
                     : "No sub-categories"}
                 </option>
-                {l2options.map((c) => (
+                {subCategoryOptions.map((c) => (
                   <option key={c._id} value={c._id}>
                     {c.name}
                   </option>
                 ))}
               </select>
             </label>
-
-            {!!l3options.length && (
-              <label className="cpf-field">
-                <span>Specify</span>
-                <select
-                  value={selectedL3}
-                  onChange={(e) => handleSelectL3(e.target.value)}
-                >
-                  <option value="">Select type</option>
-                  {l3options.map((c) => (
-                    <option key={c._id} value={c._id}>
-                      {c.name}
-                    </option>
-                  ))}
-                </select>
-              </label>
-            )}
 
             <label className="cpf-field">
               <span>Vendor</span>
@@ -595,7 +796,16 @@ export default function CreateProductForm() {
             </span>
             <div>
               <h2>Variants</h2>
-              <p>Size, quantity or tier options with their own pricing.</p>
+              <p>
+                Size, quantity or tier options, each with its own image and
+                price.
+              </p>
+              {isEditMode && (
+                <p className="cpf-field-hint">
+                  Cost price isn't returned by the API — re-enter it for any
+                  variant you want to update.
+                </p>
+              )}
             </div>
           </div>
 
@@ -605,7 +815,39 @@ export default function CreateProductForm() {
 
           <div className="cpf-variant-list">
             {form.variants.map((variant, i) => (
-              <div className="cpf-variant-row" key={i}>
+              <div className="cpf-variant-row" key={variant.key ?? i}>
+                <label className="cpf-variant-thumb">
+                  {variant.imageFile ? (
+                    <img
+                      src={URL.createObjectURL(variant.imageFile)}
+                      alt="Variant preview"
+                    />
+                  ) : variant.existingImage ? (
+                    <img src={variant.existingImage} alt="Current variant" />
+                  ) : (
+                    <Icon.Image />
+                  )}
+                  <input
+                    type="file"
+                    accept="image/*"
+                    hidden
+                    onChange={handleVariantImageChange(i)}
+                  />
+                  {(variant.imageFile || variant.existingImage) && (
+                    <button
+                      type="button"
+                      className="cpf-variant-thumb-clear"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        clearVariantImage(i);
+                      }}
+                      aria-label="Remove variant image"
+                    >
+                      <Icon.Close />
+                    </button>
+                  )}
+                </label>
                 <input
                   type="text"
                   placeholder="Label (e.g. Small)"
@@ -634,23 +876,6 @@ export default function CreateProductForm() {
                     })
                   }
                 />
-                <select
-                  value={variant.imageIndex ?? ""}
-                  onChange={(e) =>
-                    updateVariant(i, {
-                      imageIndex:
-                        e.target.value === "" ? null : Number(e.target.value),
-                    })
-                  }
-                >
-                  <option value="">Image</option>
-                  {form.featuredImages.map((file, idx) => (
-                    <option
-                      key={idx}
-                      value={idx}
-                    >{`#${idx} · ${file.name}`}</option>
-                  ))}
-                </select>
                 <button
                   type="button"
                   className="cpf-icon-btn"
@@ -681,12 +906,14 @@ export default function CreateProductForm() {
             <div>
               <h2>Media</h2>
               <p>
-                Main listing image, gallery shots and variant-specific photos.
+                Main listing image and gallery shots. Variant photos live in the
+                Variants section above.
               </p>
             </div>
           </div>
 
           <div className="cpf-media-grid">
+            {/* Main Image */}
             <div className="cpf-media-block">
               <span className="cpf-media-label">Main image</span>
               <div
@@ -698,10 +925,25 @@ export default function CreateProductForm() {
                     src={URL.createObjectURL(form.mainImage)}
                     alt="Main preview"
                   />
+                ) : existingMainImage ? (
+                  <img src={existingMainImage} alt="Current main" />
                 ) : (
                   <span>Click to upload</span>
                 )}
               </div>
+              {(form.mainImage || existingMainImage) && (
+                <button
+                  type="button"
+                  className="cpf-btn cpf-btn--ghost"
+                  style={{ marginTop: 8 }}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    clearMainImage();
+                  }}
+                >
+                  Remove Main Image
+                </button>
+              )}
               <input
                 ref={mainImageRef}
                 type="file"
@@ -711,11 +953,25 @@ export default function CreateProductForm() {
               />
             </div>
 
+            {/* Featured Images */}
             <div className="cpf-media-block">
               <span className="cpf-media-label">Featured images</span>
               <div className="cpf-thumb-row">
+                {existingFeaturedImages.map((url, i) => (
+                  <div className="cpf-thumb" key={`existing-${i}`}>
+                    <img src={url} alt={`Current featured ${i}`} />
+                    <button
+                      type="button"
+                      onClick={() => removeExistingFeaturedImage(i)}
+                      aria-label="Remove image"
+                    >
+                      <Icon.Close />
+                    </button>
+                  </div>
+                ))}
+
                 {form.featuredImages.map((file, i) => (
-                  <div className="cpf-thumb" key={i}>
+                  <div className="cpf-thumb" key={`new-${i}`}>
                     <img
                       src={URL.createObjectURL(file)}
                       alt={`Featured ${i}`}
@@ -729,6 +985,7 @@ export default function CreateProductForm() {
                     </button>
                   </div>
                 ))}
+
                 <button
                   type="button"
                   className="cpf-thumb cpf-thumb--add"
@@ -746,39 +1003,6 @@ export default function CreateProductForm() {
                 onChange={handleFeaturedImages}
               />
             </div>
-
-            <div className="cpf-media-block">
-              <span className="cpf-media-label">Variant images</span>
-              <div className="cpf-thumb-row">
-                {form.variantImages.map((file, i) => (
-                  <div className="cpf-thumb" key={i}>
-                    <img src={URL.createObjectURL(file)} alt={`Variant ${i}`} />
-                    <button
-                      type="button"
-                      onClick={() => removeVariantImage(i)}
-                      aria-label="Remove image"
-                    >
-                      <Icon.Close />
-                    </button>
-                  </div>
-                ))}
-                <button
-                  type="button"
-                  className="cpf-thumb cpf-thumb--add"
-                  onClick={() => variantImagesRef.current?.click()}
-                >
-                  <Icon.Plus />
-                </button>
-              </div>
-              <input
-                ref={variantImagesRef}
-                type="file"
-                accept="image/*"
-                multiple
-                hidden
-                onChange={handleVariantImages}
-              />
-            </div>
           </div>
         </section>
       </form>
@@ -791,6 +1015,8 @@ export default function CreateProductForm() {
             <div className="cpf-tag-image">
               {form.mainImage ? (
                 <img src={URL.createObjectURL(form.mainImage)} alt="Product" />
+              ) : existingMainImage ? (
+                <img src={existingMainImage} alt="Product" />
               ) : (
                 <span>No image</span>
               )}
@@ -820,13 +1046,13 @@ export default function CreateProductForm() {
             )}
           </div>
 
-          <div className="cpf-payload">
+          {/* <div className="cpf-payload">
             <div className="cpf-payload-head">
               <span>form-data payload</span>
               <span className="cpf-payload-dot" />
             </div>
             <pre>{JSON.stringify(previewJson, null, 2)}</pre>
-          </div>
+          </div> */}
         </div>
       </aside>
     </div>

@@ -1,150 +1,186 @@
-import { useNavigate, useLocation } from "react-router-dom";
-import { getStoredUser } from "../utils/auth";
-import { resolveMediaUrl } from "../config/api";
-import { ROUTES } from "../routes";
+import React from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
+import { 
+  LuLayoutDashboard, 
+  LuStore, 
+  LuUsers, 
+  LuUserRound, 
+  LuFolderTree, 
+  LuPackage, 
+  LuShoppingBag, 
+  LuLogOut,
+  LuX
+} from 'react-icons/lu';
 
-const NAV_ITEMS = [
+import { getStoredUser, clearAuthSession } from '../utils/auth';
+import { resolveMediaUrl } from '../config/api';
+import { ROUTES } from '../routes';
+import { useLayout } from './LayoutContext';
+import '../styles/Sidebar.css';
+
+interface NavItem {
+  id: string;
+  label: string;
+  path: string;
+  activePaths: string[];
+  icon: React.ReactElement;
+}
+
+interface StoredUser {
+  name?: string;
+  email?: string;
+  profilePicture?: string;
+}
+
+const NAV_ITEMS: NavItem[] = [
   {
-    id: "Dashboard",
-    label: "Dashboard",
+    id: 'Dashboard',
+    label: 'Dashboard',
     path: ROUTES.dashboard,
     activePaths: [ROUTES.dashboard],
-    icon: (
-      <svg viewBox="0 0 24 24" fill="currentColor" width="16" height="16">
-        <path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z" />
-      </svg>
-    ),
+    icon: <LuLayoutDashboard size={20} />,
   },
   {
-    id: "Vendors",
-    label: "Vendors",
+    id: 'Vendors',
+    label: 'Vendors',
     path: ROUTES.vendors,
     activePaths: [ROUTES.vendors],
-    icon: (
-      <svg viewBox="0 0 24 24" fill="currentColor" width="16" height="16">
-        <path d="M12 7V3H2v18h20V7H12zM6 19H4v-2h2v2zm0-4H4v-2h2v2zm0-4H4V9h2v2zm0-4H4V5h2v2zm4 12H8v-2h2v2zm0-4H8v-2h2v2zm0-4H8V9h2v2zm0-4H8V5h2v2zm10 12h-8v-2h2v-2h-2v-2h2v-2h-2V9h8v10zm-2-8h-2v2h2v-2zm0 4h-2v2h2v-2z" />
-      </svg>
-    ),
+    icon: <LuStore size={20} />,
   },
   {
-    id: "Users",
-    label: "Users",
+    id: 'Users',
+    label: 'Users',
     path: ROUTES.users,
     activePaths: [ROUTES.users],
-    icon: (
-      <svg viewBox="0 0 24 24" fill="currentColor" width="16" height="16">
-        <path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5s-3 1.34-3 3 1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5C15 14.17 10.33 13 8 13zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.98 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z" />
-      </svg>
-    ),
+    icon: <LuUsers size={20} />,
   },
   {
-    id: "Profile",
-    label: "Profile",
+    id: 'Profile',
+    label: 'Profile',
     path: ROUTES.profile,
     activePaths: [ROUTES.profile],
-    icon: (
-      <svg viewBox="0 0 24 24" fill="currentColor" width="16" height="16">
-        <path d="M12 12c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm0 2c-3.33 0-10 1.67-10 5v3h20v-3c0-3.33-6.67-5-10-5z" />
-      </svg>
-    ),
+    icon: <LuUserRound size={20} />,
   },
   {
-    id: "Category",
-    label: "Category",
+    id: 'Category',
+    label: 'Categories',
     path: ROUTES.categories,
-    activePaths: [ROUTES.categories, "/admin/sub-categories"],
-    icon: (
-      <svg viewBox="0 0 24 24" fill="currentColor" width="16" height="16">
-        <path d="M10 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2h-8l-2-2z" />
-      </svg>
-    ),
+    activePaths: [ROUTES.categories, '/admin/sub-categories'],
+    icon: <LuFolderTree size={20} />,
   },
   {
-    id: "Product",
-    label: "Product",
+    id: 'Product',
+    label: 'Products',
     path: ROUTES.products,
     activePaths: [ROUTES.products],
-    icon: (
-      <svg viewBox="0 0 24 24" fill="currentColor" width="16" height="16">
-        <path d="M21 16V8c0-.88-.48-1.69-1.25-2.08l-7-4a2.5 2.5 0 0 0-2.5 0l-7 4A2.34 2.34 0 0 0 2 8v8c0 .88.48 1.69 1.25 2.08l7 4c.38.2.81.3 1.25.3s.87-.1 1.25-.3l7-4A2.34 2.34 0 0 0 21 16zm-9 3.15-6-3.43V9.38l6 3.43v6.34zm1-8.07-6.04-3.45L13 4.18l6.04 3.45L13 11.08z" />
-      </svg>
-    ),
+    icon: <LuPackage size={20} />,
   },
   {
-    id: "Banners",
-    label: "Banners",
-    path: ROUTES.banners,
-    activePaths: [ROUTES.banners],
-    icon: (
-      <svg viewBox="0 0 24 24" fill="currentColor" width="16" height="16">
-        <path d="M21 3H3c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h18c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H3V5h18v14zM9 7h6v2H9V7zm0 4h6v2H9v-2zm0 4h4v2H9v-2z" />
-      </svg>
-    ),
-  },
-  {
-    id: "Orders",
-    label: "Orders",
+    id: 'Orders',
+    label: 'Orders',
     path: ROUTES.orders,
     activePaths: [ROUTES.orders],
-    icon: (
-      <svg viewBox="0 0 24 24" fill="currentColor" width="16" height="16">
-        <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14a2 2 0 0 0 2-2V5c0-1.1-.9-2-2-2zm0 16H5V5h14v14zM7 7h10v2H7zm0 4h10v2H7zm0 4h7v2H7z" />
-      </svg>
-    ),
+    icon: <LuShoppingBag size={20} />,
   },
 ];
 
-function Sidebar() {
-  const user = getStoredUser();
+export default function Sidebar(): React.ReactElement {
+  const user = getStoredUser() as StoredUser | null;
   const navigate = useNavigate();
   const { pathname } = useLocation();
+  const { isSidebarOpen, setIsSidebarOpen } = useLayout();
+
+  const handleNavClick = (path: string) => {
+    navigate(path);
+    if (window.innerWidth < 992) {
+      setIsSidebarOpen(false);
+    }
+  };
+
+  const handleLogout = () => {
+    clearAuthSession();
+    navigate(ROUTES.login, { replace: true });
+  };
 
   return (
-    <aside className="db-sidebar d-flex flex-column flex-shrink-0">
-      {/* User profile */}
-      <div className="text-center py-4 px-3 border-bottom border-white border-opacity-10">
-        <div className="db-avatar mx-auto mb-3">
-          {user?.profilePicture ? (
-            <img
-              src={resolveMediaUrl(user.profilePicture)}
-              alt={user.name}
-              style={{
-                width: "100%",
-                height: "100%",
-                objectFit: "cover",
-                borderRadius: "50%",
-              }}
-            />
-          ) : (
-            <svg viewBox="0 0 80 80" xmlns="http://www.w3.org/2000/svg">
-              <circle cx="40" cy="40" r="40" fill="#2d4f7a" />
-              <circle cx="40" cy="30" r="15" fill="#7da8cc" />
-              <ellipse cx="40" cy="70" rx="26" ry="18" fill="#7da8cc" />
-            </svg>
-          )}
-        </div>
-        <h6 className="fw-bold text-white mb-1 text-uppercase ls-wide">
-          {user?.name}
-        </h6>
-        <small className="text-white-50">{user?.email}</small>
-      </div>
+    <>
+      {/* Mobile Backdrop */}
+      <div 
+        className={`sidebar-backdrop ${isSidebarOpen ? 'sidebar-backdrop-visible' : ''}`}
+        onClick={() => setIsSidebarOpen(false)}
+      />
 
-      {/* Nav */}
-      <nav className="flex-grow-1 py-2">
-        {NAV_ITEMS.map((item) => (
-          <button
-            key={item.id}
-            type="button"
-            className={`db-nav-btn w-100 d-flex align-items-center gap-2 px-4 py-2 border-0 text-start${item.activePaths.some((p) => pathname.startsWith(p)) ? " active" : ""}`}
-            onClick={() => navigate(item.path)}
+      <aside className={`sidebar-container ${isSidebarOpen ? 'sidebar-open' : ''}`}>
+        {/* Brand / Close Header */}
+        <div className="sidebar-brand-header">
+          <div className="sidebar-brand-logo">
+            <span className="sidebar-brand-accent">Urban</span>Clap
+          </div>
+          <button 
+            type="button" 
+            className="sidebar-close-btn d-lg-none"
+            onClick={() => setIsSidebarOpen(false)}
+            aria-label="Close sidebar"
           >
-            <span className="nav-icon">{item.icon}</span>
-            <span className="text-capitalize">{item.label}</span>
+            <LuX size={20} />
           </button>
-        ))}
-      </nav>
-    </aside>
+        </div>
+
+        {/* User Card */}
+        <div className="sidebar-user-card">
+          <div className="sidebar-avatar-wrapper">
+            {user?.profilePicture ? (
+              <img
+                src={resolveMediaUrl(user.profilePicture)}
+                alt={user?.name || 'User Avatar'}
+                className="sidebar-avatar-img"
+              />
+            ) : (
+              <div className="sidebar-avatar-fallback">
+                {user?.name ? user.name.charAt(0).toUpperCase() : 'A'}
+              </div>
+            )}
+            <span className="sidebar-status-badge" />
+          </div>
+          <div className="sidebar-user-info">
+            <p className="sidebar-user-name">{user?.name || 'Administrator'}</p>
+            <p className="sidebar-user-role">{user?.email || 'admin@domain.com'}</p>
+          </div>
+        </div>
+
+        {/* Navigation Section */}
+        <div className="sidebar-nav-wrapper">
+          <span className="sidebar-nav-heading">Main Navigation</span>
+          <nav className="sidebar-nav-list">
+            {NAV_ITEMS.map((item) => {
+              const isActive = item.activePaths.some((p) => pathname.startsWith(p));
+              return (
+                <button
+                  key={item.id}
+                  type="button"
+                  className={`sidebar-nav-item ${isActive ? 'sidebar-nav-item-active' : ''}`}
+                  onClick={() => handleNavClick(item.path)}
+                >
+                  <span className="sidebar-nav-icon">{item.icon}</span>
+                  <span className="sidebar-nav-label">{item.label}</span>
+                </button>
+              );
+            })}
+          </nav>
+        </div>
+
+        {/* Footer Actions */}
+        <div className="sidebar-footer">
+          <button 
+            type="button" 
+            className="sidebar-logout-btn"
+            onClick={handleLogout}
+          >
+            <LuLogOut size={18} />
+            <span>Sign Out</span>
+          </button>
+        </div>
+      </aside>
+    </>
   );
 }
-
-export default Sidebar;

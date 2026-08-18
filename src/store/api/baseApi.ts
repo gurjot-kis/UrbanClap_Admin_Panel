@@ -1,18 +1,18 @@
-import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
+import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react'
 import type {
   BaseQueryFn,
   FetchArgs,
-  FetchBaseQueryError,
-} from "@reduxjs/toolkit/query";
-import type { RootState } from "../store";
-import { getStoredToken } from "../../utils/auth";
+  FetchBaseQueryError
+} from '@reduxjs/toolkit/query'
+import type { RootState } from '../store'
+import { getStoredToken } from '../../utils/auth'
 
 const baseQuery = fetchBaseQuery({
   baseUrl:
     (import.meta.env.VITE_CHAT_API_URL as string) ||
-    "http://localhost:5000/api",
-  credentials: "include",
-});
+    'http://localhost:5000/api',
+  credentials: 'include'
+})
 
 const baseQueryWithAuth: BaseQueryFn<
   string | FetchArgs,
@@ -20,33 +20,42 @@ const baseQueryWithAuth: BaseQueryFn<
   FetchBaseQueryError,
   { requiresAuth?: boolean }
 > = async (args, api, extraOptions) => {
-  const token = (api.getState() as RootState).auth.token ?? getStoredToken();
+  const token = (api.getState() as RootState).auth.token ?? getStoredToken()
 
   if (extraOptions?.requiresAuth && token) {
-    if (typeof args === "string") {
+    if (typeof args === 'string') {
       args = {
         url: args,
         headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      };
+          Authorization: `Bearer ${token}`
+        }
+      }
     } else {
       args = {
         ...args,
         headers: {
           ...args.headers,
-          Authorization: `Bearer ${token}`,
-        },
-      };
+          Authorization: `Bearer ${token}`
+        }
+      }
     }
   }
 
-  return baseQuery(args, api, extraOptions);
-};
+  return baseQuery(args, api, extraOptions)
+}
 
 export const baseApi = createApi({
-  reducerPath: "api",
+  reducerPath: 'api',
   baseQuery: baseQueryWithAuth,
-  tagTypes: ["Auth", "Conversation", "Message", "Category", "Product"],
-  endpoints: () => ({}),
-});
+  tagTypes: [
+    'Auth',
+    'Conversation',
+    'Message',
+    'Category',
+    'Product',
+    'Order',
+    'Profile',
+    'User'
+  ],
+  endpoints: () => ({})
+})

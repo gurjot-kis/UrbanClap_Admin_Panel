@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import { toast } from "sonner";
 import {
   useDeleteProductMutation,
@@ -19,6 +20,7 @@ import { useNavigate } from "react-router-dom";
 import { ConfirmationModal } from "../../../components/common/ConfirmationModal";
 import { DataTable } from "../../../components/common/DataTable/DataTable";
 import type { DataTableColumn } from "../../../components/common/DataTable/DataTable.types";
+import { useHeader } from "../../../layout/LayoutContext";
 
 const PAGE_LIMIT = 10;
 
@@ -59,51 +61,107 @@ const STATUS_CONFIG: Record<
   rejected: { label: "Rejected", dotColor: "#ef4444" },
 };
 
+interface ProductStatusSelectProps {
+  status: ProductStatus;
+  isUpdating?: boolean;
+  onChange: (status: ProductStatus) => void;
+}
+
 const ProductStatusSelect = ({
   status,
   isUpdating,
   onChange,
-}: {
-  status: ProductStatus;
-  isUpdating?: boolean;
-  onChange: (status: ProductStatus) => void;
-}) => {
+}: ProductStatusSelectProps) => {
   const [isOpen, setIsOpen] = useState(false);
-  const dropdownRef = useRef<HTMLDivElement>(null);
+  const [menuCoords, setMenuCoords] = useState<{
+    top: number;
+    left: number;
+    openUpwards: boolean;
+  } | null>(null);
 
-  // Close dropdown on click outside
+  const triggerRef = useRef<HTMLButtonElement>(null);
+  const menuRef = useRef<HTMLDivElement>(null);
+
+  const updateMenuPosition = () => {
+    if (!triggerRef.current) return;
+    const rect = triggerRef.current.getBoundingClientRect();
+    const dropdownHeight = 160;
+    const spaceBelow = window.innerHeight - rect.bottom;
+    const openUpwards =
+      spaceBelow < dropdownHeight && rect.top > dropdownHeight;
+
+    setMenuCoords({
+      top: openUpwards ? rect.top - 6 : rect.bottom + 6,
+      left: rect.left,
+      openUpwards,
+    });
+  };
+
+  const handleToggle = () => {
+    if (!isOpen) {
+      updateMenuPosition();
+    }
+    setIsOpen((prev) => !prev);
+  };
+
   useEffect(() => {
+    if (!isOpen) return;
+
     const handleClickOutside = (event: MouseEvent) => {
+      const target = event.target as Node;
       if (
-        dropdownRef.current &&
-        !dropdownRef.current.contains(event.target as Node)
+        triggerRef.current &&
+        !triggerRef.current.contains(target) &&
+        menuRef.current &&
+        !menuRef.current.contains(target)
       ) {
         setIsOpen(false);
       }
     };
+
+    const handleScrollOrResize = () => {
+      updateMenuPosition();
+    };
+
     document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, []);
+    window.addEventListener("scroll", handleScrollOrResize, true);
+    window.addEventListener("resize", handleScrollOrResize);
+
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+      window.removeEventListener("scroll", handleScrollOrResize, true);
+      window.removeEventListener("resize", handleScrollOrResize);
+    };
+  }, [isOpen]);
 
   const currentConfig = STATUS_CONFIG[status] || STATUS_CONFIG.pending;
 
   return (
     <div
-      className={`pl-status-dropdown ${isUpdating ? "pl-status-dropdown--busy" : ""}`}
-      ref={dropdownRef}
+      className={`pl-status-dropdown ${
+        isUpdating ? "pl-status-dropdown--busy" : ""
+      }`}
     >
       <button
+        ref={triggerRef}
         type="button"
         disabled={isUpdating}
-        onClick={() => setIsOpen((prev) => !prev)}
-        className={`pl-status-trigger pl-status-trigger--${status} ${isOpen ? "pl-status-trigger--open" : ""}`}
+        onClick={handleToggle}
+        className={`pl-status-trigger pl-status-trigger--${status} ${
+          isOpen ? "pl-status-trigger--open" : ""
+        }`}
         aria-haspopup="listbox"
         aria-expanded={isOpen}
       >
-        <span className="pl-status-dot-pulse" />
+        <span
+          className="pl-status-dot-pulse"
+          style={{ backgroundColor: currentConfig.dotColor }}
+        />
         <span className="pl-status-label">{currentConfig.label}</span>
         <svg
-          className={`pl-status-chevron ${isOpen ? "pl-status-chevron--rotate" : ""}`}
+          className={`pl-status-chevron ${
+            isOpen ? "pl-status-chevron--rotate" : ""
+          }`}
           width="12"
           height="12"
           viewBox="0 0 24 24"
@@ -119,51 +177,71 @@ const ProductStatusSelect = ({
         </svg>
       </button>
 
-      {isOpen && (
-        <div className="pl-status-menu" role="listbox">
-          {(Object.keys(STATUS_CONFIG) as ProductStatus[]).map((key) => {
-            const item = STATUS_CONFIG[key];
-            const isSelected = key === status;
+      {isOpen &&
+        menuCoords &&
+        createPortal(
+          <div
+            ref={menuRef}
+            className={`pl-status-menu ${
+              menuCoords.openUpwards ? "pl-status-menu--up" : ""
+            }`}
+            style={{
+              position: "fixed",
+              top: menuCoords.openUpwards ? "auto" : `${menuCoords.top}px`,
+              bottom: menuCoords.openUpwards
+                ? `${window.innerHeight - menuCoords.top}px`
+                : "auto",
+              left: `${menuCoords.left}px`,
+              zIndex: 999999,
+            }}
+            role="listbox"
+          >
+            {(Object.keys(STATUS_CONFIG) as ProductStatus[]).map((key) => {
+              const item = STATUS_CONFIG[key];
+              const isSelected = key === status;
 
-            return (
-              <button
-                key={key}
-                type="button"
-                role="option"
-                aria-selected={isSelected}
-                className={`pl-status-option ${isSelected ? "pl-status-option--selected" : ""}`}
-                onClick={() => {
-                  setIsOpen(false);
-                  onChange(key);
-                }}
-              >
-                <span
-                  className="pl-status-option-dot"
-                  style={{ backgroundColor: item.dotColor }}
-                />
-                <span className="pl-status-option-text">{item.label}</span>
-                {isSelected && (
-                  <svg
-                    className="pl-status-check"
-                    width="14"
-                    height="14"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                  >
-                    <path
-                      d="M20 6L9 17l-5-5"
-                      stroke="currentColor"
-                      strokeWidth="2.5"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    />
-                  </svg>
-                )}
-              </button>
-            );
-          })}
-        </div>
-      )}
+              return (
+                <button
+                  key={key}
+                  type="button"
+                  role="option"
+                  aria-selected={isSelected}
+                  className={`pl-status-option ${
+                    isSelected ? "pl-status-option--selected" : ""
+                  }`}
+                  onClick={() => {
+                    setIsOpen(false);
+                    onChange(key);
+                  }}
+                >
+                  <span
+                    className="pl-status-option-dot"
+                    style={{ backgroundColor: item.dotColor }}
+                  />
+                  <span className="pl-status-option-text">{item.label}</span>
+                  {isSelected && (
+                    <svg
+                      className="pl-status-check"
+                      width="14"
+                      height="14"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                    >
+                      <path
+                        d="M20 6L9 17l-5-5"
+                        stroke="currentColor"
+                        strokeWidth="2.5"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      />
+                    </svg>
+                  )}
+                </button>
+              );
+            })}
+          </div>,
+          document.body,
+        )}
     </div>
   );
 };
@@ -177,6 +255,14 @@ const ProductList = () => {
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
 
   const navigate = useNavigate();
+
+  const { setHeaderConfig } = useHeader();
+
+  useEffect(() => {
+    setHeaderConfig({
+      title: "Products",
+    });
+  }, [setHeaderConfig]);
 
   useEffect(() => {
     const t = setTimeout(() => {
@@ -379,7 +465,7 @@ const ProductList = () => {
             type="button"
             className="pl-icon-btn"
             title="View details"
-            onClick={() => navigate(`/admin/products/${product._id}`)}
+            onClick={() => navigate(`/admin/products/${product._id}/details`)}
           >
             <MdOutlineVisibility color="#1b3a5c" />
           </button>
@@ -407,7 +493,7 @@ const ProductList = () => {
   return (
     <>
       <DataTable
-        title="Products"
+        // title="Products"
         statPills={[
           {
             label: `${pagination?.total ?? products.length} total`,
