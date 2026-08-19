@@ -8,7 +8,7 @@ import { getStoredToken, getStoredUser, setAuthSession } from "../utils/auth";
 import { getPostLoginRoute } from "../utils/roles";
 import { useAppDispatch } from "../store/hooks";
 import { setCredentials } from "../features/auth/authSlice";
-import { useAdminLoginMutation } from "../features/auth/authApi"; // Adjust path to your authApi
+import { useAdminLoginMutation } from "../features/auth/authApi";
 import "../styles/LoginPage.css";
 
 export default function LoginPage(): React.ReactElement {
@@ -89,9 +89,7 @@ export default function LoginPage(): React.ReactElement {
         }),
       );
 
-      toast.success("Welcome back!", {
-        description: "Successfully authenticated to dashboard.",
-      });
+      toast.success("Login successful");
 
       navigate(getPostLoginRoute(authUser.role), { replace: true });
     } catch (err: any) {
@@ -122,9 +120,9 @@ export default function LoginPage(): React.ReactElement {
           <h2 className="login-brand-title">
             <span>Urban</span>Clap
           </h2>
-          <p className="login-brand-subtitle">
-            Welcome back! Enter your credentials to access the admin portal.
-          </p>
+          {/* <p className="login-brand-subtitle">
+            Enter your credentials to access the admin portal.
+          </p> */}
         </div>
 
         {/* Login Form */}
@@ -198,14 +196,14 @@ export default function LoginPage(): React.ReactElement {
                 <span>Signing in...</span>
               </div>
             ) : (
-              "Sign In to Account"
+              "Sign In"
             )}
           </button>
         </form>
 
-        <div className="login-card-footer">
+        {/* <div className="login-card-footer">
           <span>Protected system • Authorized personnel only</span>
-        </div>
+        </div> */}
       </div>
     </div>
   );

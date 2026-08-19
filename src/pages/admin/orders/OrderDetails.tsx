@@ -23,6 +23,13 @@ const ORDER_STATUS_MAP: Record<
   OrderStatus,
   { label: string; dot: string; bg: string; text: string; border: string }
 > = {
+  payment_pending: {
+    label: "Payment Pending",
+    dot: "#f59e0b",
+    bg: "#fffbeb",
+    text: "#92400e",
+    border: "#fde68a",
+  },
   pending: {
     label: "Pending",
     dot: "#f59e0b",
@@ -44,12 +51,26 @@ const ORDER_STATUS_MAP: Record<
     text: "#5b21b6",
     border: "#ddd6fe",
   },
+  packed: {
+    label: "Packed",
+    dot: "#06b6d4",
+    bg: "#ecfeff",
+    text: "#155e75",
+    border: "#a5f3fc",
+  },
   shipped: {
     label: "Shipped",
     dot: "#06b6d4",
     bg: "#ecfeff",
     text: "#155e75",
     border: "#a5f3fc",
+  },
+  out_for_delivery: {
+    label: "Out for Delivery",
+    dot: "#f97316",
+    bg: "#fff7ed",
+    text: "#9a3412",
+    border: "#fed7aa",
   },
   delivered: {
     label: "Delivered",
@@ -58,12 +79,19 @@ const ORDER_STATUS_MAP: Record<
     text: "#065f46",
     border: "#a7f3d0",
   },
-  completed: {
-    label: "Completed",
-    dot: "#10b981",
-    bg: "#ecfdf5",
-    text: "#065f46",
-    border: "#a7f3d0",
+  // completed: {
+  //   label: "Completed",
+  //   dot: "#10b981",
+  //   bg: "#ecfdf5",
+  //   text: "#065f46",
+  //   border: "#a7f3d0",
+  // },
+  returned: {
+    label: "Returned",
+    dot: "#64748b",
+    bg: "#f8fafc",
+    text: "#334155",
+    border: "#cbd5e1",
   },
   cancelled: {
     label: "Cancelled",
@@ -329,22 +357,22 @@ const OrderDetails = () => {
                   <span>Cancellation Information</span>
                 </div>
               </div>
-              <div className="od-info-grid">
-                <div className="od-info-item">
-                  <span className="od-info-label">Cancelled By</span>
-                  <span className="od-info-val od-capitalize">
+              <div className="od-cancel-grid">
+                <div className="od-cancel-item">
+                  <span className="od-cancel-label">Cancelled By</span>
+                  <span className="od-cancel-value od-capitalize">
                     {order.cancellation.cancelledBy || "Unknown"}
                   </span>
                 </div>
-                <div className="od-info-item">
-                  <span className="od-info-label">Cancelled At</span>
-                  <span className="od-info-val">
+                <div className="od-cancel-item">
+                  <span className="od-cancel-label">Cancelled At</span>
+                  <span className="od-cancel-value">
                     {formatDate(order.cancellation.cancelledAt)}
                   </span>
                 </div>
-                <div className="od-info-item full-width">
-                  <span className="od-info-label">Reason</span>
-                  <span className="od-info-val">
+                <div className="od-cancel-item od-cancel-item--full">
+                  <span className="od-cancel-label">Reason</span>
+                  <span className="od-cancel-value od-cancel-reason">
                     {order.cancellation.reason ||
                       "No cancellation reason provided."}
                   </span>

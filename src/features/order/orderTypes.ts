@@ -9,7 +9,7 @@ export type OrderStatus =
   | 'delivered'
   | 'returned'
   | 'cancelled'
-  | 'completed';
+  // | 'completed';
 
 export type PaymentMethod = 'cod' | 'online'
 

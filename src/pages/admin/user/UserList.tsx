@@ -229,7 +229,7 @@ export default function UserList(): React.ReactElement {
               setPage(1);
             },
             options: [
-              { value: "all", label: "All Statuses" },
+              { value: "all", label: "All Status" },
               { value: "1", label: "Active" },
               { value: "0", label: "Inactive" },
             ],

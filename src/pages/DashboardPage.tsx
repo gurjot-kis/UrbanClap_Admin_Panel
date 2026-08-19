@@ -1,6 +1,7 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { useGetDashboardQuery } from "../features/dashboard/dashboardApi";
 import "../styles/dashboard/dashboard.css";
+import { useHeader } from "../layout/LayoutContext";
 
 const Icons = {
   Wallet: () => (
@@ -79,6 +80,15 @@ const Icons = {
 export default function Dashboard(): React.ReactElement {
   const { data: response, isLoading } = useGetDashboardQuery();
   const dashboard = response?.data;
+
+  const { setHeaderConfig } = useHeader();
+
+  useEffect(() => {
+    setHeaderConfig({
+      title: "Dashboard",
+      subtitle: "Overview of your platform’s performance and activity",
+    });
+  }, [setHeaderConfig]);
 
   const formatCurrency = (val: string | number | undefined) => {
     if (val === undefined || val === null) return "₹0";

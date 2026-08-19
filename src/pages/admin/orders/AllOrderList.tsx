@@ -31,7 +31,7 @@ export const STATUS_TRANSITIONS: Record<OrderStatus, OrderStatus[]> = {
   delivered: ["returned"],
   cancelled: [],
   returned: [],
-  completed: [],
+  // completed: [],
 };
 
 // Visual config for all order statuses
@@ -49,7 +49,7 @@ export const ORDER_STATUS_CONFIG: Record<
   delivered: { label: "Delivered", dotColor: "#10b981" },
   returned: { label: "Returned", dotColor: "#f43f5e" },
   cancelled: { label: "Cancelled", dotColor: "#ef4444" },
-  completed: { label: "Completed", dotColor: "#059669" },
+  // completed: { label: "Completed", dotColor: "#059669" },
 };
 
 const PAYMENT_STATUS_CONFIG: Record<
@@ -466,7 +466,7 @@ const AllOrderList = () => {
               { value: "delivered", label: "Delivered" },
               { value: "returned", label: "Returned" },
               { value: "cancelled", label: "Cancelled" },
-              { value: "completed", label: "Completed" },
+              // { value: "completed", label: "Completed" },
             ],
           },
         ]}

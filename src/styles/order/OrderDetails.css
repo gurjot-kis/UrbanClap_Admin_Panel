@@ -505,3 +505,53 @@
     font-size: 1.25rem;
   }
 }
+
+/* Cancellation section */
+.od-cancel-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.od-cancel-item {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.od-cancel-item--full {
+  grid-column: 1 / -1;
+  padding-top: 4px;
+  border-top: 1px dashed #fecaca;
+}
+
+.od-cancel-label {
+  font-size: 0.72rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #ef4444;
+  opacity: 0.8;
+}
+
+.od-cancel-value {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #7f1d1d;
+}
+
+.od-cancel-reason {
+  font-weight: 400;
+  color: #991b1b;
+  font-style: italic;
+  line-height: 1.5;
+}
+
+@media (max-width: 480px) {
+  .od-cancel-grid {
+    grid-template-columns: 1fr;
+  }
+  .od-cancel-item--full {
+    grid-column: 1;
+  }
+}
