@@ -74,3 +74,50 @@ export interface UpdateVendorResponse {
   message: string;
   data: Vendor;
 }
+
+export interface CreateVendorPayload {
+  fullName: string;
+  email: string;
+  password: string;
+  phone: string;
+  address: string;
+  gst_number: string;
+  vendorCategories: string[];
+  serviceableAreas: {
+    pincode: string;
+  }[];
+}
+
+export interface VendorDetails {
+  fullName?: string;
+  user_id: string;
+  email: string;
+  phone: string;
+  address: string;
+  gst_number: string;
+  vendorCategories: string[];
+  serviceableAreas: {
+    pincode: string;
+  }[];
+  createdAt: string;
+}
+
+export interface GetVendorByIdResponse {
+  success: boolean;
+  code: number;
+  message: string;
+  data: VendorDetails;
+}
+
+export interface UpdateVendorPayload {
+  fullName?: string;
+  email?: string;
+  password?: string;
+  phone?: string;
+  address?: string;
+  gst_number?: string;
+  vendorCategories?: string[];
+  serviceableAreas?: {
+    pincode: string;
+  }[];
+}

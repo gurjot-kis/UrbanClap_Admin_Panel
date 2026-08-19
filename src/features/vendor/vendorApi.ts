@@ -1,8 +1,11 @@
 import { baseApi } from "../../store/api/baseApi";
 import type {
+  CreateVendorPayload,
+  GetVendorByIdResponse,
   GetVendorsParams,
   GetVendorsResponse,
   UpdateVendorAvailabilityPayload,
+  UpdateVendorPayload,
   UpdateVendorResponse,
   UpdateVendorStatusPayload,
   UpdateVendorVerificationPayload,
@@ -48,6 +51,53 @@ export const vendorApi = baseApi.injectEndpoints({
       },
 
       providesTags: ["Vendor"],
+    }),
+
+    fetchVendorById: builder.query<GetVendorByIdResponse, string>({
+      query: (userId) => ({
+        url: `/vendors/${userId}`,
+        method: "GET",
+      }),
+
+      extraOptions: {
+        requiresAuth: true,
+      },
+
+      providesTags: ["Vendor"],
+    }),
+
+    createVendor: builder.mutation<UpdateVendorResponse, CreateVendorPayload>({
+      query: (payload) => ({
+        url: "/vendors",
+        method: "POST",
+        body: payload,
+      }),
+
+      extraOptions: {
+        requiresAuth: true,
+      },
+
+      invalidatesTags: ["Vendor"],
+    }),
+
+    updateVendor: builder.mutation<
+      UpdateVendorResponse,
+      {
+        userId: string;
+        payload: UpdateVendorPayload;
+      }
+    >({
+      query: ({ userId, payload }) => ({
+        url: `/vendors/${userId}`,
+        method: "PUT",
+        body: payload,
+      }),
+
+      extraOptions: {
+        requiresAuth: true,
+      },
+
+      invalidatesTags: ["Vendor"],
     }),
 
     updateVendorStatus: builder.mutation<
@@ -109,12 +159,25 @@ export const vendorApi = baseApi.injectEndpoints({
 
       invalidatesTags: ["Vendor"],
     }),
+
+    deleteVendor: builder.mutation<unknown, string>({
+      query: (venderId: string) => ({
+        url: `/vendors/${venderId}`,
+        method: "DELETE",
+      }),
+      extraOptions: { requiresAuth: true },
+      invalidatesTags: ["Vendor"],
+    }),
   }),
 });
 
 export const {
   useFetchVendorsQuery,
+  useFetchVendorByIdQuery,
+  useCreateVendorMutation,
+  useUpdateVendorMutation,
   useUpdateVendorStatusMutation,
   useUpdateVendorVerificationMutation,
   useUpdateVendorAvailabilityMutation,
+  useDeleteVendorMutation
 } = vendorApi;

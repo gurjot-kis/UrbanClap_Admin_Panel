@@ -11,6 +11,7 @@ import {
   useUpdateVendorStatusMutation,
   useUpdateVendorVerificationMutation,
   useUpdateVendorAvailabilityMutation,
+  useDeleteVendorMutation,
 } from "../../../features/vendor/vendorApi";
 import type { Vendor } from "../../../features/vendor/vendorTypes";
 import {
@@ -20,7 +21,7 @@ import {
 import type { DataTableColumn } from "../../../components/common/DataTable/DataTable.types";
 import { useHeader } from "../../../layout/LayoutContext";
 import "../../../styles/admin_vendor/vendorList.css";
-import { resolveImageUrl } from "../../../features/category/categoryHelpers";
+import { ConfirmationModal } from "../../../components/common/ConfirmationModal";
 
 const PAGE_LIMIT = 10;
 
@@ -40,6 +41,9 @@ export default function VendorList(): React.ReactElement {
   const [updatingStatus, setUpdatingStatus] = useState<string | null>(null);
   const [updatingVerify, setUpdatingVerify] = useState<string | null>(null);
   const [updatingAvail, setUpdatingAvail] = useState<string | null>(null);
+
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [selectedVendor, setSelectedVendor] = useState<Vendor | null>(null);
 
   useEffect(() => {
     setHeaderConfig({
@@ -75,6 +79,8 @@ export default function VendorList(): React.ReactElement {
       sortBy: "createdAt",
       sortOrder: "desc",
     });
+
+  const [deleteVendor, { isLoading: isDeleting }] = useDeleteVendorMutation();
 
   const [updateVendorStatus] = useUpdateVendorStatusMutation();
   const [updateVendorVerification] = useUpdateVendorVerificationMutation();
@@ -179,6 +185,31 @@ export default function VendorList(): React.ReactElement {
       });
     } finally {
       setUpdatingAvail(null);
+    }
+  };
+
+  const openDeleteModal = (vendor: Vendor) => {
+    setSelectedVendor(vendor);
+    setIsDeleteModalOpen(true);
+  };
+
+  const handleDeleteConfirm = async () => {
+    if (!selectedVendor) return;
+    const vendorName = selectedVendor.fullName;
+    try {
+      await deleteVendor(selectedVendor.user_id).unwrap();
+      setIsDeleteModalOpen(false);
+      setSelectedVendor(null);
+      toast.success("Vendor deleted", {
+        description: `"${vendorName}" has been successfully removed.`,
+      });
+    } catch (error: any) {
+      console.error("Failed to delete vendor:", error);
+      const errMsg =
+        error?.data?.message || "Something went wrong. Please try again.";
+      toast.error("Failed to delete vendor", {
+        description: errMsg,
+      });
     }
   };
 
@@ -336,6 +367,7 @@ export default function VendorList(): React.ReactElement {
             type="button"
             className="cl-icon-btn cl-icon-btn--danger"
             title="Delete"
+            onClick={() => openDeleteModal(vendor)}
           >
             <MdDelete color="red" />
           </button>
@@ -415,6 +447,23 @@ export default function VendorList(): React.ReactElement {
         }
         pagination={pagination}
         onPageChange={setPage}
+      />
+
+      <ConfirmationModal
+        isOpen={isDeleteModalOpen}
+        onClose={() => {
+          setIsDeleteModalOpen(false);
+          setSelectedVendor(null);
+        }}
+        onConfirm={handleDeleteConfirm}
+        isLoading={isDeleting}
+        title="Delete Vendor"
+        message={
+          <>
+            Are you sure you want to delete{" "}
+            <strong>"{selectedVendor?.fullName}"</strong>? 
+          </>
+        }
       />
     </div>
   );
