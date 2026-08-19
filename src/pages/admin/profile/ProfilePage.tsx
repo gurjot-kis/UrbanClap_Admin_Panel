@@ -11,9 +11,15 @@ import {
   LuSave,
   LuRotateCcw,
   LuShieldCheck,
+  LuEye,
+  LuEyeOff,
 } from "react-icons/lu";
 
-import { getStoredToken, getStoredUser, setAuthSession } from "../../../utils/auth";
+import {
+  getStoredToken,
+  getStoredUser,
+  setAuthSession,
+} from "../../../utils/auth";
 import { resolveMediaUrl } from "../../../config/api";
 import { ROUTES } from "../../../routes";
 import { useHeader } from "../../../layout/LayoutContext";
@@ -65,6 +71,7 @@ export default function ProfilePage(): React.ReactElement {
   const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
   const [phone, setPhone] = useState("");
   const [address, setAddress] = useState("");
   const [profileImage, setProfileImage] = useState("");
@@ -115,6 +122,7 @@ export default function ProfilePage(): React.ReactElement {
 
   const handleReset = () => {
     setPassword("");
+    setShowPassword(false);
     refetch();
     toast.info("Form reset", {
       description: "Reverted changes to match server state.",
@@ -295,13 +303,38 @@ export default function ProfilePage(): React.ReactElement {
                 <div className="user-profile-input-box">
                   <LuLock className="user-profile-field-icon" size={18} />
                   <input
-                    type="password"
-                    className="user-profile-input"
+                    type={showPassword ? "text" : "password"}
+                    className="user-profile-input user-profile-input-password"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     placeholder="Leave blank to keep existing password"
                     minLength={6}
                   />
+                  <button
+                    type="button"
+                    className="user-profile-password-toggle"
+                    onClick={() => setShowPassword((prev) => !prev)}
+                    title={showPassword ? "Hide password" : "Show password"}
+                    aria-label={
+                      showPassword ? "Hide password" : "Show password"
+                    }
+                    style={{
+                      background: "none",
+                      border: "none",
+                      cursor: "pointer",
+                      padding: "0 8px",
+                      display: "flex",
+                      alignItems: "center",
+                      color: "inherit",
+                      opacity: 0.7,
+                    }}
+                  >
+                    {showPassword ? (
+                      <LuEyeOff size={18} />
+                    ) : (
+                      <LuEye size={18} />
+                    )}
+                  </button>
                 </div>
               </div>
 

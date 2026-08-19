@@ -7,8 +7,9 @@ export const PUBLIC_ROUTES = {
 
 export const ROUTES = {
   ...PUBLIC_ROUTES,
-  dashboard: "/admin/dashboard",
   //Worked by kshitish start
+  dashboard: "/admin/dashboard",
+  
   categories: "/admin/categories",
   addCategory: "/admin/categories/add",
   editCategory: "/admin/categories/:categoryId/edit",
@@ -22,16 +23,17 @@ export const ROUTES = {
   orderDetails: "/admin/orders/:orderId/details",
   
   users: "/admin/users",
+
+  vendors: "/admin/vendors",
+  vendorCreate: "/admin/vendors/add",
+  vendorEdit: "admin/vendors/:vendorId/edit",
   //Worked by kshitish end
 
   banners: "/admin/banners",
   cartSettings: "/admin/cart-settings",
   usersNew: "/admin/users/new",
   userEdit: (userId: string | number) => `/admin/users/${userId}/edit`,
-  vendors: "/admin/vendors",
-  vendorsCreate: "/admin/vendors/create",
   vendorsNew: "/admin/vendors/new",
-  vendorEdit: (vendorId: string | number) => `/admin/vendors/${vendorId}/edit`,
   vendorWarehouses: (vendorId: string | number) =>
     `/admin/vendors/${vendorId}/warehouses`,
   vendorWarehouseNew: (vendorId: string | number) =>

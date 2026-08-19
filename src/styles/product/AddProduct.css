@@ -1,25 +1,44 @@
 /* CreateProductForm.css
-   Palette   — ink #14181F · canvas #F3F1EA · surface #FFFFFF
-               pine (accent) #1F6F5C · brass (accent 2) #C08A3E · line #E5E1D8 · danger #B3432B
-   Type      — display: "Fraunces" (serif, section titles) · body: "Inter" · data: "JetBrains Mono"
+   Colors, radius, shadow, and type now come from the shared
+   _tokens.css (loaded globally) — this file only aliases them
+   onto the local --cpf variable names below. Load _tokens.css
+   once, app-wide, before this file.
 */
 
-@import url("https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap");
+.cpf-page {
+  min-height: 100vh;
+  background:
+    radial-gradient(
+      1200px 480px at 100% -10%,
+      #eee9ff 0%,
+      rgba(238, 233, 255, 0) 60%
+    ),
+    var(--color-bg);
+  font-family: var(--font-body);
+  color: var(--color-ink);
+  border-radius: var(--radius-10);
+}
 
 .cpf {
-  --ink: #14181f;
-  --ink-soft: #565b52;
-  --canvas: #f3f1ea;
-  --surface: #ffffff;
-  --pine: #1f6f5c;
-  --pine-tint: #e5efec;
-  --brass: #c08a3e;
-  --line: #e5e1d8;
-  --danger: #b3432b;
-  --danger-tint: #f8e8e4;
-  --success-tint: #e6f0ea;
-  --radius: 14px;
-  --shadow: 0 1px 2px rgba(20, 24, 31, 0.04), 0 12px 32px -16px rgba(20, 24, 31, 0.16);
+  /* Local aliases onto the shared global tokens (see _tokens.css).
+     Keeping the original names means every rule below is untouched —
+     only the source of truth moved. The old warm palette (canvas,
+     pine, brass) now maps onto the shared cool palette + highlight
+     accent so both forms render from one color system; --brass stays
+     as the secondary "highlight" accent for the price/eyebrow. */
+  --ink: var(--color-ink);
+  --ink-soft: var(--color-ink-soft);
+  --canvas: var(--color-bg);
+  --surface: var(--color-surface);
+  --pine: var(--color-accent);
+  --pine-tint: var(--color-accent-soft);
+  --brass: var(--color-highlight);
+  --line: var(--color-border);
+  --danger: var(--color-danger);
+  --danger-tint: var(--color-danger-soft);
+  --success-tint: var(--color-success-soft);
+  --radius: var(--radius-14);
+  --shadow: var(--shadow-lg);
 
   display: grid;
   grid-template-columns: minmax(0, 1fr) 360px;
@@ -29,7 +48,7 @@
   padding: 40px 24px 96px;
   background: var(--canvas);
   color: var(--ink);
-  font-family: "Inter", -apple-system, BlinkMacSystemFont, sans-serif;
+  font-family: var(--font-body);
 }
 
 .cpf * {
@@ -49,8 +68,8 @@
 
 .cpf-eyebrow {
   margin: 0 0 6px;
-  font-size: 12px;
-  font-weight: 600;
+  font-size: var(--fs-12);
+  font-weight: var(--fw-semibold);
   letter-spacing: 0.09em;
   text-transform: uppercase;
   color: var(--pine);
@@ -58,16 +77,16 @@
 
 .cpf-title {
   margin: 0 0 6px;
-  font-family: "Fraunces", serif;
-  font-weight: 600;
-  font-size: 34px;
+  font-family: var(--font-display);
+  font-weight: var(--fw-semibold);
+  font-size: var(--fs-34);
   letter-spacing: -0.01em;
 }
 
 .cpf-subtitle {
   margin: 0;
   color: var(--ink-soft);
-  font-size: 14.5px;
+  font-size: var(--fs-14-5);
 }
 
 .cpf-header-actions {
@@ -80,14 +99,17 @@
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  border-radius: 10px;
+  border-radius: var(--radius-10);
   padding: 10px 18px;
-  font-size: 14px;
-  font-weight: 600;
+  font-size: var(--fs-14);
+  font-weight: var(--fw-semibold);
   font-family: inherit;
   border: 1px solid transparent;
   cursor: pointer;
-  transition: transform 0.12s ease, background 0.15s ease, border-color 0.15s ease;
+  transition:
+    transform 0.12s ease,
+    background 0.15s ease,
+    border-color 0.15s ease;
 }
 
 .cpf-btn svg {
@@ -135,7 +157,7 @@
   justify-content: center;
   width: 32px;
   height: 32px;
-  border-radius: 8px;
+  border-radius: var(--radius-8);
   border: 1px solid var(--line);
   background: #fff;
   color: var(--ink-soft);
@@ -155,10 +177,10 @@
 /* ---------------------------- banners ---------------------------------- */
 .cpf-banner {
   grid-column: 1;
-  border-radius: 10px;
+  border-radius: var(--radius-10);
   padding: 12px 16px;
-  font-size: 13.5px;
-  font-weight: 500;
+  font-size: var(--fs-13-5);
+  font-weight: var(--fw-medium);
   margin-bottom: 20px;
 }
 
@@ -199,7 +221,7 @@
   flex: none;
   width: 38px;
   height: 38px;
-  border-radius: 10px;
+  border-radius: var(--radius-10);
   background: var(--pine-tint);
   color: var(--pine);
   display: flex;
@@ -214,22 +236,22 @@
 
 .cpf-section-head h2 {
   margin: 0 0 3px;
-  font-family: "Fraunces", serif;
-  font-weight: 600;
-  font-size: 19px;
+  font-family: var(--font-display);
+  font-weight: var(--fw-semibold);
+  font-size: var(--fs-19);
 }
 
 .cpf-section-head p {
   margin: 0;
-  font-size: 13px;
+  font-size: var(--fs-13);
   color: var(--ink-soft);
 }
 
 .cpf-breadcrumb {
   margin: 16px 0 0;
-  font-size: 12.5px;
+  font-size: var(--fs-12-5);
   color: var(--pine);
-  font-weight: 600;
+  font-weight: var(--fw-semibold);
 }
 
 /* ---------------------------- fields ------------------------------------ */
@@ -243,8 +265,8 @@
   display: flex;
   flex-direction: column;
   gap: 7px;
-  font-size: 13px;
-  font-weight: 600;
+  font-size: var(--fs-13);
+  font-weight: var(--fw-semibold);
   color: var(--ink);
 }
 
@@ -256,15 +278,17 @@
 .cpf-field select,
 .cpf-field textarea {
   font-family: inherit;
-  font-size: 14px;
-  font-weight: 400;
+  font-size: var(--fs-14);
+  font-weight: var(--fw-regular);
   padding: 11px 13px;
-  border-radius: 9px;
+  border-radius: var(--radius-9);
   border: 1px solid var(--line);
   background: #fdfcfa;
   color: var(--ink);
   outline: none;
-  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+  transition:
+    border-color 0.15s ease,
+    box-shadow 0.15s ease;
 }
 
 .cpf-field textarea {
@@ -287,15 +311,15 @@
 }
 
 .cpf-field-hint {
-  font-size: 11.5px;
-  font-weight: 400;
+  font-size: var(--fs-11-5);
+  font-weight: var(--fw-regular);
   font-style: normal;
   color: var(--ink-soft);
 }
 
 .cpf-field-error {
-  font-size: 11.5px;
-  font-weight: 400;
+  font-size: var(--fs-11-5);
+  font-weight: var(--fw-regular);
   font-style: normal;
   color: var(--danger);
 }
@@ -310,9 +334,9 @@
 .cpf-chip-input input {
   flex: 1;
   font-family: inherit;
-  font-size: 14px;
+  font-size: var(--fs-14);
   padding: 11px 13px;
-  border-radius: 9px;
+  border-radius: var(--radius-9);
   border: 1px solid var(--line);
   background: #fdfcfa;
   outline: none;
@@ -335,10 +359,10 @@
   gap: 8px;
   background: var(--pine-tint);
   color: #1a4d3c;
-  border-radius: 999px;
+  border-radius: var(--radius-full);
   padding: 7px 8px 7px 14px;
-  font-size: 13px;
-  font-weight: 500;
+  font-size: var(--fs-13);
+  font-weight: var(--fw-medium);
 }
 
 .cpf-chip button {
@@ -347,7 +371,7 @@
   justify-content: center;
   width: 18px;
   height: 18px;
-  border-radius: 50%;
+  border-radius: var(--radius-circle);
   border: none;
   background: rgba(255, 255, 255, 0.6);
   color: #1a4d3c;
@@ -360,7 +384,7 @@
 }
 
 .cpf-empty {
-  font-size: 13px;
+  font-size: var(--fs-13);
   color: var(--ink-soft);
   font-style: italic;
   display: block;
@@ -382,16 +406,16 @@
   align-items: center;
   background: #fbfaf7;
   border: 1px solid var(--line);
-  border-radius: 10px;
+  border-radius: var(--radius-10);
   padding: 10px;
 }
 
 .cpf-variant-row input,
 .cpf-variant-row select {
   font-family: inherit;
-  font-size: 13.5px;
+  font-size: var(--fs-13-5);
   padding: 9px 10px;
-  border-radius: 8px;
+  border-radius: var(--radius-8);
   border: 1px solid var(--line);
   background: #fff;
   outline: none;
@@ -411,21 +435,21 @@
 
 .cpf-media-label {
   display: block;
-  font-size: 13px;
-  font-weight: 600;
+  font-size: var(--fs-13);
+  font-weight: var(--fw-semibold);
   margin-bottom: 8px;
 }
 
 .cpf-dropzone {
   height: 140px;
   border: 1.5px dashed var(--line);
-  border-radius: 12px;
+  border-radius: var(--radius-12);
   background: #fbfaf7;
   display: flex;
   align-items: center;
   justify-content: center;
   color: var(--ink-soft);
-  font-size: 13px;
+  font-size: var(--fs-13);
   cursor: pointer;
   overflow: hidden;
   transition: border-color 0.15s ease;
@@ -451,7 +475,7 @@
   position: relative;
   width: 58px;
   height: 58px;
-  border-radius: 9px;
+  border-radius: var(--radius-9);
   overflow: hidden;
   border: 1px solid var(--line);
   background: #fbfaf7;
@@ -469,7 +493,7 @@
   right: 3px;
   width: 16px;
   height: 16px;
-  border-radius: 50%;
+  border-radius: var(--radius-circle);
   border: none;
   background: rgba(20, 24, 31, 0.7);
   color: #fff;
@@ -516,7 +540,7 @@
   position: relative;
   background: var(--surface);
   border: 1px solid var(--line);
-  border-radius: 16px;
+  border-radius: var(--radius-16);
   padding: 22px 20px 20px;
   box-shadow: var(--shadow);
 }
@@ -528,7 +552,7 @@
   transform: translateX(-50%);
   width: 12px;
   height: 12px;
-  border-radius: 50%;
+  border-radius: var(--radius-circle);
   background: var(--canvas);
   border: 1px solid var(--line);
 }
@@ -536,14 +560,14 @@
 .cpf-tag-image {
   margin-top: 14px;
   height: 150px;
-  border-radius: 10px;
+  border-radius: var(--radius-10);
   background: var(--canvas);
   display: flex;
   align-items: center;
   justify-content: center;
   overflow: hidden;
   color: var(--ink-soft);
-  font-size: 12.5px;
+  font-size: var(--fs-12-5);
 }
 
 .cpf-tag-image img {
@@ -554,8 +578,8 @@
 
 .cpf-tag-category {
   margin: 14px 0 4px;
-  font-size: 11px;
-  font-weight: 700;
+  font-size: var(--fs-11);
+  font-weight: var(--fw-bold);
   letter-spacing: 0.06em;
   text-transform: uppercase;
   color: var(--brass);
@@ -563,15 +587,15 @@
 
 .cpf-tag-name {
   margin: 0 0 6px;
-  font-family: "Fraunces", serif;
-  font-size: 19px;
-  font-weight: 600;
+  font-family: var(--font-display);
+  font-size: var(--fs-19);
+  font-weight: var(--fw-semibold);
   line-height: 1.25;
 }
 
 .cpf-tag-short {
   margin: 0 0 14px;
-  font-size: 12.5px;
+  font-size: var(--fs-12-5);
   color: var(--ink-soft);
   line-height: 1.5;
 }
@@ -585,15 +609,15 @@
 }
 
 .cpf-tag-price span {
-  font-size: 21px;
-  font-weight: 700;
-  font-family: "Fraunces", serif;
+  font-size: var(--fs-21);
+  font-weight: var(--fw-bold);
+  font-family: var(--font-display);
   color: var(--pine);
 }
 
 .cpf-tag-price em {
   font-style: normal;
-  font-size: 12px;
+  font-size: var(--fs-12);
   color: var(--ink-soft);
 }
 
@@ -607,7 +631,7 @@
 }
 
 .cpf-tag-includes li {
-  font-size: 12px;
+  font-size: var(--fs-12);
   color: var(--ink-soft);
   padding-left: 14px;
   position: relative;
@@ -620,14 +644,14 @@
   top: 6px;
   width: 5px;
   height: 5px;
-  border-radius: 50%;
+  border-radius: var(--radius-circle);
   background: var(--pine);
 }
 
 /* payload / code preview */
 .cpf-payload {
   background: var(--ink);
-  border-radius: 14px;
+  border-radius: var(--radius-14);
   overflow: hidden;
   box-shadow: var(--shadow);
 }
@@ -641,17 +665,17 @@
 }
 
 .cpf-payload-head span:first-child {
-  font-size: 11px;
+  font-size: var(--fs-11);
   letter-spacing: 0.08em;
   text-transform: uppercase;
   color: rgba(255, 255, 255, 0.55);
-  font-weight: 600;
+  font-weight: var(--fw-semibold);
 }
 
 .cpf-payload-dot {
   width: 8px;
   height: 8px;
-  border-radius: 50%;
+  border-radius: var(--radius-circle);
   background: var(--brass);
 }
 
@@ -660,8 +684,8 @@
   padding: 16px;
   max-height: 420px;
   overflow: auto;
-  font-family: "JetBrains Mono", monospace;
-  font-size: 11.5px;
+  font-family: var(--font-mono);
+  font-size: var(--fs-11-5);
   line-height: 1.6;
   color: #e7e4da;
   white-space: pre-wrap;
@@ -701,7 +725,6 @@
   }
 }
 
-
 .cpf-spin {
   width: 15px;
   height: 15px;
@@ -709,7 +732,9 @@
 }
 
 @keyframes cpf-spin {
-  to { transform: rotate(360deg); }
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 .cpf-page-loader {
@@ -720,7 +745,7 @@
   gap: 12px;
   min-height: 60vh;
   color: var(--ink-soft);
-  font-size: 14px;
+  font-size: var(--fs-14);
 }
 
 .cpf-page-loader svg {
@@ -742,7 +767,7 @@
   align-items: center;
   background: #fbfaf7;
   border: 1px solid var(--line);
-  border-radius: 10px;
+  border-radius: var(--radius-10);
   padding: 10px;
 }
 
@@ -750,7 +775,7 @@
   position: relative;
   width: 56px;
   height: 56px;
-  border-radius: 9px;
+  border-radius: var(--radius-9);
   overflow: hidden;
   border: 1px dashed var(--line);
   background: #fff;
@@ -778,7 +803,7 @@
   right: 3px;
   width: 16px;
   height: 16px;
-  border-radius: 50%;
+  border-radius: var(--radius-circle);
   border: none;
   background: rgba(20, 24, 31, 0.7);
   color: #fff;

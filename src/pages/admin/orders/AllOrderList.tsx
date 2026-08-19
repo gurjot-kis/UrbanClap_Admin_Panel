@@ -15,20 +15,41 @@ import type {
 import { DataTable } from "../../../components/common/DataTable/DataTable";
 import type { DataTableColumn } from "../../../components/common/DataTable/DataTable.types";
 import "../../../styles/order/OrderList.css";
+import { OrderFlowIndicator } from "./OrderFlowIndicator";
 
 const PAGE_LIMIT = 10;
 
-const ORDER_STATUS_CONFIG: Record<
+// Workflow state transition mapping
+export const STATUS_TRANSITIONS: Record<OrderStatus, OrderStatus[]> = {
+  payment_pending: ["pending", "cancelled"],
+  pending: ["confirmed", "cancelled"],
+  confirmed: ["processing", "cancelled"],
+  processing: ["packed", "cancelled"],
+  packed: ["shipped", "cancelled"],
+  shipped: ["out_for_delivery", "cancelled"],
+  out_for_delivery: ["delivered", "cancelled"],
+  delivered: ["returned"],
+  cancelled: [],
+  returned: [],
+  completed: [],
+};
+
+// Visual config for all order statuses
+export const ORDER_STATUS_CONFIG: Record<
   OrderStatus,
   { label: string; dotColor: string }
 > = {
+  payment_pending: { label: "Payment Pending", dotColor: "#eab308" },
   pending: { label: "Pending", dotColor: "#f59e0b" },
   confirmed: { label: "Confirmed", dotColor: "#3b82f6" },
   processing: { label: "Processing", dotColor: "#8b5cf6" },
+  packed: { label: "Packed", dotColor: "#6366f1" },
   shipped: { label: "Shipped", dotColor: "#06b6d4" },
+  out_for_delivery: { label: "Out for Delivery", dotColor: "#0ea5e9" },
   delivered: { label: "Delivered", dotColor: "#10b981" },
-  completed: { label: "Completed", dotColor: "#10b981" },
+  returned: { label: "Returned", dotColor: "#f43f5e" },
   cancelled: { label: "Cancelled", dotColor: "#ef4444" },
+  completed: { label: "Completed", dotColor: "#059669" },
 };
 
 const PAYMENT_STATUS_CONFIG: Record<
@@ -63,6 +84,11 @@ const OrderStatusSelect = ({
   const triggerRef = useRef<HTMLButtonElement>(null);
   const menuRef = useRef<HTMLDivElement>(null);
 
+  // Get allowed next statuses for current state
+  const allowedNextStatuses = STATUS_TRANSITIONS[status] || [];
+  const selectableStatuses = [status, ...allowedNextStatuses];
+  const isTerminalState = allowedNextStatuses.length === 0;
+
   const updateMenuPosition = () => {
     if (!triggerRef.current) return;
     const rect = triggerRef.current.getBoundingClientRect();
@@ -79,6 +105,7 @@ const OrderStatusSelect = ({
   };
 
   const handleToggle = () => {
+    if (isTerminalState) return;
     if (!isOpen) {
       updateMenuPosition();
     }
@@ -127,11 +154,11 @@ const OrderStatusSelect = ({
       <button
         ref={triggerRef}
         type="button"
-        disabled={isUpdating}
+        disabled={isUpdating || isTerminalState}
         onClick={handleToggle}
         className={`ol-status-trigger ol-status-trigger--${status} ${
           isOpen ? "ol-status-trigger--open" : ""
-        }`}
+        } ${isTerminalState ? "ol-status-trigger--disabled" : ""}`}
         aria-haspopup="listbox"
         aria-expanded={isOpen}
       >
@@ -140,23 +167,25 @@ const OrderStatusSelect = ({
           style={{ backgroundColor: currentConfig.dotColor }}
         />
         <span className="ol-status-label">{currentConfig.label}</span>
-        <svg
-          className={`ol-status-chevron ${
-            isOpen ? "ol-status-chevron--rotate" : ""
-          }`}
-          width="12"
-          height="12"
-          viewBox="0 0 24 24"
-          fill="none"
-        >
-          <path
-            d="M6 9l6 6 6-6"
-            stroke="currentColor"
-            strokeWidth="2.5"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          />
-        </svg>
+        {!isTerminalState && (
+          <svg
+            className={`ol-status-chevron ${
+              isOpen ? "ol-status-chevron--rotate" : ""
+            }`}
+            width="12"
+            height="12"
+            viewBox="0 0 24 24"
+            fill="none"
+          >
+            <path
+              d="M6 9l6 6 6-6"
+              stroke="currentColor"
+              strokeWidth="2.5"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+          </svg>
+        )}
       </button>
 
       {isOpen &&
@@ -178,7 +207,7 @@ const OrderStatusSelect = ({
             }}
             role="listbox"
           >
-            {(Object.keys(ORDER_STATUS_CONFIG) as OrderStatus[]).map((key) => {
+            {selectableStatuses.map((key) => {
               const item = ORDER_STATUS_CONFIG[key];
               const isSelected = key === status;
 
@@ -193,7 +222,9 @@ const OrderStatusSelect = ({
                   }`}
                   onClick={() => {
                     setIsOpen(false);
-                    onChange(key);
+                    if (!isSelected) {
+                      onChange(key);
+                    }
                   }}
                 >
                   <span
@@ -268,7 +299,7 @@ const AllOrderList = () => {
       }).unwrap();
 
       toast.success("Order status updated", {
-        description: `Order ${order.orderNumber} is now marked as ${newStatus}.`,
+        description: `Order ${order.orderNumber} is now marked as ${ORDER_STATUS_CONFIG[newStatus]?.label || newStatus}.`,
       });
     } catch (err: any) {
       console.error("Failed to update order status:", err);
@@ -401,65 +432,73 @@ const AllOrderList = () => {
   ];
 
   return (
-    <DataTable
-      title="All Orders"
-      statPills={[
-        {
-          label: `${pagination?.total ?? orders.length} total`,
-          navy: true,
-        },
-      ]}
-      columns={columns}
-      data={orders}
-      getId={(order) => order._id}
-      searchValue={searchInput}
-      onSearchChange={setSearchInput}
-      searchPlaceholder="Search by order ID, customer..."
-      filters={[
-        {
-          value: statusFilter,
-          onChange: (v) => {
-            setStatusFilter(v as OrderStatus | "all");
-            setPage(1);
+    <div className="ol-page-container">
+      <DataTable
+        title="All Orders"
+        statPills={[
+          {
+            label: `${pagination?.total ?? orders.length} total`,
+            navy: true,
           },
-          options: [
-            { value: "all", label: "All Status" },
-            { value: "pending", label: "Pending" },
-            { value: "confirmed", label: "Confirmed" },
-            { value: "processing", label: "Processing" },
-            { value: "shipped", label: "Shipped" },
-            { value: "delivered", label: "Delivered" },
-            { value: "completed", label: "Completed" },
-            { value: "cancelled", label: "Cancelled" },
-          ],
-        },
-      ]}
-      isLoading={isLoading}
-      isFetching={isFetching}
-      isError={isError}
-      errorMessage={`Couldn't load orders${
-        error && "status" in error ? ` (${error.status})` : ""
-      }.`}
-      onRetry={refetch}
-      emptyMessage={
-        search || statusFilter !== "all"
-          ? "No orders match your filter criteria."
-          : "No orders found."
-      }
-      pagination={
-        pagination
-          ? {
-              page: pagination.page,
-              limit: pagination.limit,
-              total: pagination.total,
-              totalPages: pagination.pages,
-              hasNextPage: pagination.page < pagination.pages,
-              hasPrevPage: pagination.page > 1,
-            }
-          : undefined
-      }
-      onPageChange={setPage}
-    />
+        ]}
+        columns={columns}
+        data={orders}
+        getId={(order) => order._id}
+        searchValue={searchInput}
+        onSearchChange={setSearchInput}
+        searchPlaceholder="Search by order ID, customer..."
+        filters={[
+          {
+            value: statusFilter,
+            onChange: (v) => {
+              setStatusFilter(v as OrderStatus | "all");
+              setPage(1);
+            },
+            options: [
+              { value: "all", label: "All Status" },
+              { value: "payment_pending", label: "Payment Pending" },
+              { value: "pending", label: "Pending" },
+              { value: "confirmed", label: "Confirmed" },
+              { value: "processing", label: "Processing" },
+              { value: "packed", label: "Packed" },
+              { value: "shipped", label: "Shipped" },
+              { value: "out_for_delivery", label: "Out for Delivery" },
+              { value: "delivered", label: "Delivered" },
+              { value: "returned", label: "Returned" },
+              { value: "cancelled", label: "Cancelled" },
+              { value: "completed", label: "Completed" },
+            ],
+          },
+        ]}
+        isLoading={isLoading}
+        isFetching={isFetching}
+        isError={isError}
+        errorMessage={`Couldn't load orders${
+          error && "status" in error ? ` (${error.status})` : ""
+        }.`}
+        onRetry={refetch}
+        emptyMessage={
+          search || statusFilter !== "all"
+            ? "No orders match your filter criteria."
+            : "No orders found."
+        }
+        pagination={
+          pagination
+            ? {
+                page: pagination.page,
+                limit: pagination.limit,
+                total: pagination.total,
+                totalPages: pagination.pages,
+                hasNextPage: pagination.page < pagination.pages,
+                hasPrevPage: pagination.page > 1,
+              }
+            : undefined
+        }
+        onPageChange={setPage}
+      />
+
+      <OrderFlowIndicator />
+    </div>
   );
 };
 

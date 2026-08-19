@@ -13,7 +13,7 @@ import type {
 } from "../../../features/product/productTypes";
 import "../../../styles/product/AddProduct.css";
 import type { Category } from "../../../features/category/categoryTypes";
-import {FullScreenLoader} from "../../../components/common/FullScreenLoader"
+import { FullScreenLoader } from "../../../components/common/FullScreenLoader";
 
 const emptyVariant = (): CreateProductVariant => ({
   label: "",
@@ -115,6 +115,21 @@ const Icon = {
         strokeLinecap="round"
         strokeLinejoin="round"
       />
+    </svg>
+  ),
+  Trash: () => (
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.8"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <path d="M3 6h18" />
+      <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
+      <line x1="10" y1="11" x2="10" y2="17" />
+      <line x1="14" y1="11" x2="14" y2="17" />
     </svg>
   ),
   Close: () => (
@@ -504,7 +519,7 @@ export default function CreateProductForm() {
   // ---- full-page loader while fetching the existing product ---------------
   if (isEditMode && productLoading) {
     return (
-     <FullScreenLoader
+      <FullScreenLoader
         title="Loading Product"
         subtitle="Getting everything ready...."
       />
@@ -527,534 +542,547 @@ export default function CreateProductForm() {
   }
 
   return (
-    <div className="cpf">
-      <form className="cpf-form" onSubmit={handleSubmit}>
-        <header className="cpf-header">
-          <div>
-            <p className="cpf-eyebrow">
-              Catalog / {isEditMode ? "Edit listing" : "New listing"}
-            </p>
-            <h1 className="cpf-title">
-              {isEditMode ? "Edit product" : "Create product"}
-            </h1>
-            <p className="cpf-subtitle">
-              {isEditMode
-                ? "Update any section — the spec sheet on the right reflects your changes."
-                : "Fill in each section — the spec sheet on the right updates as you go."}
-            </p>
-          </div>
-          <div className="cpf-header-actions">
-            {/* <button type="button" className="cpf-btn cpf-btn--ghost">
+    <div className="cpf-page">
+      <div className="cpf">
+        <form className="cpf-form" onSubmit={handleSubmit}>
+          <header className="cpf-header">
+            <div>
+              <p className="cpf-eyebrow">
+                Catalog / {isEditMode ? "Edit listing" : "New listing"}
+              </p>
+              <h1 className="cpf-title">
+                {isEditMode ? "Edit product" : "Create product"}
+              </h1>
+              <p className="cpf-subtitle">
+                {isEditMode
+                  ? "Update any section — the spec sheet on the right reflects your changes."
+                  : "Fill in each section — the spec sheet on the right updates as you go."}
+              </p>
+            </div>
+            <div className="cpf-header-actions">
+              {/* <button type="button" className="cpf-btn cpf-btn--ghost">
               Save draft
             </button> */}
-            <button
-              type="submit"
-              className="cpf-btn cpf-btn--primary"
-              disabled={submitting}
-            >
-              {submitting && <Icon.Spinner />}
-              {submitting
-                ? isEditMode
-                  ? "Saving…"
-                  : "Publishing…"
-                : isEditMode
-                  ? "Save changes"
-                  : "Publish product"}
-            </button>
-          </div>
-        </header>
-
-        {submitMessage === "success" && (
-          <div className="cpf-banner cpf-banner--success">
-            {isEditMode
-              ? "Product updated successfully."
-              : "Product published successfully."}
-          </div>
-        )}
-        {submitMessage === "error" && (
-          <div className="cpf-banner cpf-banner--error">
-            {submitError || "Something went wrong. Please try again."}
-          </div>
-        )}
-
-        {/* SECTION 1 — Identity */}
-        <section className="cpf-section">
-          <div className="cpf-section-head">
-            <span className="cpf-section-icon">
-              <Icon.Identity />
-            </span>
-            <div>
-              <h2>Product identity</h2>
-              <p>The name and descriptions shoppers see first.</p>
-            </div>
-          </div>
-          <div className="cpf-grid">
-            <label className="cpf-field cpf-field--full">
-              <span>Product name</span>
-              <input
-                type="text"
-                placeholder="e.g. Professional Ceramic Hair Straightener"
-                value={form.name}
-                onChange={handleText("name")}
-                required
-              />
-            </label>
-            <label className="cpf-field cpf-field--full">
-              <span>Short description</span>
-              <input
-                type="text"
-                placeholder="One line shown on listing cards"
-                value={form.shortDescription}
-                onChange={handleText("shortDescription")}
-              />
-            </label>
-            <label className="cpf-field cpf-field--full">
-              <span>Full description</span>
-              <textarea
-                rows={4}
-                placeholder="Describe materials, use-case and what makes it stand out"
-                value={form.description}
-                onChange={handleText("description")}
-              />
-            </label>
-          </div>
-        </section>
-
-        {/* SECTION 2 — Classification */}
-        <section className="cpf-section">
-          <div className="cpf-section-head">
-            <span className="cpf-section-icon">
-              <Icon.Layers />
-            </span>
-            <div>
-              <h2>Classification</h2>
-              <p>Where this product lives in the catalog tree.</p>
-            </div>
-          </div>
-          <div className="cpf-grid">
-            <label className="cpf-field">
-              <span>Category</span>
-              <select
-                value={selectedL1}
-                onChange={(e) => handleSelectL1(e.target.value)}
-                disabled={categoriesLoading}
+              <button
+                type="submit"
+                className="cpf-btn cpf-btn--primary"
+                disabled={submitting}
               >
-                <option value="">
-                  {categoriesLoading
-                    ? "Loading categories…"
-                    : "Select category"}
-                </option>
-                {categories.map((c: Category) => (
-                  <option key={c._id} value={c._id}>
-                    {c.name}
+                {submitting && <Icon.Spinner />}
+                {submitting
+                  ? isEditMode
+                    ? "Saving…"
+                    : "Publishing…"
+                  : isEditMode
+                    ? "Save changes"
+                    : "Publish product"}
+              </button>
+            </div>
+          </header>
+
+          {submitMessage === "success" && (
+            <div className="cpf-banner cpf-banner--success">
+              {isEditMode
+                ? "Product updated successfully."
+                : "Product published successfully."}
+            </div>
+          )}
+          {submitMessage === "error" && (
+            <div className="cpf-banner cpf-banner--error">
+              {submitError || "Something went wrong. Please try again."}
+            </div>
+          )}
+
+          {/* SECTION 1 — Identity */}
+          <section className="cpf-section">
+            <div className="cpf-section-head">
+              <span className="cpf-section-icon">
+                <Icon.Identity />
+              </span>
+              <div>
+                <h2>Product identity</h2>
+                <p>The name and descriptions shoppers see first.</p>
+              </div>
+            </div>
+            <div className="cpf-grid">
+              <label className="cpf-field cpf-field--full">
+                <span>Product name</span>
+                <input
+                  type="text"
+                  placeholder="e.g. Professional Ceramic Hair Straightener"
+                  value={form.name}
+                  onChange={handleText("name")}
+                  required
+                />
+              </label>
+              <label className="cpf-field cpf-field--full">
+                <span>Short description</span>
+                <input
+                  type="text"
+                  placeholder="One line shown on listing cards"
+                  value={form.shortDescription}
+                  onChange={handleText("shortDescription")}
+                />
+              </label>
+              <label className="cpf-field cpf-field--full">
+                <span>Full description</span>
+                <textarea
+                  rows={4}
+                  placeholder="Describe materials, use-case and what makes it stand out"
+                  value={form.description}
+                  onChange={handleText("description")}
+                />
+              </label>
+            </div>
+          </section>
+
+          {/* SECTION 2 — Classification */}
+          <section className="cpf-section">
+            <div className="cpf-section-head">
+              <span className="cpf-section-icon">
+                <Icon.Layers />
+              </span>
+              <div>
+                <h2>Classification</h2>
+                <p>Where this product lives in the catalog tree.</p>
+              </div>
+            </div>
+            <div className="cpf-grid">
+              <label className="cpf-field">
+                <span>Category</span>
+                <select
+                  value={selectedL1}
+                  onChange={(e) => handleSelectL1(e.target.value)}
+                  disabled={categoriesLoading}
+                >
+                  <option value="">
+                    {categoriesLoading
+                      ? "Loading categories…"
+                      : "Select category"}
                   </option>
-                ))}
-              </select>
-              {categoriesError && (
-                <em className="cpf-field-error">Couldn't load categories.</em>
+                  {categories.map((c: Category) => (
+                    <option key={c._id} value={c._id}>
+                      {c.name}
+                    </option>
+                  ))}
+                </select>
+                {categoriesError && (
+                  <em className="cpf-field-error">Couldn't load categories.</em>
+                )}
+              </label>
+
+              <label className="cpf-field">
+                <span>Sub-category</span>
+                <select
+                  value={selectedSubCategory}
+                  onChange={(e) => handleSelectSubCategory(e.target.value)}
+                  disabled={!subCategoryOptions.length}
+                >
+                  <option value="">
+                    {subCategoryOptions.length
+                      ? "Select sub-category"
+                      : "No sub-categories"}
+                  </option>
+                  {subCategoryOptions.map((c) => (
+                    <option key={c._id} value={c._id}>
+                      {c.name}
+                    </option>
+                  ))}
+                </select>
+              </label>
+
+              <label className="cpf-field">
+                <span>Vendor</span>
+                <select
+                  value={form.vendor_id}
+                  onChange={(e) => setField("vendor_id", e.target.value)}
+                  disabled
+                >
+                  <option value="">No vendors added yet</option>
+                </select>
+                <em className="cpf-field-hint">
+                  Vendor management is coming soon — leave unassigned for now.
+                </em>
+              </label>
+            </div>
+            {categoryPath && <p className="cpf-breadcrumb">{categoryPath}</p>}
+          </section>
+
+          {/* SECTION 3 — Pricing & fulfilment */}
+          <section className="cpf-section">
+            <div className="cpf-section-head">
+              <span className="cpf-section-icon">
+                <Icon.Tag />
+              </span>
+              <div>
+                <h2>Pricing &amp; fulfilment</h2>
+                <p>Base price and how long the service or delivery takes.</p>
+              </div>
+            </div>
+            <div className="cpf-grid">
+              <label className="cpf-field">
+                <span>Base price (₹)</span>
+                <input
+                  type="number"
+                  min={0}
+                  placeholder="1299"
+                  value={form.basePrice}
+                  onChange={handleNumber("basePrice")}
+                  required
+                />
+              </label>
+              <label className="cpf-field">
+                <span>Variant label</span>
+                <input
+                  type="text"
+                  placeholder="e.g. Select Size"
+                  value={form.variantLabel}
+                  onChange={handleText("variantLabel")}
+                />
+              </label>
+              <label className="cpf-field">
+                <span>Duration (minutes)</span>
+                <input
+                  type="number"
+                  min={0}
+                  placeholder="0"
+                  value={form.durationMinutes}
+                  onChange={handleNumber("durationMinutes")}
+                />
+              </label>
+            </div>
+          </section>
+
+          {/* SECTION 4 — What's included */}
+          <section className="cpf-section">
+            <div className="cpf-section-head">
+              <span className="cpf-section-icon">
+                <Icon.List />
+              </span>
+              <div>
+                <h2>What&apos;s included</h2>
+                <p>Everything the customer receives in the box.</p>
+              </div>
+            </div>
+            <div className="cpf-chip-input">
+              <input
+                type="text"
+                placeholder="e.g. Heat Protection Glove"
+                value={includeDraft}
+                onChange={(e) => setIncludeDraft(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") {
+                    e.preventDefault();
+                    addInclude();
+                  }
+                }}
+              />
+              <button
+                type="button"
+                className="cpf-btn cpf-btn--secondary"
+                onClick={addInclude}
+              >
+                <Icon.Plus /> Add
+              </button>
+            </div>
+            <div className="cpf-chip-list">
+              {form.includes.length === 0 && (
+                <span className="cpf-empty">No items added yet.</span>
               )}
-            </label>
-
-            <label className="cpf-field">
-              <span>Sub-category</span>
-              <select
-                value={selectedSubCategory}
-                onChange={(e) => handleSelectSubCategory(e.target.value)}
-                disabled={!subCategoryOptions.length}
-              >
-                <option value="">
-                  {subCategoryOptions.length
-                    ? "Select sub-category"
-                    : "No sub-categories"}
-                </option>
-                {subCategoryOptions.map((c) => (
-                  <option key={c._id} value={c._id}>
-                    {c.name}
-                  </option>
-                ))}
-              </select>
-            </label>
-
-            <label className="cpf-field">
-              <span>Vendor</span>
-              <select
-                value={form.vendor_id}
-                onChange={(e) => setField("vendor_id", e.target.value)}
-                disabled
-              >
-                <option value="">No vendors added yet</option>
-              </select>
-              <em className="cpf-field-hint">
-                Vendor management is coming soon — leave unassigned for now.
-              </em>
-            </label>
-          </div>
-          {categoryPath && <p className="cpf-breadcrumb">{categoryPath}</p>}
-        </section>
-
-        {/* SECTION 3 — Pricing & fulfilment */}
-        <section className="cpf-section">
-          <div className="cpf-section-head">
-            <span className="cpf-section-icon">
-              <Icon.Tag />
-            </span>
-            <div>
-              <h2>Pricing &amp; fulfilment</h2>
-              <p>Base price and how long the service or delivery takes.</p>
+              {form.includes.map((item, i) => (
+                <span className="cpf-chip" key={`${item}-${i}`}>
+                  {item}
+                  <button
+                    type="button"
+                    onClick={() => removeInclude(i)}
+                    aria-label={`Remove ${item}`}
+                  >
+                    <Icon.Close />
+                  </button>
+                </span>
+              ))}
             </div>
-          </div>
-          <div className="cpf-grid">
-            <label className="cpf-field">
-              <span>Base price (₹)</span>
-              <input
-                type="number"
-                min={0}
-                placeholder="1299"
-                value={form.basePrice}
-                onChange={handleNumber("basePrice")}
-                required
-              />
-            </label>
-            <label className="cpf-field">
-              <span>Variant label</span>
-              <input
-                type="text"
-                placeholder="e.g. Select Size"
-                value={form.variantLabel}
-                onChange={handleText("variantLabel")}
-              />
-            </label>
-            <label className="cpf-field">
-              <span>Duration (minutes)</span>
-              <input
-                type="number"
-                min={0}
-                placeholder="0"
-                value={form.durationMinutes}
-                onChange={handleNumber("durationMinutes")}
-              />
-            </label>
-          </div>
-        </section>
+          </section>
 
-        {/* SECTION 4 — What's included */}
-        <section className="cpf-section">
-          <div className="cpf-section-head">
-            <span className="cpf-section-icon">
-              <Icon.List />
-            </span>
-            <div>
-              <h2>What&apos;s included</h2>
-              <p>Everything the customer receives in the box.</p>
+          {/* SECTION 5 — Variants */}
+          <section className="cpf-section">
+            <div className="cpf-section-head">
+              <span className="cpf-section-icon">
+                <Icon.Variant />
+              </span>
+              <div>
+                <h2>Variants</h2>
+                <p>
+                  Size, quantity or tier options, each with its own image and
+                  price.
+                </p>
+                {isEditMode && (
+                  <p className="cpf-field-hint">
+                    Cost price isn't returned by the API — re-enter it for any
+                    variant you want to update.
+                  </p>
+                )}
+              </div>
             </div>
-          </div>
-          <div className="cpf-chip-input">
-            <input
-              type="text"
-              placeholder="e.g. Heat Protection Glove"
-              value={includeDraft}
-              onChange={(e) => setIncludeDraft(e.target.value)}
-              onKeyDown={(e) => {
-                if (e.key === "Enter") {
-                  e.preventDefault();
-                  addInclude();
-                }
-              }}
-            />
+
+            {form.variants.length === 0 && (
+              <span className="cpf-empty">
+                No variants yet — add one below.
+              </span>
+            )}
+
+            <div className="cpf-variant-list">
+              {form.variants.map((variant, i) => (
+                <div className="cpf-variant-row" key={variant.key ?? i}>
+                  <label className="cpf-variant-thumb">
+                    {variant.imageFile ? (
+                      <img
+                        src={URL.createObjectURL(variant.imageFile)}
+                        alt="Variant preview"
+                      />
+                    ) : variant.existingImage ? (
+                      <img src={variant.existingImage} alt="Current variant" />
+                    ) : (
+                      <Icon.Image />
+                    )}
+                    <input
+                      type="file"
+                      accept="image/*"
+                      hidden
+                      onChange={handleVariantImageChange(i)}
+                    />
+                    {(variant.imageFile || variant.existingImage) && (
+                      <button
+                        type="button"
+                        className="cpf-variant-thumb-clear"
+                        onClick={(e) => {
+                          e.preventDefault();
+                          e.stopPropagation();
+                          clearVariantImage(i);
+                        }}
+                        aria-label="Remove variant image"
+                      >
+                        <Icon.Close />
+                      </button>
+                    )}
+                  </label>
+                  <input
+                    type="text"
+                    placeholder="Label (e.g. Small)"
+                    value={variant.label}
+                    onChange={(e) =>
+                      updateVariant(i, { label: e.target.value })
+                    }
+                  />
+                  <input
+                    type="number"
+                    placeholder="Price"
+                    value={variant.price}
+                    onChange={(e) =>
+                      updateVariant(i, {
+                        price:
+                          e.target.value === "" ? "" : Number(e.target.value),
+                      })
+                    }
+                  />
+                  <input
+                    type="number"
+                    placeholder="Cost price"
+                    value={variant.costPrice}
+                    onChange={(e) =>
+                      updateVariant(i, {
+                        costPrice:
+                          e.target.value === "" ? "" : Number(e.target.value),
+                      })
+                    }
+                  />
+                  <button
+                    type="button"
+                    className="cpf-icon-btn"
+                    onClick={() => removeVariant(i)}
+                    aria-label="Remove variant"
+                  >
+                    <Icon.Trash />
+                  </button>
+                </div>
+              ))}
+            </div>
+
             <button
               type="button"
               className="cpf-btn cpf-btn--secondary"
-              onClick={addInclude}
+              onClick={addVariant}
             >
-              <Icon.Plus /> Add
+              <Icon.Plus /> Add variant
             </button>
-          </div>
-          <div className="cpf-chip-list">
-            {form.includes.length === 0 && (
-              <span className="cpf-empty">No items added yet.</span>
-            )}
-            {form.includes.map((item, i) => (
-              <span className="cpf-chip" key={`${item}-${i}`}>
-                {item}
-                <button
-                  type="button"
-                  onClick={() => removeInclude(i)}
-                  aria-label={`Remove ${item}`}
-                >
-                  <Icon.Close />
-                </button>
+          </section>
+
+          {/* SECTION 6 — Media */}
+          <section className="cpf-section">
+            <div className="cpf-section-head">
+              <span className="cpf-section-icon">
+                <Icon.Image />
               </span>
-            ))}
-          </div>
-        </section>
-
-        {/* SECTION 5 — Variants */}
-        <section className="cpf-section">
-          <div className="cpf-section-head">
-            <span className="cpf-section-icon">
-              <Icon.Variant />
-            </span>
-            <div>
-              <h2>Variants</h2>
-              <p>
-                Size, quantity or tier options, each with its own image and
-                price.
-              </p>
-              {isEditMode && (
-                <p className="cpf-field-hint">
-                  Cost price isn't returned by the API — re-enter it for any
-                  variant you want to update.
+              <div>
+                <h2>Media</h2>
+                <p>
+                  Main listing image and gallery shots. Variant photos live in
+                  the Variants section above.
                 </p>
-              )}
-            </div>
-          </div>
-
-          {form.variants.length === 0 && (
-            <span className="cpf-empty">No variants yet — add one below.</span>
-          )}
-
-          <div className="cpf-variant-list">
-            {form.variants.map((variant, i) => (
-              <div className="cpf-variant-row" key={variant.key ?? i}>
-                <label className="cpf-variant-thumb">
-                  {variant.imageFile ? (
-                    <img
-                      src={URL.createObjectURL(variant.imageFile)}
-                      alt="Variant preview"
-                    />
-                  ) : variant.existingImage ? (
-                    <img src={variant.existingImage} alt="Current variant" />
-                  ) : (
-                    <Icon.Image />
-                  )}
-                  <input
-                    type="file"
-                    accept="image/*"
-                    hidden
-                    onChange={handleVariantImageChange(i)}
-                  />
-                  {(variant.imageFile || variant.existingImage) && (
-                    <button
-                      type="button"
-                      className="cpf-variant-thumb-clear"
-                      onClick={(e) => {
-                        e.preventDefault();
-                        e.stopPropagation();
-                        clearVariantImage(i);
-                      }}
-                      aria-label="Remove variant image"
-                    >
-                      <Icon.Close />
-                    </button>
-                  )}
-                </label>
-                <input
-                  type="text"
-                  placeholder="Label (e.g. Small)"
-                  value={variant.label}
-                  onChange={(e) => updateVariant(i, { label: e.target.value })}
-                />
-                <input
-                  type="number"
-                  placeholder="Price"
-                  value={variant.price}
-                  onChange={(e) =>
-                    updateVariant(i, {
-                      price:
-                        e.target.value === "" ? "" : Number(e.target.value),
-                    })
-                  }
-                />
-                <input
-                  type="number"
-                  placeholder="Cost price"
-                  value={variant.costPrice}
-                  onChange={(e) =>
-                    updateVariant(i, {
-                      costPrice:
-                        e.target.value === "" ? "" : Number(e.target.value),
-                    })
-                  }
-                />
-                <button
-                  type="button"
-                  className="cpf-icon-btn"
-                  onClick={() => removeVariant(i)}
-                  aria-label="Remove variant"
-                >
-                  <Icon.Close />
-                </button>
               </div>
-            ))}
-          </div>
-
-          <button
-            type="button"
-            className="cpf-btn cpf-btn--secondary"
-            onClick={addVariant}
-          >
-            <Icon.Plus /> Add variant
-          </button>
-        </section>
-
-        {/* SECTION 6 — Media */}
-        <section className="cpf-section">
-          <div className="cpf-section-head">
-            <span className="cpf-section-icon">
-              <Icon.Image />
-            </span>
-            <div>
-              <h2>Media</h2>
-              <p>
-                Main listing image and gallery shots. Variant photos live in the
-                Variants section above.
-              </p>
             </div>
-          </div>
 
-          <div className="cpf-media-grid">
-            {/* Main Image */}
-            <div className="cpf-media-block">
-              <span className="cpf-media-label">Main image</span>
-              <div
-                className="cpf-dropzone"
-                onClick={() => mainImageRef.current?.click()}
-              >
+            <div className="cpf-media-grid">
+              {/* Main Image */}
+              <div className="cpf-media-block">
+                <span className="cpf-media-label">Main image</span>
+                <div
+                  className="cpf-dropzone"
+                  onClick={() => mainImageRef.current?.click()}
+                >
+                  {form.mainImage ? (
+                    <img
+                      src={URL.createObjectURL(form.mainImage)}
+                      alt="Main preview"
+                    />
+                  ) : existingMainImage ? (
+                    <img src={existingMainImage} alt="Current main" />
+                  ) : (
+                    <span>Click to upload</span>
+                  )}
+                </div>
+                {(form.mainImage || existingMainImage) && (
+                  <button
+                    type="button"
+                    className="cpf-btn cpf-btn--ghost"
+                    style={{ marginTop: 8 }}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      clearMainImage();
+                    }}
+                  >
+                    Remove Main Image
+                  </button>
+                )}
+                <input
+                  ref={mainImageRef}
+                  type="file"
+                  accept="image/*"
+                  hidden
+                  onChange={handleMainImage}
+                />
+              </div>
+
+              {/* Featured Images */}
+              <div className="cpf-media-block">
+                <span className="cpf-media-label">Featured images</span>
+                <div className="cpf-thumb-row">
+                  {existingFeaturedImages.map((url, i) => (
+                    <div className="cpf-thumb" key={`existing-${i}`}>
+                      <img src={url} alt={`Current featured ${i}`} />
+                      <button
+                        type="button"
+                        onClick={() => removeExistingFeaturedImage(i)}
+                        aria-label="Remove image"
+                      >
+                        <Icon.Close />
+                      </button>
+                    </div>
+                  ))}
+
+                  {form.featuredImages.map((file, i) => (
+                    <div className="cpf-thumb" key={`new-${i}`}>
+                      <img
+                        src={URL.createObjectURL(file)}
+                        alt={`Featured ${i}`}
+                      />
+                      <button
+                        type="button"
+                        onClick={() => removeFeaturedImage(i)}
+                        aria-label="Remove image"
+                      >
+                        <Icon.Close />
+                      </button>
+                    </div>
+                  ))}
+
+                  <button
+                    type="button"
+                    className="cpf-thumb cpf-thumb--add"
+                    onClick={() => featuredImagesRef.current?.click()}
+                  >
+                    <Icon.Plus />
+                  </button>
+                </div>
+                <input
+                  ref={featuredImagesRef}
+                  type="file"
+                  accept="image/*"
+                  multiple
+                  hidden
+                  onChange={handleFeaturedImages}
+                />
+              </div>
+            </div>
+          </section>
+        </form>
+
+        {/* PREVIEW RAIL */}
+        <aside className="cpf-preview">
+          <div className="cpf-preview-sticky">
+            <div className="cpf-tag-card">
+              <div className="cpf-tag-hole" />
+              <div className="cpf-tag-image">
                 {form.mainImage ? (
                   <img
                     src={URL.createObjectURL(form.mainImage)}
-                    alt="Main preview"
+                    alt="Product"
                   />
                 ) : existingMainImage ? (
-                  <img src={existingMainImage} alt="Current main" />
+                  <img src={existingMainImage} alt="Product" />
                 ) : (
-                  <span>Click to upload</span>
+                  <span>No image</span>
                 )}
               </div>
-              {(form.mainImage || existingMainImage) && (
-                <button
-                  type="button"
-                  className="cpf-btn cpf-btn--ghost"
-                  style={{ marginTop: 8 }}
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    clearMainImage();
-                  }}
-                >
-                  Remove Main Image
-                </button>
-              )}
-              <input
-                ref={mainImageRef}
-                type="file"
-                accept="image/*"
-                hidden
-                onChange={handleMainImage}
-              />
-            </div>
-
-            {/* Featured Images */}
-            <div className="cpf-media-block">
-              <span className="cpf-media-label">Featured images</span>
-              <div className="cpf-thumb-row">
-                {existingFeaturedImages.map((url, i) => (
-                  <div className="cpf-thumb" key={`existing-${i}`}>
-                    <img src={url} alt={`Current featured ${i}`} />
-                    <button
-                      type="button"
-                      onClick={() => removeExistingFeaturedImage(i)}
-                      aria-label="Remove image"
-                    >
-                      <Icon.Close />
-                    </button>
-                  </div>
-                ))}
-
-                {form.featuredImages.map((file, i) => (
-                  <div className="cpf-thumb" key={`new-${i}`}>
-                    <img
-                      src={URL.createObjectURL(file)}
-                      alt={`Featured ${i}`}
-                    />
-                    <button
-                      type="button"
-                      onClick={() => removeFeaturedImage(i)}
-                      aria-label="Remove image"
-                    >
-                      <Icon.Close />
-                    </button>
-                  </div>
-                ))}
-
-                <button
-                  type="button"
-                  className="cpf-thumb cpf-thumb--add"
-                  onClick={() => featuredImagesRef.current?.click()}
-                >
-                  <Icon.Plus />
-                </button>
-              </div>
-              <input
-                ref={featuredImagesRef}
-                type="file"
-                accept="image/*"
-                multiple
-                hidden
-                onChange={handleFeaturedImages}
-              />
-            </div>
-          </div>
-        </section>
-      </form>
-
-      {/* PREVIEW RAIL */}
-      <aside className="cpf-preview">
-        <div className="cpf-preview-sticky">
-          <div className="cpf-tag-card">
-            <div className="cpf-tag-hole" />
-            <div className="cpf-tag-image">
-              {form.mainImage ? (
-                <img src={URL.createObjectURL(form.mainImage)} alt="Product" />
-              ) : existingMainImage ? (
-                <img src={existingMainImage} alt="Product" />
-              ) : (
-                <span>No image</span>
-              )}
-            </div>
-            <p className="cpf-tag-category">
-              {categoryPath || "Uncategorised"}
-            </p>
-            <h3 className="cpf-tag-name">{form.name || "Untitled product"}</h3>
-            <p className="cpf-tag-short">
-              {form.shortDescription || "Short description will appear here."}
-            </p>
-            <div className="cpf-tag-price">
-              <span>{form.basePrice === "" ? "₹—" : `₹${form.basePrice}`}</span>
-              {form.durationMinutes !== "" && (
-                <em>{form.durationMinutes} min</em>
-              )}
-            </div>
-            {form.includes.length > 0 && (
-              <ul className="cpf-tag-includes">
-                {form.includes.slice(0, 4).map((item, i) => (
-                  <li key={i}>{item}</li>
-                ))}
-                {form.includes.length > 4 && (
-                  <li>+{form.includes.length - 4} more</li>
+              <p className="cpf-tag-category">
+                {categoryPath || "Uncategorised"}
+              </p>
+              <h3 className="cpf-tag-name">
+                {form.name || "Untitled product"}
+              </h3>
+              <p className="cpf-tag-short">
+                {form.shortDescription || "Short description will appear here."}
+              </p>
+              <div className="cpf-tag-price">
+                <span>
+                  {form.basePrice === "" ? "₹—" : `₹${form.basePrice}`}
+                </span>
+                {form.durationMinutes !== "" && (
+                  <em>{form.durationMinutes} min</em>
                 )}
-              </ul>
-            )}
-          </div>
+              </div>
+              {form.includes.length > 0 && (
+                <ul className="cpf-tag-includes">
+                  {form.includes.slice(0, 4).map((item, i) => (
+                    <li key={i}>{item}</li>
+                  ))}
+                  {form.includes.length > 4 && (
+                    <li>+{form.includes.length - 4} more</li>
+                  )}
+                </ul>
+              )}
+            </div>
 
-          {/* <div className="cpf-payload">
+            {/* <div className="cpf-payload">
             <div className="cpf-payload-head">
               <span>form-data payload</span>
               <span className="cpf-payload-dot" />
             </div>
             <pre>{JSON.stringify(previewJson, null, 2)}</pre>
           </div> */}
-        </div>
-      </aside>
+          </div>
+        </aside>
+      </div>
     </div>
   );
 }

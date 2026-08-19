@@ -12,9 +12,6 @@ import ProfilePage from "./pages/admin/profile/ProfilePage";
 import SupportPage from "./pages/SupportPage";
 import BannerPage from "./pages/BannerPage";
 import CartSettingsPage from "./pages/CartSettingsPage";
-import VendorListPage from "./pages/VendorListPage";
-import AddVendorPage from "./pages/AddVendorPage";
-import EditVendorPage from "./pages/EditVendorPage";
 import WarehouseListPage from "./pages/WarehouseListPage";
 import AddWarehousePage from "./pages/AddWarehousePage";
 import EditWarehousePage from "./pages/EditWarehousePage";
@@ -45,6 +42,8 @@ import ProductDetails from "./pages/admin/product/ProductDetails";
 import AllOrderList from "./pages/admin/orders/AllOrderList";
 import OrderDetails from "./pages/admin/orders/OrderDetails";
 import UserList from "./pages/admin/user/UserList";
+import VendorList from "./pages/admin/vendor/VendorList";
+import AddVendor from "./pages/admin/vendor/AddVendor";
 
 function App() {
   return (
@@ -102,8 +101,9 @@ function App() {
         </Route>
         <Route element={<AdminProtectedRoute />}>
           <Route element={<Layout />}>
-            <Route path={ROUTES.dashboard} element={<DashboardPage />} />
             {/* Worked by Kshitish on routes start */}
+            <Route path={ROUTES.dashboard} element={<DashboardPage />} />
+
             <Route path={ROUTES.categories} element={<CategoryList />} />
             <Route path={ROUTES.addCategory} element={<AddCategory />} />
             <Route path={ROUTES.editCategory} element={<AddCategory />} />
@@ -119,6 +119,10 @@ function App() {
             <Route path={ROUTES.profile} element={<ProfilePage />} />
 
             <Route path={ROUTES.users} element={<UserList />} />
+
+            <Route path={ROUTES.vendors} element={<VendorList />} />
+            <Route path={ROUTES.vendorCreate} element={<AddVendor />} />
+            <Route path={ROUTES.vendorEdit} element={<AddVendor />} />
             {/* Worked by Kshitish on routes end */}
 
             <Route
@@ -133,13 +137,8 @@ function App() {
               path="/admin/users/:userId/edit"
               element={<EditUserPage />}
             />
-            <Route path={ROUTES.vendors} element={<VendorListPage />} />
+
             <Route path={ROUTES.vendorsNew} element={<AddWarehousePage />} />
-            <Route path={ROUTES.vendorsCreate} element={<AddVendorPage />} />
-            <Route
-              path="/admin/vendors/:vendorId/edit"
-              element={<EditVendorPage />}
-            />
             <Route
               path="/admin/vendors/:vendorId/warehouses"
               element={<WarehouseListPage />}

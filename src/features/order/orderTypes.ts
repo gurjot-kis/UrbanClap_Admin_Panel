@@ -1,11 +1,15 @@
 export type OrderStatus =
+  | 'payment_pending'
   | 'pending'
   | 'confirmed'
   | 'processing'
+  | 'packed'
   | 'shipped'
+  | 'out_for_delivery'
   | 'delivered'
+  | 'returned'
   | 'cancelled'
-  | 'completed'
+  | 'completed';
 
 export type PaymentMethod = 'cod' | 'online'
 

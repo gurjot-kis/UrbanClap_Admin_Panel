@@ -187,24 +187,24 @@ export default function UserList(): React.ReactElement {
         </div>
       ),
     },
-    {
-      key: "actions",
-      header: "Actions",
-      headerClassName: "text-end",
-      cellClassName: "text-end",
-      render: (user) => (
-        <div className="user-table-actions">
-          <button
-            type="button"
-            className="user-table-action-btn"
-            title="Edit User"
-            onClick={() => navigate(`/admin/users/${user.user_id}/edit`)}
-          >
-            <MdModeEdit size={18} />
-          </button>
-        </div>
-      ),
-    },
+    // {
+    //   key: "actions",
+    //   header: "Actions",
+    //   headerClassName: "text-end",
+    //   cellClassName: "text-end",
+    //   render: (user) => (
+    //     <div className="user-table-actions">
+    //       <button
+    //         type="button"
+    //         className="user-table-action-btn"
+    //         title="Edit User"
+    //         onClick={() => navigate(`/admin/users/${user.user_id}/edit`)}
+    //       >
+    //         <MdModeEdit size={18} />
+    //       </button>
+    //     </div>
+    //   ),
+    // },
   ];
 
   return (

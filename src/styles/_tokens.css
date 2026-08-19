@@ -1,0 +1,108 @@
+/* _tokens.css
+   ------------------------------------------------------------------
+   Shared design tokens for the real-estate platform's forms
+   (CreateCategory, CreateProductForm, and anything built after them).
+
+   Load this ONCE, globally (e.g. styles.css / angular.json "styles"
+   array) before any component-level CSS. Angular's default
+   ViewEncapsulation.Emulated does not create real Shadow DOM, so
+   :root custom properties defined here are visible to every
+   component — component files below just alias these into their
+   own local variable names, so nothing else about them had to
+   change.
+
+   Note on the merge: CreateCategory and CreateProductForm previously
+   shipped two unrelated palettes (a cool violet/teal system vs. a
+   warm pine/brass one) and two display faces (Sora vs. Fraunces).
+   This file picks ONE system — the cool violet/teal palette — as the
+   single source of truth; --color-highlight (brass) is kept on as a
+   secondary accent so the product tag price still stands out.
+   ------------------------------------------------------------------ */
+
+@import url("https://fonts.googleapis.com/css2?family=Sora:wght@500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap");
+
+:root {
+  /* ---------- Color: neutrals ---------- */
+  --color-bg: #f5f5fb;
+  --color-surface: #ffffff;
+  --color-border: #e7e6f3;
+  --color-ink: #191a2b;
+  --color-ink-soft: #5c5d75;
+  --color-muted: #8b8ca3;
+
+  /* ---------- Color: brand / primary ---------- */
+  --color-primary: #6c5ce7;
+  --color-primary-dark: #5546d6;
+  --color-primary-soft: #efecfe;
+
+  /* ---------- Color: accent (success / active state) ---------- */
+  --color-accent: #17b897;
+  --color-accent-dark: #129a80;
+  --color-accent-soft: #e3f7f1;
+
+  /* ---------- Color: secondary accent (was product's "brass") ---------- */
+  --color-highlight: #c08a3e;
+  --color-highlight-dark: #a8752f;
+  --color-highlight-soft: #f7ecd9;
+
+  /* ---------- Color: feedback ---------- */
+  --color-danger: #e5484d;
+  --color-danger-soft: #fdecec;
+  --color-danger-border: #f6c4c5;
+  --color-danger-ink: #a4232a;
+
+  --color-success-soft: #eafaf4;
+  --color-success-border: #b9ecd9;
+  --color-success-ink: #146c53;
+
+  /* ---------- Shadow ---------- */
+  --shadow-rgb: 37, 24, 110;
+  --shadow-sm: 0 4px 14px -6px rgba(var(--shadow-rgb), 0.12);
+  --shadow-md: 0 12px 32px -12px rgba(var(--shadow-rgb), 0.14);
+  --shadow-lg:
+    0 1px 2px rgba(var(--shadow-rgb), 0.05),
+    0 12px 32px -16px rgba(var(--shadow-rgb), 0.18);
+
+  /* ---------- Radius ---------- */
+  --radius-8: 8px;
+  --radius-9: 9px;
+  --radius-10: 10px;
+  --radius-11: 11px;
+  --radius-12: 12px;
+  --radius-14: 14px;
+  --radius-16: 16px;
+  --radius-20: 20px;
+  --radius-full: 999px;
+  --radius-circle: 50%;
+
+  /* ---------- Font families ---------- */
+  --font-display: "Sora", "Segoe UI", sans-serif;
+  --font-body: "Inter", "Segoe UI", sans-serif;
+  --font-mono: "JetBrains Mono", "Courier New", monospace;
+
+  /* ---------- Font weights ---------- */
+  --fw-regular: 400;
+  --fw-medium: 500;
+  --fw-semibold: 600;
+  --fw-bold: 700;
+
+  /* ---------- Font size scale ---------- */
+  --fs-10: 10px;
+  --fs-10-5: 10.5px;
+  --fs-11: 11px;
+  --fs-11-5: 11.5px;
+  --fs-12: 12px;
+  --fs-12-5: 12.5px;
+  --fs-13: 13px;
+  --fs-13-5: 13.5px;
+  --fs-14: 14px;
+  --fs-14-5: 14.5px;
+  --fs-15: 15px;
+  --fs-18: 18px;
+  --fs-19: 19px;
+  --fs-21: 21px;
+  --fs-22: 22px;
+  --fs-26: 26px;
+  --fs-32: 32px;
+  --fs-34: 34px;
+}
