@@ -1,8 +1,8 @@
 import React from 'react';
 import { Outlet } from 'react-router-dom';
 import Sidebar from './Sidebar';
-import Navbar from './Navbar';
-import { LayoutProvider } from './LayoutContext';
+import Navbar from '../Navbar';
+import { LayoutProvider } from '../LayoutContext';
 
 export default function Layout(): React.ReactElement {
   return (

@@ -20,13 +20,22 @@ import {
 } from "../../features/chat/chatSlice";
 import type { Message } from "../../features/chat/chatTypes";
 import { chatApi, useLazyGetMessagesQuery } from "../../features/chat/chatApi";
-import VendorLayout from "../../components/vendor/VendorLayout";
+import { useHeader } from "../../layout/LayoutContext";
 import "../../styles/Chat.css";
 
 function VendorSupportPage() {
   const dispatch = useAppDispatch();
   const vendorToken = getStoredToken();
   const vendorUser = getStoredUser();
+  const { setHeaderConfig } = useHeader();
+
+  useEffect(() => {
+    setHeaderConfig({
+      title: "Support",
+      subtitle: "Get in touch with customer service and resolve issues.",
+      backTo: null,
+    });
+  }, [setHeaderConfig]);
 
   const [getMessages] = useLazyGetMessagesQuery();
 
@@ -288,9 +297,7 @@ function VendorSupportPage() {
   }, [vendorToken, dispatch, getMessages]);
 
   return (
-    <VendorLayout title="Support">
-      <ChatLayout />
-    </VendorLayout>
+    <ChatLayout />
   );
 }
 

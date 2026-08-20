@@ -8,6 +8,7 @@ import { getStoredToken, getStoredUser, setAuthSession } from "../utils/auth";
 import { getPostLoginRoute } from "../utils/roles";
 import { useAppDispatch } from "../store/hooks";
 import { setCredentials } from "../features/auth/authSlice";
+import { setRole } from "../features/auth/roleSlice";
 import { useAdminLoginMutation } from "../features/auth/authApi";
 import "../styles/LoginPage.css";
 
@@ -88,6 +89,9 @@ export default function LoginPage(): React.ReactElement {
           token: authUser.token,
         }),
       );
+
+      // Sync Redux Role Store
+      dispatch(setRole(authUser.role as "SuperAdmin" | "Vendor"));
 
       toast.success("Login successful");
 

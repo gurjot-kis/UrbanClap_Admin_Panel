@@ -1,7 +1,7 @@
 import React, { useEffect } from "react";
-import { useGetDashboardQuery } from "../features/dashboard/dashboardApi";
-import "../styles/dashboard/dashboard.css";
-import { useHeader } from "../layout/LayoutContext";
+import { useGetDashboardQuery } from "../../features/dashboard/dashboardApi";
+import "../../styles/dashboard/admin_dashboard.css";
+import { useHeader } from "../../layout/LayoutContext";
 
 const Icons = {
   Wallet: () => (

@@ -1,12 +1,16 @@
-import { baseApi } from "../../store/api/baseApi"
+import { baseApi } from "../../store/api/baseApi";
 import type {
   GetAdminProfileResponse,
+  GetVendorProfileResponse,
   UpdateAdminProfilePayload,
   UpdateAdminProfileResponse,
-} from "./profileTypes"
+  UpdateVendorProfilePayload,
+  UpdateVendorProfileResponse,
+} from "./profileTypes";
 
 export const profileApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
+    // Admin Profile
     getAdminProfile: builder.query<GetAdminProfileResponse, void>({
       query: () => ({
         url: "/admin/profile",
@@ -32,10 +36,39 @@ export const profileApi = baseApi.injectEndpoints({
       },
       invalidatesTags: ["Profile"],
     }),
+
+    // Vendor Profile
+    getVendorProfile: builder.query<GetVendorProfileResponse, void>({
+      query: () => ({
+        url: "/vendors/profile",
+        method: "GET",
+      }),
+      extraOptions: {
+        requiresAuth: true,
+      },
+      providesTags: ["Profile"],
+    }),
+
+    updateVendorProfile: builder.mutation<
+      UpdateVendorProfileResponse,
+      UpdateVendorProfilePayload
+    >({
+      query: (payload) => ({
+        url: "/vendors/profile",
+        method: "PATCH",
+        body: payload,
+      }),
+      extraOptions: {
+        requiresAuth: true,
+      },
+      invalidatesTags: ["Profile"],
+    }),
   }),
-})
+});
 
 export const {
   useGetAdminProfileQuery,
   useUpdateAdminProfileMutation,
-} = profileApi
+  useGetVendorProfileQuery,
+  useUpdateVendorProfileMutation,
+} = profileApi;

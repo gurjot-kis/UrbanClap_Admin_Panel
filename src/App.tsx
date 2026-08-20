@@ -4,36 +4,18 @@ import {
   AdminProtectedRoute,
   VendorProtectedRoute,
 } from "./components/ProtectedRoute";
-import DashboardPage from "./pages/DashboardPage";
-import SubCategoryPage from "./pages/SubCategoryPage";
-import AddUserPage from "./pages/AddUserPage";
-import EditUserPage from "./pages/EditUserPage";
+import { VENDOR_ROUTES, ROUTES } from "./routes";
+import DashboardPage from "./pages/admin/DashboardPage";
 import ProfilePage from "./pages/admin/profile/ProfilePage";
 import SupportPage from "./pages/SupportPage";
-import BannerPage from "./pages/BannerPage";
-import CartSettingsPage from "./pages/CartSettingsPage";
-import WarehouseListPage from "./pages/WarehouseListPage";
-import AddWarehousePage from "./pages/AddWarehousePage";
-import EditWarehousePage from "./pages/EditWarehousePage";
 import LoginPage from "./pages/LoginPage";
 import ForgotPasswordPage from "./pages/ForgotPasswordPage";
 import VerifyOtpPage from "./pages/VerifyOtpPage";
 import ResetPasswordPage from "./pages/ResetPasswordPage";
-import VendorDashboardPage from "./pages/vendor/VendorDashboardPage";
 import VendorProfilePage from "./pages/vendor/VendorProfilePage";
-import VendorCategoryPage from "./pages/vendor/VendorCategoryPage";
-import VendorSubCategoryPage from "./pages/vendor/VendorSubCategoryPage";
-import VendorProductListPage from "./pages/vendor/VendorProductListPage";
-import VendorAddProductPage from "./pages/vendor/VendorAddProductPage";
-import VendorEditProductPage from "./pages/vendor/VendorEditProductPage";
-import VendorWarehouseListPage from "./pages/vendor/VendorWarehouseListPage";
-import VendorAddWarehousePage from "./pages/vendor/VendorAddWarehousePage";
-import VendorEditWarehousePage from "./pages/vendor/VendorEditWarehousePage";
-import VendorCartSettingsPage from "./pages/vendor/VendorCartSettingsPage";
 import VendorSupportPage from "./pages/vendor/VendorSupportPage";
-import { VENDOR_ROUTES, ROUTES } from "./routes";
 import CategoryList from "./pages/admin/category/CategoryList";
-import Layout from "./layout/Layout";
+import Layout from "./layout/admin/Layout";
 import AddCategory from "./pages/admin/category/AddCategory";
 import { CustomToaster } from "./components/common/CustomToaster";
 import ProductList from "./pages/admin/product/ProductList";
@@ -44,6 +26,9 @@ import OrderDetails from "./pages/admin/orders/OrderDetails";
 import UserList from "./pages/admin/user/UserList";
 import VendorList from "./pages/admin/vendor/VendorList";
 import AddVendor from "./pages/admin/vendor/AddVendor";
+import VendorDashboardPage from "./pages/vendor/VendorDashboardPage";
+import VendorLayout from "./layout/vendor/VendorLayout";
+import VendorSlotList from "./pages/vendor/vendorSlot/VendorSlotList";
 
 function App() {
   return (
@@ -56,52 +41,19 @@ function App() {
         <Route path={ROUTES.verifyOtp} element={<VerifyOtpPage />} />
         <Route path={ROUTES.resetPassword} element={<ResetPasswordPage />} />
         <Route element={<VendorProtectedRoute />}>
-          <Route
-            path={VENDOR_ROUTES.dashboard}
-            element={<VendorDashboardPage />}
-          />
-          <Route path={VENDOR_ROUTES.profile} element={<VendorProfilePage />} />
-          <Route
-            path={VENDOR_ROUTES.categories}
-            element={<VendorCategoryPage />}
-          />
-          <Route
-            path="/vendor/sub-categories/:categoryId"
-            element={<VendorSubCategoryPage />}
-          />
-          <Route
-            path={VENDOR_ROUTES.products}
-            element={<VendorProductListPage />}
-          />
-          <Route
-            path={VENDOR_ROUTES.productsNew}
-            element={<VendorAddProductPage />}
-          />
-          <Route
-            path="/vendor/products/:productId/edit"
-            element={<VendorEditProductPage />}
-          />
-          <Route
-            path={VENDOR_ROUTES.warehouses}
-            element={<VendorWarehouseListPage />}
-          />
-          <Route
-            path={VENDOR_ROUTES.warehousesNew}
-            element={<VendorAddWarehousePage />}
-          />
-          <Route
-            path="/vendor/warehouses/:warehouseId/edit"
-            element={<VendorEditWarehousePage />}
-          />
-          <Route
-            path={VENDOR_ROUTES.cartSettings}
-            element={<VendorCartSettingsPage />}
-          />
-          <Route path={VENDOR_ROUTES.support} element={<VendorSupportPage />} />
+          <Route element={<VendorLayout />}>
+            <Route
+              path={VENDOR_ROUTES.dashboard}
+              element={<VendorDashboardPage />}
+            />
+            <Route path={VENDOR_ROUTES.profile} element={<VendorProfilePage />} />
+            <Route path={VENDOR_ROUTES.support} element={<VendorSupportPage />} />
+
+            <Route path={VENDOR_ROUTES.slots} element={<VendorSlotList/>}/>
+          </Route>
         </Route>
         <Route element={<AdminProtectedRoute />}>
           <Route element={<Layout />}>
-            {/* Worked by Kshitish on routes start */}
             <Route path={ROUTES.dashboard} element={<DashboardPage />} />
 
             <Route path={ROUTES.categories} element={<CategoryList />} />
@@ -117,40 +69,12 @@ function App() {
             <Route path={ROUTES.orderDetails} element={<OrderDetails />} />
 
             <Route path={ROUTES.profile} element={<ProfilePage />} />
-
             <Route path={ROUTES.users} element={<UserList />} />
 
             <Route path={ROUTES.vendors} element={<VendorList />} />
             <Route path={ROUTES.vendorCreate} element={<AddVendor />} />
             <Route path={ROUTES.vendorEdit} element={<AddVendor />} />
-            {/* Worked by Kshitish on routes end */}
 
-            <Route
-              path="/admin/sub-categories/:categoryId"
-              element={<SubCategoryPage />}
-            />
-
-            <Route path={ROUTES.banners} element={<BannerPage />} />
-            <Route path={ROUTES.cartSettings} element={<CartSettingsPage />} />
-            <Route path={ROUTES.usersNew} element={<AddUserPage />} />
-            <Route
-              path="/admin/users/:userId/edit"
-              element={<EditUserPage />}
-            />
-
-            <Route path={ROUTES.vendorsNew} element={<AddWarehousePage />} />
-            <Route
-              path="/admin/vendors/:vendorId/warehouses"
-              element={<WarehouseListPage />}
-            />
-            <Route
-              path="/admin/vendors/:vendorId/warehouses/new"
-              element={<AddWarehousePage />}
-            />
-            <Route
-              path="/admin/vendors/:vendorId/warehouses/:warehouseId/edit"
-              element={<EditWarehousePage />}
-            />
             <Route path={ROUTES.support} element={<SupportPage />} />
           </Route>
         </Route>
