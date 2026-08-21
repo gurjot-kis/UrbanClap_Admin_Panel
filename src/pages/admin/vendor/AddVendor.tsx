@@ -9,7 +9,7 @@ import {
 import { useGetActiveCategoriesQuery } from "../../../features/category/categoryApi";
 import { flattenForParentOptions } from "../../../features/category/categoryHelpers";
 import type { FlatCategoryOption } from "../../../features/category/categoryTypes";
-import "../../../styles/admin_vendor/AddVendor.css";
+import "../../../styles/vendor/AddVendor.css";
 import { FullScreenLoader } from "../../../components/common/FullScreenLoader";
 
 /* -------------------------------------------------------------------- */

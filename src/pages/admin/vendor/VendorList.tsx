@@ -20,7 +20,7 @@ import {
 } from "../../../components/common/DataTable/DataTable";
 import type { DataTableColumn } from "../../../components/common/DataTable/DataTable.types";
 import { useHeader } from "../../../layout/LayoutContext";
-import "../../../styles/admin_vendor/vendorList.css";
+import "../../../styles/vendor/vendorList.css";
 import { ConfirmationModal } from "../../../components/common/ConfirmationModal";
 
 const PAGE_LIMIT = 10;

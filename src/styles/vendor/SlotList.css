@@ -1,0 +1,141 @@
+/* SlotList.css
+   Slot-specific styles only.
+   cl-* classes (cl-actions, cl-icon-btn, cl-icon-btn--danger)
+   come from CategoryList.css — import that file too.
+   ------------------------------------------------------------------ */
+
+/* ── Primary cell: icon box + text ─────────────────────────────────── */
+
+.sl-icon-cell {
+  width: 34px;
+  height: 34px;
+  border-radius: 8px;
+  flex-shrink: 0;
+  background: #f1f4f8;
+  border: 1px solid #e5e9ed;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #667685;         /* same neutral-dark as cl-thumb-fallback */
+}
+
+.sl-primary-text {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  min-width: 0;
+}
+
+.sl-name {
+  font-weight: 600;
+  color: #1e2a35;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* ── Slot type pill (matches cl-level-tag spirit) ───────────────────── */
+
+.sl-type-wrap {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+.sl-type-pill {
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  text-transform: capitalize;
+  padding: 2px 8px;
+  border-radius: 6px;
+  background: #f1f4f8;    /* same as cl-level-tag--3 */
+  color: #667685;
+  border: 1px solid #e0e6ec;
+}
+
+/* ── Meta cells: date, time, coords ────────────────────────────────── */
+
+.sl-meta-cell {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.82rem;
+  color: #4a5568;
+  white-space: nowrap;
+}
+
+.sl-meta-icon {
+  color: #a7b1ba;         /* same muted tone as cl-thumb-fallback */
+  flex-shrink: 0;
+}
+
+.sl-coords {
+  font-family: "SF Mono", "Fira Mono", "Consolas", monospace;
+  font-size: 0.76rem;
+  color: #5a6a78;
+}
+
+/* ── Status badge (static — never a toggle) ─────────────────────────── */
+
+.sl-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  text-transform: capitalize;
+  padding: 4px 10px;
+  border-radius: 6px;
+  white-space: nowrap;
+  line-height: 1;
+}
+
+.sl-status-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+/* available — green */
+.sl-status--available {
+  background: #e6f4ec;
+  color: #1a7a41;
+  border: 1px solid #b6dfc8;
+}
+.sl-status--available .sl-status-dot { background: #1a7a41; }
+
+/* booked — amber */
+.sl-status--booked {
+  background: #fff4e0;
+  color: #a05c00;
+  border: 1px solid #f5d28a;
+}
+.sl-status--booked .sl-status-dot { background: #e07800; }
+
+/* cancelled — red */
+.sl-status--cancelled {
+  background: #fdf1f1;
+  color: #b03030;
+  border: 1px solid #f0baba;
+}
+.sl-status--cancelled .sl-status-dot { background: #b03030; }
+
+/* expired — gray */
+.sl-status--expired {
+  background: #f1f4f8;
+  color: #667685;
+  border: 1px solid #d5dde5;
+}
+.sl-status--expired .sl-status-dot { background: #a7b1ba; }
+
+/* ── Responsive ─────────────────────────────────────────────────────── */
+
+@media (max-width: 767px) {
+  .sl-icon-cell {
+    width: 30px;
+    height: 30px;
+  }
+}

@@ -1,12 +1,17 @@
 import { baseApi } from "../../store/api/baseApi";
 import type {
+  AddVendorSlotPayload,
+  AddVendorSlotResponse,
   CreateVendorPayload,
   GetVendorByIdResponse,
+  GetVendorSlotsParams,
+  GetVendorSlotsResponse,
   GetVendorsParams,
   GetVendorsResponse,
   UpdateVendorAvailabilityPayload,
   UpdateVendorPayload,
   UpdateVendorResponse,
+  UpdateVendorSlotAvailabilityResponse,
   UpdateVendorStatusPayload,
   UpdateVendorVerificationPayload,
 } from "./vendorTypes";
@@ -168,6 +173,70 @@ export const vendorApi = baseApi.injectEndpoints({
       extraOptions: { requiresAuth: true },
       invalidatesTags: ["Vendor"],
     }),
+
+    // vendor slot apis
+    addVendorSlot: builder.mutation<
+      AddVendorSlotResponse,
+      AddVendorSlotPayload
+    >({
+      query: (payload) => ({
+        url: "/vendor-slots",
+        method: "POST",
+        body: payload,
+      }),
+
+      extraOptions: {
+        requiresAuth: true,
+      },
+
+      invalidatesTags: ["VendorSlot"],
+    }),
+
+    getMyVendorSlots: builder.query<
+      GetVendorSlotsResponse,
+      GetVendorSlotsParams
+    >({
+      query: ({ page, limit }) => {
+        const queryParams = new URLSearchParams();
+
+        if (page !== undefined) {
+          queryParams.set("page", String(page));
+        }
+
+        if (limit !== undefined) {
+          queryParams.set("limit", String(limit));
+        }
+
+        const qs = queryParams.toString();
+
+        return {
+          url: `/vendor-slots/my-slots${qs ? `?${qs}` : ""}`,
+          method: "GET",
+        };
+      },
+
+      extraOptions: {
+        requiresAuth: true,
+      },
+
+      providesTags: ["VendorSlot"],
+    }),
+
+    updateVendorSlotAvailability: builder.mutation<
+      UpdateVendorSlotAvailabilityResponse,
+      string
+    >({
+      query: (slotId) => ({
+        url: `/vendor-slots/${slotId}/availability`,
+        method: "PATCH",
+      }),
+
+      extraOptions: {
+        requiresAuth: true,
+      },
+
+      invalidatesTags: ["VendorSlot"],
+    }),
   }),
 });
 
@@ -179,5 +248,9 @@ export const {
   useUpdateVendorStatusMutation,
   useUpdateVendorVerificationMutation,
   useUpdateVendorAvailabilityMutation,
-  useDeleteVendorMutation
+  useDeleteVendorMutation,
+  //vendor slot
+  useAddVendorSlotMutation,
+  useGetMyVendorSlotsQuery,
+  useUpdateVendorSlotAvailabilityMutation,
 } = vendorApi;

@@ -121,3 +121,69 @@ export interface UpdateVendorPayload {
     pincode: string;
   }[];
 }
+
+// Vendor Slot interfaces
+export interface VendorSlotLocation {
+  type: string;
+  coordinates: [number, number];
+}
+
+export interface AddVendorSlotPayload {
+  category_id: string;
+  date: string;
+  startTime: string;
+  endTime: string;
+  location: {
+    coordinates: [number, number];
+  };
+}
+
+export interface AddVendorSlotResponse {
+  success: boolean;
+  code: number;
+  message: string;
+  data: unknown;
+}
+
+export interface VendorSlot {
+  _id: string;
+  vendor_id: string;
+  category_id: string;
+  categoryName: string;
+  slotType: string[];
+  date: string;
+  startTime: string;
+  endTime: string;
+  location: VendorSlotLocation;
+  status: string;
+  booking_id: string | null;
+}
+
+export interface VendorSlotPagination {
+  total: number;
+  page: number;
+  limit: number;
+  totalPages: number;
+  hasNextPage: boolean;
+  hasPrevPage: boolean;
+}
+
+export interface GetVendorSlotsResponse {
+  success: boolean;
+  statusCode: number;
+  message: string;
+  data: VendorSlot[];
+  pagination: VendorSlotPagination;
+}
+
+export interface GetVendorSlotsParams {
+  page?: number;
+  limit?: number;
+}
+
+export interface UpdateVendorSlotAvailabilityResponse {
+  success: boolean;
+  code: number;
+  message: string;
+  data: VendorSlot;
+}

@@ -90,7 +90,8 @@ export const DataTableStatusToggle = ({
       <span className="dt-switch-thumb" />
     </span>
     <span className="dt-switch-label">
-      {isUpdating ? "…" : active ? activeLabel : inactiveLabel}
+      {/* {isUpdating ? "…" : active ? activeLabel : inactiveLabel} */}
+      {active ? activeLabel : inactiveLabel}
     </span>
   </button>
 );

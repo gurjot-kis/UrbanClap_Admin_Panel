@@ -258,7 +258,7 @@
 .dt-switch-label {
   font-size: 0.72rem;
   font-weight: 700;
-  min-width: 46px;
+  min-width: 76px;
   text-align: left;
 }
 .dt-switch--on .dt-switch-label {

@@ -1,6 +1,3 @@
-/* AddVendor.css
-   Mirrors CategoryForm's cc- structure under an av- prefix.
-   Consumes tokens from _tokens.css — load that globally first. */
 
 .av-page {
   min-height: 100vh;

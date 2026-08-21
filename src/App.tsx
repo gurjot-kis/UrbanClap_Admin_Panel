@@ -28,7 +28,8 @@ import VendorList from "./pages/admin/vendor/VendorList";
 import AddVendor from "./pages/admin/vendor/AddVendor";
 import VendorDashboardPage from "./pages/vendor/VendorDashboardPage";
 import VendorLayout from "./layout/vendor/VendorLayout";
-import VendorSlotList from "./pages/vendor/vendorSlot/VendorSlotList";
+import VendorSlotList from "./pages/vendor/vendorSlot/SlotList";
+import VendorSlotAdd from "./pages/vendor/vendorSlot/AddSlot";
 
 function App() {
   return (
@@ -50,6 +51,7 @@ function App() {
             <Route path={VENDOR_ROUTES.support} element={<VendorSupportPage />} />
 
             <Route path={VENDOR_ROUTES.slots} element={<VendorSlotList/>}/>
+            <Route path={VENDOR_ROUTES.addSlot} element={<VendorSlotAdd/>}/>
           </Route>
         </Route>
         <Route element={<AdminProtectedRoute />}>
